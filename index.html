@@ -1990,20 +1990,60 @@ function renderEnemy(){
   // Show death state
   const actBtns=document.querySelector('.act-btns');
   if(actBtns){actBtns.querySelectorAll('button').forEach(b=>b.disabled=G.dead);}
-  // Enemy specials display
+  // Enemy specials display — 可点击查看详情
   let specialsHtml='';
   if(e.specials&&e.specials.length>0){
-    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal)">';
-    for(const sp of e.specials){specialsHtml+=`${sp.icon||''}${sp.name||''} `;}
+    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal);display:flex;flex-wrap:wrap;gap:4px">';
+    for(const sp of e.specials){
+      specialsHtml+=`<span class="enemy-special-tag" data-sp-id="${sp.id}" style="background:rgba(16,185,129,0.15);border:1px solid var(--green);border-radius:12px;padding:1px 6px;cursor:pointer;white-space:nowrap">${sp.icon||''}${sp.name||''}</span>`;
+    }
     specialsHtml+='</div>';
   }
   // Skill display
-  if(e.skill){specialsHtml+=`<div style="font-size:10px;color:var(--purple);margin-top:2px">${e.skill.icon||''}技能：${e.skill.name||''}</div>`;}
+  if(e.skill){
+    specialsHtml+=`<div style="margin-top:4px;font-size:10px;display:flex;gap:4px">`;
+    specialsHtml+=`<span class="enemy-skill-tag" data-skill-name="${e.skill.name}" data-skill-icon="${e.skill.icon||''}" data-skill-desc="${e.skill.desc}" data-skill-cd="${e.skill.cdMs}" style="background:rgba(167,139,250,0.15);border:1px solid var(--purple);border-radius:12px;padding:1px 6px;cursor:pointer;white-space:nowrap">${e.skill.icon||''}技能：${e.skill.name||''}</span>`;
+    specialsHtml+=`</div>`;
+  }
   // Insert into enemy card
   const cardEl=document.getElementById('enemy-card');
   let infoEl=document.getElementById('enemy-specials');
   if(!infoEl){infoEl=document.createElement('div');infoEl.id='enemy-specials';cardEl.appendChild(infoEl);}
   infoEl.innerHTML=specialsHtml;
+  // 绑定怪物特殊属性点击事件
+  bindEnemySpecialClicks();
+}
+function bindEnemySpecialClicks(){
+  document.querySelectorAll('.enemy-special-tag').forEach(tag=>{
+    tag.removeEventListener('click',onEnemySpecialClick);
+    tag.addEventListener('click',onEnemySpecialClick);
+  });
+  document.querySelectorAll('.enemy-skill-tag').forEach(tag=>{
+    tag.removeEventListener('click',onEnemySkillClick);
+    tag.addEventListener('click',onEnemySkillClick);
+  });
+}
+function onEnemySpecialClick(e){
+  e.stopPropagation();
+  const spId=e.currentTarget.dataset.spId;
+  const sp=ENEMY_SPECIALS.find(s=>s.id===spId);
+  if(!sp)return;
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
+  box.innerHTML=`<h3>${sp.icon} ${sp.name}</h3>
+    <div style="font-size:13px;line-height:1.8;margin-bottom:8px"><p>${sp.desc}</p></div>
+    <button class="btn btn-sm" style="width:100%" onclick="document.getElementById('modal-overlay').classList.remove('show')">关闭</button>`;
+}
+function onEnemySkillClick(e){
+  e.stopPropagation();
+  const tag=e.currentTarget;
+  const name=tag.dataset.skillName;
+  const icon=tag.dataset.skillIcon;
+  const desc=tag.dataset.skillDesc;
+  const cd=tag.dataset.skillCd;
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
+  box.innerHTML=`<h3>${icon} ${name}</h3>
+    <div style="font-size:13px;line-height:1.8;margin-bottom:8px"><p>${desc}</p><p style="font-size:11px;color:var(--muted);margin-top:4px">冷却时间：${Math.round(cd/1000)}秒</p></div>
+    <button class="btn btn-sm" style="width:100%" onclick="document.getElementById('modal-overlay').classList.remove('show')">关闭</button>`;
 }
 function renderBag(){
   // 更新装备格子数
