@@ -1390,6 +1390,7 @@ let G={
   curMap:'village',enemy:null,killStreak:0,
   quests:[],questRefreshTime:0,killAnyCount:0,
   killNormalCount:0,killEliteCount:0,killBossCount:0,
+  mapKills:{}, // 按地图和类型统计: {village:{normal:5,elite:2,boss:1}}
   autoAtk:false,autoSkill:false,autoEquip:false,
   kills:{},
   logs:[],maxLogs:50,
@@ -1751,6 +1752,12 @@ function onKill(){
   if(e.type==='boss')G.killBossCount++;
   else if(e.type==='elite')G.killEliteCount++;
   else G.killNormalCount++;
+  // 按地图统计
+  if(!G.mapKills)G.mapKills={};
+  if(!G.mapKills[G.curMap])G.mapKills[G.curMap]={normal:0,elite:0,boss:0};
+  if(e.type==='boss')G.mapKills[G.curMap].boss++;
+  else if(e.type==='elite')G.mapKills[G.curMap].elite++;
+  else G.mapKills[G.curMap].normal++;
   G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;
   gainXp(e.xp);gainGold(e.gold);
   if(G.curHpRegen)G.hp=Math.min(G.maxHp,G.hp+G.curHpRegen);
@@ -2388,7 +2395,8 @@ function renderMaps(){
     div.className='map-item'+(m.id===G.curMap?' active':'')+(locked?' locked':'');
     const allMonsters=[...m.monsters];if(m.elite)allMonsters.push(m.elite);if(m.boss)allMonsters.push(m.boss);
     const monList=allMonsters.map(x=>{const cls=x===m.boss?'map-boss':x===m.elite?'map-elite':'';return`<span class="${cls}">${x.icon}${x.name}</span>`;}).join('');
-    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''}</div><div class="map-desc" style="font-size:10px;color:var(--muted)">普通${G.killNormalCount||0} · 精英${G.killEliteCount||0} · BOSS${G.killBossCount||0} · 总${G.killAnyCount||0}</div><div class="map-monsters">${monList}</div></div>`;
+    const mk = G.mapKills&&G.mapKills[m.id] ? G.mapKills[m.id] : {normal:0,elite:0,boss:0};
+    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''}</div><div class="map-desc" style="font-size:10px;color:var(--muted)">普通${mk.normal} · 精英${mk.elite} · BOSS${mk.boss}</div><div class="map-monsters">${monList}</div></div>`;
     if(!locked)div.addEventListener('click',()=>changeMap(m.id));
     el.appendChild(div);
   }
@@ -3138,6 +3146,7 @@ function restoreGameData(d){
   G.killNormalCount = d.killNormalCount || 0;
   G.killEliteCount = d.killEliteCount || 0;
   G.killBossCount = d.killBossCount || 0;
+  G.mapKills = d.mapKills || {};
   G.quests = d.quests || [];
   G.skillBooks = d.skillBooks || [];
   G.materials = d.materials || {};
@@ -3291,6 +3300,7 @@ function buildSaveData(now_){
     killNormalCount: G.killNormalCount,
     killEliteCount: G.killEliteCount,
     killBossCount: G.killBossCount,
+    mapKills: G.mapKills,
     quests: G.quests,
     skillBooks: G.skillBooks,
     materials: G.materials,
