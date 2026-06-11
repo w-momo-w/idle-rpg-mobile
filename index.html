@@ -768,13 +768,11 @@ body{
           <div id="buff-bar"></div>
           <!-- 战斗技能 -->
           <div class="section-label">⚔️ 战斗技能</div>
-          <div class="act-btns" id="battle-skill-btns">
-            <button class="btn btn-red btn-lg" id="btn-attack">⚔️ 攻击</button>
-            <button class="btn btn-blue btn-lg" id="btn-skill">✨ 技能</button>
-            <button class="btn btn-purple" id="btn-skill2">📖 技能2</button>
-            <button class="btn btn-teal" id="btn-skill3" style="display:none">🔮 技能3</button>
-            <button class="btn btn-gold" id="btn-skill4" style="display:none">⚡ 技能4</button>
+          <div class="act-btns act-btns-sm" id="battle-skill-btns">
+            <button class="btn btn-red" id="btn-attack">⚔️ 攻击</button>
+            <button class="btn btn-blue" id="btn-skill">✨ 技能</button>
           </div>
+          <div class="act-btns act-btns-sm" id="extra-skill-btns"></div>
           <!-- 消耗品 -->
           <div class="section-label">🧪 消耗品</div>
           <div class="act-btns act-btns-sm" id="consumable-btns">
@@ -1306,17 +1304,17 @@ const QUEST_TEMPLATES=[
     const m=MAPS.find(x=>x.lv<=G.level)||MAPS[0];
     const allMon=[...m.monsters];if(m.elite)allMon.push(m.elite);if(m.boss)allMon.push(m.boss);
     const mo=pick(allMon);const tgt=randi(2,5)+Math.floor(G.level/10);
-    return{type:'kill',text:`在${m.name}击杀${tgt}只${mo.name}`,reward:genQuestReward(G,{gold:randi(40,120)*Math.floor(G.level/5+1),xp:randi(100,350)*Math.floor(G.level/5+1)}),mapId:m.id,monster:mo.name,target:tgt,progress:0,_startCount:(G.kills[mo.name]||0),submitted:false}}},
+    return{type:'kill',text:`在${m.name}击杀${tgt}只${mo.name}`,reward:genQuestReward(G,{gold:randi(40,120)*Math.floor(G.level/5+1),xp:randi(30,100)*Math.floor(G.level/5+1)}),mapId:m.id,monster:mo.name,target:tgt,progress:0,_startCount:(G.kills[mo.name]||0),submitted:false}}},
   {type:'collect_gold',gen:function(G){
     const tgt=randi(80,250)*Math.floor(G.level/3+1);
-    return{type:'collect_gold',text:`收集${tgt}金币`,reward:genQuestReward(G,{gold:randi(50,150)*Math.floor(G.level/5+1),xp:randi(80,250)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_goldCollected:0,submitted:false}}},
+    return{type:'collect_gold',text:`收集${tgt}金币`,reward:genQuestReward(G,{gold:randi(50,150)*Math.floor(G.level/5+1),xp:randi(25,80)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_goldCollected:0,submitted:false}}},
   {type:'collect_equip',gen:function(G){
     const q=Math.min(randi(0,Math.floor(G.level/30)),7);
     const tgt=randi(1,3);
     return{type:'collect_equip',text:`收集${tgt}件${QUALITY[q]}及以上品质装备（提交装备后完成任务）`,reward:genQuestReward(G,{gold:randi(80,250)*Math.floor(G.level/5+1)}),target:tgt,quality:q,progress:0,submitted:false}}},
   {type:'kill_any',gen:function(G){
     const tgt=randi(5,15)+Math.floor(G.level/5);
-    return{type:'kill_any',text:`击杀任意怪物${tgt}只`,reward:genQuestReward(G,{gold:randi(50,180)*Math.floor(G.level/5+1),xp:randi(100,300)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_startCount:(G.killAnyCount||0),submitted:false}}},
+    return{type:'kill_any',text:`击杀任意怪物${tgt}只`,reward:genQuestReward(G,{gold:randi(50,180)*Math.floor(G.level/5+1),xp:randi(30,90)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_startCount:(G.killAnyCount||0),submitted:false}}},
 ];
 
 function genQuestReward(G,base){
@@ -2381,10 +2379,44 @@ function renderSkills(){
   refreshSkillBtns();
 }
 function refreshSkillBtns(){
-  const b2=document.getElementById('btn-skill2');
-  if(G.skill2){b2.style.display='';b2.textContent='📖 '+G.skill2.name;b2.disabled=!canUseSkill(G.skill2);}else b2.style.display='none';
+  const extraEl=document.getElementById('extra-skill-btns');
+  if(!extraEl)return;
+  extraEl.innerHTML='';
+  const activeSkills=G.skills.filter(s=>!s.skillType||s.skillType==='active');
+  // 跳过前2个技能（攻击和技能按钮已占）
+  for(let i=2;i<activeSkills.length;i++){
+    const sk=activeSkills[i];
+    const btn=document.createElement('button');
+    btn.className='btn btn-purple';
+    const cdL=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;
+    btn.textContent=sk.icon+' '+sk.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');
+    btn.disabled=cdL>0||G.dead;
+    btn.addEventListener('click',(function(s){return function(){useSpecificSkill(s);};})(sk));
+    extraEl.appendChild(btn);
+  }
+  // 更新前两个按钮
   const s1=G.skills[0];const bs=document.getElementById('btn-skill');
-  if(s1){const cdL=s1.lastUsed?Math.max(0,s1.cdMs-(now()-s1.lastUsed)):0;bs.textContent='✨ '+s1.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');bs.disabled=cdL>0;}
+  if(s1){const cdL=s1.lastUsed?Math.max(0,s1.cdMs-(now()-s1.lastUsed)):0;bs.textContent='✨ '+s1.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');bs.disabled=cdL>0||G.dead;}
+}
+function useSpecificSkill(sk){
+  if(!canUseSkill(sk)||G.dead)return;
+  const e=G.enemy;if(!e)return;
+  let dmg=Math.floor(G.curAtk*sk.mult);
+  if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef));
+  else dmg=Math.max(1,dmg-Math.floor(e.def*0.3));
+  if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(e.def*0.3));}dmg=td;}
+  e.hp-=dmg;
+  if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');sk.lastUsed=now();renderAll();return;}
+  if(sk.type==='dot'){
+    e.dotDmg=Math.floor(G.curAtk*0.2);e.dotUntil=now()+5000;
+    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 伤害+5秒中毒`,'skill');
+  }else{
+    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
+  }
+  sk.lastUsed=now();
+  gainSkillXp(sk);
+  if(e.hp<=0)onKill();else enemyAttack();
+  renderAll();
 }
 function renderMaps(){
   const el=document.getElementById('map-list');
@@ -2711,7 +2743,19 @@ function showAdvModal(opts){
 }
 function refreshQuestUI(){
   const btn=document.getElementById('btn-refresh-quest');
-  if(btn)btn.disabled=now()-G.questRefreshTime<1800000;
+  if(!btn)return;
+  const elapsed=now()-G.questRefreshTime;
+  const cooldown=300000; // 5分钟
+  const left=Math.max(0,cooldown-elapsed);
+  if(left>0){
+    btn.disabled=true;
+    const m=Math.floor(left/60000);
+    const s=Math.floor((left%60000)/1000);
+    btn.textContent=`⏳ 刷新 (${m}:${String(s).padStart(2,'0')})`;
+  }else{
+    btn.disabled=false;
+    btn.textContent='🔄 刷新任务';
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -3470,7 +3514,6 @@ function showResetConfirmModal(){
 // ═══════════════════════════════════════════
 document.getElementById('btn-attack').addEventListener('click',()=>playerAttack(false));
 document.getElementById('btn-skill').addEventListener('click',()=>playerAttack(true));
-document.getElementById('btn-skill2').addEventListener('click',()=>{if(G.skill2&&canUseSkill(G.skill2)){const s=G.skill2;const e=G.enemy;if(!e)return;let dmg=Math.floor(G.curAtk*s.mult);if(s.ignoreDef)dmg=Math.floor(dmg*(1-s.ignoreDef));else dmg=Math.max(1,dmg-Math.floor(e.def*0.3));if(s.hits){let td=0;for(let i=0;i<s.hits;i++){const sub=Math.floor(G.curAtk*s.mult);td+=Math.max(1,sub-Math.floor(e.def*0.3));}dmg=td;}e.hp-=dmg;addLog(`📖 ${s.icon} ${s.name}！造成 ${dmg} 点伤害`,'skill');s.lastUsed=now();if(e.hp<=0)onKill();else enemyAttack();renderAll();}});
 document.getElementById('btn-change-map').addEventListener('click',()=>{
   // 在战斗页面显示地图选择弹窗
   const box=document.getElementById('modal-box');
@@ -3518,7 +3561,7 @@ document.getElementById('btn-bag-toggle').addEventListener('click',function(){
   renderBag();
 });
 const rqBtn=document.createElement('button');rqBtn.id='btn-refresh-quest';rqBtn.className='btn btn-green btn-xs';rqBtn.textContent='🔄 刷新任务';rqBtn.style.cssText='margin-top:6px;width:100%';
-rqBtn.addEventListener('click',()=>{if(now()-G.questRefreshTime>=1800000)refreshQuests();else{const left=Math.ceil((1800000-(now()-G.questRefreshTime))/60000);addLog('⏳ 每30分钟可刷新一次（剩余'+left+'分钟）','sys');}});
+rqBtn.addEventListener('click',()=>{if(now()-G.questRefreshTime>=300000)refreshQuests();else{const left=Math.ceil((300000-(now()-G.questRefreshTime))/60000);addLog('⏳ 每5分钟可刷新一次（剩余'+left+'分钟）','sys');}});
 const questPanel = document.getElementById('tab-page-quests');
 if(questPanel){
   const qb = questPanel.querySelector('.panel-bd');
