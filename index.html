@@ -1978,8 +1978,8 @@ function renderEnemy(){
   const e=G.enemy;if(!e)return;
   const card=document.getElementById('enemy-card');card.className=e.type==='boss'?'boss':e.type==='elite'?'elite':'';
   // Show level badge
-  document.getElementById('en-name').textContent=e.name+(e.level!==undefined?` (Lv.${e.level})`:'');
-  document.getElementById('en-lv-tag').textContent=e.type==='boss'?'Lv.'+e.level:e.type==='elite'?'Lv.'+e.level:'';
+  document.getElementById('en-name').textContent=e.name||'???';
+  document.getElementById('en-lv-tag').textContent=e.type==='boss'?'Lv.'+(e.level||1):e.type==='elite'?'Lv.'+(e.level||1):'';
   const typeTag=document.getElementById('en-type-tag');
   if(e.type==='boss'){typeTag.textContent='BOSS';typeTag.className='enemy-type-tag boss';}
   else if(e.type==='elite'){typeTag.textContent='精英';typeTag.className='enemy-type-tag elite';}
@@ -1994,11 +1994,11 @@ function renderEnemy(){
   let specialsHtml='';
   if(e.specials&&e.specials.length>0){
     specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal)">';
-    for(const sp of e.specials){specialsHtml+=`${sp.icon}${sp.name} `;}
+    for(const sp of e.specials){specialsHtml+=`${sp.icon||''}${sp.name||''} `;}
     specialsHtml+='</div>';
   }
   // Skill display
-  if(e.skill){specialsHtml+=`<div style="font-size:10px;color:var(--purple);margin-top:2px">${e.skill.icon}技能：${e.skill.name}</div>`;}
+  if(e.skill){specialsHtml+=`<div style="font-size:10px;color:var(--purple);margin-top:2px">${e.skill.icon||''}技能：${e.skill.name||''}</div>`;}
   // Insert into enemy card
   const cardEl=document.getElementById('enemy-card');
   let infoEl=document.getElementById('enemy-specials');
