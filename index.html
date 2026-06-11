@@ -1389,6 +1389,7 @@ let G={
   skills:[],skill2:null,
   curMap:'village',enemy:null,killStreak:0,
   quests:[],questRefreshTime:0,killAnyCount:0,
+  killNormalCount:0,killEliteCount:0,killBossCount:0,
   autoAtk:false,autoSkill:false,autoEquip:false,
   kills:{},
   logs:[],maxLogs:50,
@@ -1746,7 +1747,11 @@ function enemyAttack(){
 function onKill(){
   const e=G.enemy;addLog(`🎉 击杀 ${e.name}！获得 ${e.xp} 经验、${e.gold} 金币`,'die');
   G.killStreak++;
-  G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;G.killAnyCount++;
+  G.killAnyCount++;
+  if(e.type==='boss')G.killBossCount++;
+  else if(e.type==='elite')G.killEliteCount++;
+  else G.killNormalCount++;
+  G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;
   gainXp(e.xp);gainGold(e.gold);
   if(G.curHpRegen)G.hp=Math.min(G.maxHp,G.hp+G.curHpRegen);
   if(G.curSiphon)G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*G.curSiphon/100));
@@ -2383,7 +2388,7 @@ function renderMaps(){
     div.className='map-item'+(m.id===G.curMap?' active':'')+(locked?' locked':'');
     const allMonsters=[...m.monsters];if(m.elite)allMonsters.push(m.elite);if(m.boss)allMonsters.push(m.boss);
     const monList=allMonsters.map(x=>{const cls=x===m.boss?'map-boss':x===m.elite?'map-elite':'';return`<span class="${cls}">${x.icon}${x.name}</span>`;}).join('');
-    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''} ⚡击杀${G.killStreak}</div><div class="map-monsters">${monList}</div></div>`;
+    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''}</div><div class="map-desc" style="font-size:10px;color:var(--muted)">普通${G.killNormalCount||0} · 精英${G.killEliteCount||0} · BOSS${G.killBossCount||0} · 总${G.killAnyCount||0}</div><div class="map-monsters">${monList}</div></div>`;
     if(!locked)div.addEventListener('click',()=>changeMap(m.id));
     el.appendChild(div);
   }
@@ -3130,6 +3135,9 @@ function restoreGameData(d){
   G.autoHpSmall = !!d.autoHpSmall; G.autoHpLarge = !!d.autoHpLarge;
   G.learnedSkills = d.learnedSkills || {};
   G.killAnyCount = d.killAnyCount || 0;
+  G.killNormalCount = d.killNormalCount || 0;
+  G.killEliteCount = d.killEliteCount || 0;
+  G.killBossCount = d.killBossCount || 0;
   G.quests = d.quests || [];
   G.skillBooks = d.skillBooks || [];
   G.materials = d.materials || {};
@@ -3280,6 +3288,9 @@ function buildSaveData(now_){
     autoHpSmall: G.autoHpSmall, autoHpLarge: G.autoHpLarge,
     learnedSkills: G.learnedSkills,
     killAnyCount: G.killAnyCount,
+    killNormalCount: G.killNormalCount,
+    killEliteCount: G.killEliteCount,
+    killBossCount: G.killBossCount,
     quests: G.quests,
     skillBooks: G.skillBooks,
     materials: G.materials,
