@@ -1954,9 +1954,9 @@ function playerAttack(useSkill){
       addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
       computeStats();renderAll();return;
     }
-    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
     // 敌人弱化减伤（技能）
     if(e._dmgReduce){dmg=Math.floor(dmg*(1-e._dmgReduce));addLog(`🔻 ${e.name}的弱化使你伤害降低${Math.round(e._dmgReduce*100)}%`,'sys');}
+    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   }else{
     // 敌人减益效果
     let critChance=G.curCritRate;
@@ -1964,16 +1964,21 @@ function playerAttack(useSkill){
     isCrit=Math.random()*100<critChance;
     dmg=Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
     if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)dmg=Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.1));
-    if(isCrit){dmg=Math.floor(dmg*G.curCritDmg/100);addLog(`💥 暴击！造成 ${dmg} 点伤害`,'crit');}
-    else addLog(`⚔️ 普通攻击造成 ${dmg} 点伤害`,'hit');
-    // 敌人弱化减伤
+    // 先计算暴击，暂不输出日志
+    if(isCrit)dmg=Math.floor(dmg*G.curCritDmg/100);
+    // 敌人弱化减伤（在日志输出前应用）
     if(e._dmgReduce){dmg=Math.floor(dmg*(1-e._dmgReduce));addLog(`🔻 ${e.name}的弱化使你伤害降低${Math.round(e._dmgReduce*100)}%`,'sys');}
+    // 输出最终伤害日志
+    if(isCrit)addLog(`💥 暴击！造成 ${dmg} 点伤害`,'crit');
+    else addLog(`⚔️ 普通攻击造成 ${dmg} 点伤害`,'hit');
     // double attack
     if(G.curDoubleAtk&&Math.random()*100<G.curDoubleAtk){
       // 连击单独检查敌人闪避
       if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了连击！`,'sys');}
       else{
-        const d2=isCrit?Math.floor((Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5)))*G.curCritDmg/100):Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
+        let d2=isCrit?Math.floor((Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5)))*G.curCritDmg/100):Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
+        // 连击也受弱化减伤影响
+        if(e._dmgReduce)d2=Math.floor(d2*(1-e._dmgReduce));
         G.enemy.hp-=d2;addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
         // 连击触发吸血
         if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
@@ -2021,9 +2026,9 @@ function playerAttackWithSkill(sk){
     addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
     computeStats();renderAll();return;
   }
-  addLog(`📖 ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   // 敌人弱化减伤（skill2）
   if(e._dmgReduce){dmg=Math.floor(dmg*(1-e._dmgReduce));addLog(`🔻 ${e.name}的弱化使你伤害降低${Math.round(e._dmgReduce*100)}%`,'sys');}
+  addLog(`📖 ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   // lifesteal
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);}}
   G.enemy.hp-=dmg;
@@ -2042,8 +2047,12 @@ function playerAttackWithSkill(sk){
         Math.max(1,Math.floor(G.curAtk*sk.mult)-Math.floor(G.enemy.def*dr));
       if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*dr));}d2=td;}
       // 连击也能暴击
-      if(G.curCritRate&&Math.random()*100<G.curCritRate){d2=Math.floor(d2*G.curCritDmg/100);addLog(`💥 连击暴击！追加 ${d2} 点伤害`,'crit');}
-      else{addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');}
+      const d2Crit=G.curCritRate&&Math.random()*100<G.curCritRate;
+      if(d2Crit)d2=Math.floor(d2*G.curCritDmg/100);
+      // 连击也受弱化减伤影响
+      if(e._dmgReduce)d2=Math.floor(d2*(1-e._dmgReduce));
+      if(d2Crit)addLog(`💥 连击暴击！追加 ${d2} 点伤害`,'crit');
+      else addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
       G.enemy.hp-=d2;
       if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
       if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;playerDie('💀 被荆棘反弹致死！');}}
