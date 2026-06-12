@@ -1385,10 +1385,14 @@ const ENEMY_SPECIALS=[
   {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力大幅提升',apply(e){e.atk=Math.floor(e.atk*1.5);}},
   {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+60%',apply(e){e.def=Math.floor(e.def*1.6);}},
   {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复5%HP',isRegen:true,regenPct:0.05},
-  {id:'evasive',icon:'🌀',name:'闪避',desc:'25%闪避攻击',dodge:25},
-  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹30%伤害',thorns:30},
+  {id:'evasive',icon:'🌀',name:'闪避',desc:'35%闪避攻击',dodge:35},
+  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹40%伤害',thorns:40},
   {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血35%',lifesteal:35},
   {id:'tough',icon:'💪',name:'坚韧',desc:'生命+60%',apply(e){e.hp=Math.floor(e.hp*1.6);e.maxHp=e.hp;}},
+  // 新增进攻属性
+  {id:'accurate',icon:'🎯',name:'精准',desc:'命中率+30%（降低玩家闪避）',hitRate:30},
+  {id:'piercing',icon:'🗡️',name:'穿甲',desc:'无视40%玩家防御',armorPierce:40},
+  {id:'ferocious',icon:'🔥',name:'凶猛',desc:'暴击率+25%·暴伤180%',critRate:25,critDmg:180},
   // 减益效果
   {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害55%',dmgReduce:0.55},
   {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率45%',critReduce:45},
@@ -1804,6 +1808,10 @@ function genMonster(){
       if(sp.dodge)enemy._dodge=sp.dodge;
       if(sp.thorns)enemy._thorns=sp.thorns;
       if(sp.lifesteal)enemy._lifesteal=sp.lifesteal;
+      if(sp.hitRate)enemy._hitRate=sp.hitRate;
+      if(sp.armorPierce)enemy._armorPierce=sp.armorPierce;
+      if(sp.critRate)enemy._critRate=sp.critRate;
+      if(sp.critDmg)enemy._critDmg=sp.critDmg;
     }
   }
 
@@ -1820,6 +1828,10 @@ function genMonster(){
     if(sp1.dmgReduce)enemy._dmgReduce=sp1.dmgReduce;
     if(sp1.critReduce)enemy._critReduce=sp1.critReduce;
     if(sp1.atkSpdReduce)enemy._atkSpdReduce=sp1.atkSpdReduce;
+    if(sp1.hitRate)enemy._hitRate=sp1.hitRate;
+    if(sp1.armorPierce)enemy._armorPierce=sp1.armorPierce;
+    if(sp1.critRate)enemy._critRate=sp1.critRate;
+    if(sp1.critDmg)enemy._critDmg=sp1.critDmg;
     // 第二个属性：排除已选的
     const pool2=ENEMY_SPECIALS.filter(s=>s.id!==sp1.id);
     const sp2=pick(pool2);
@@ -1832,6 +1844,10 @@ function genMonster(){
     if(sp2.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp2.dmgReduce);
     if(sp2.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp2.critReduce);
     if(sp2.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp2.atkSpdReduce);
+    if(sp2.hitRate)enemy._hitRate=(enemy._hitRate||0)+sp2.hitRate;
+    if(sp2.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp2.armorPierce;
+    if(sp2.critRate)enemy._critRate=(enemy._critRate||0)+sp2.critRate;
+    if(sp2.critDmg)enemy._critDmg=Math.max(enemy._critDmg||0,sp2.critDmg);
   }
   if(type==='boss'){
     const shuffled=[...ENEMY_SPECIALS].sort(()=>Math.random()-0.5);
@@ -1846,6 +1862,10 @@ function genMonster(){
       if(sp.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp.dmgReduce);
       if(sp.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp.critReduce);
       if(sp.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp.atkSpdReduce);
+      if(sp.hitRate)enemy._hitRate=(enemy._hitRate||0)+sp.hitRate;
+      if(sp.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp.armorPierce;
+      if(sp.critRate)enemy._critRate=(enemy._critRate||0)+sp.critRate;
+      if(sp.critDmg)enemy._critDmg=Math.max(enemy._critDmg||0,sp.critDmg);
     }
     // Boss 70%概率额外附带一个减益效果
     if(Math.random()<0.7){
@@ -2079,15 +2099,37 @@ function enemyAttack(){
       G.buffs.slow={slow:e.skill.slow,until:now()+e.skill.slowDur*1000,icon:'❄️'};
     }
   }
-  // player dodge/block
-  if(!useEnemySkill&&G.curDodge&&Math.random()*100<G.curDodge){addLog(`🌀 闪避！躲过了${e.name}的攻击`,'sys');return;}
+  // player dodge/block — 怪物命中率降低玩家闪避
+  let playerDodge=G.curDodge;
+  if(e._hitRate)playerDodge=Math.max(0,playerDodge-e._hitRate);
+  if(!useEnemySkill&&playerDodge&&Math.random()*100<playerDodge){addLog(`🌀 闪避！躲过了${e.name}的攻击`,'sys');return;}
   if(!useEnemySkill&&G.curBlock&&Math.random()*100<G.curBlock){addLog(`🛡️ 格挡！${e.name}的攻击被格挡`,'sys');return;}
-  const dmg=useEnemySkill?enemySkillDmg:Math.max(1,e.atk-Math.floor(G.curDef*0.3));
+  let dmg;
+  if(useEnemySkill){
+    dmg=enemySkillDmg;
+  }else{
+    // 怪物穿甲：无视部分玩家防御
+    let effectiveDef=G.curDef;
+    if(e._armorPierce)effectiveDef=Math.floor(G.curDef*(1-e._armorPierce/100));
+    dmg=Math.max(1,e.atk-Math.floor(effectiveDef*0.3));
+  }
+  // 怪物暴击
+  let enemyCrit=false;
+  if(e._critRate&&Math.random()*100<e._critRate){
+    enemyCrit=true;
+    dmg=Math.floor(dmg*(e._critDmg||180)/100);
+  }
   // slow debuff
   if(useEnemySkill&&e.skill&&e.skill.slow)G._slowUntil=now()+e.skill.slowDur*1000;
   G.hp-=dmg;
   if(useEnemySkill)addLog(`${e.icon} ${e.name} 使用 ${e.skill.icon}${enemySkillName}！造成 ${dmg} 点伤害`,'boss');
-  else addLog(`${e.icon} ${e.name} 对你造成 ${dmg} 点伤害`,'hit');
+  else {
+    let parts=[`${e.icon} ${e.name} 对你造成 ${dmg} 点伤害`];
+    if(enemyCrit)parts.push('💥暴击');
+    if(e._armorPierce)parts.push('🗡️穿甲');
+    if(e._hitRate)parts.push('🎯精准');
+    addLog(parts.join(' '),'hit');
+  }
   // enemy lifesteal
   if(e._lifesteal&&G.enemy){const eh=Math.floor(dmg*e._lifesteal/100);e.hp=Math.min(e.maxHp,e.hp+eh);}
   // thorns
