@@ -2792,8 +2792,9 @@ function showItemModal(it,source,isEquipped,activeTab){
   const levelTooLow=!isEquipped&&it.reqLv&&G.level<it.reqLv;
   const elv=isEquipped?(G.slotEnhance[source]||0):0;
   const enhTag=elv>0?` <span style="color:var(--orange);font-size:13px;font-weight:bold">+${elv}</span>`:'';
-  const showPower=it.power||0;
-  let html=`<h3 class="${QCLASS[it.quality]}">${eqIcon(it.slot,it.classReq)} ${it.name}${enhTag}${classBadge}</h3><div style="margin-bottom:4px"><span style="background:${QCOLOR[it.quality]};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">${it.qName}</span> 战力：${showPower} · 需要Lv${it.reqLv||1}${cantEquip?' <span style="color:var(--red);font-size:10px">⚠️非本职业</span>':''}${levelTooLow?' <span style="color:var(--orange);font-size:10px">⚠️等级不足('+it.reqLv+')</span>':''}${elv>0?` · <span style="color:var(--orange);font-weight:bold">强化+${elv}</span>`:''}</div>`;
+  const showPower=(it.power||0)+(isEquipped?getEnhancePower(source):0);
+  const enhPowerDetail=isEquipped&&elv>0?` <span style="color:var(--orange);font-size:10px">(+${getEnhancePower(source)}强化)</span>`:'';
+  let html=`<h3 class="${QCLASS[it.quality]}">${eqIcon(it.slot,it.classReq)} ${it.name}${enhTag}${classBadge}</h3><div style="margin-bottom:4px"><span style="background:${QCOLOR[it.quality]};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">${it.qName}</span> 战力：${showPower}${enhPowerDetail} · 需要Lv${it.reqLv||1}${cantEquip?' <span style="color:var(--red);font-size:10px">⚠️非本职业</span>':''}${levelTooLow?' <span style="color:var(--orange);font-size:10px">⚠️等级不足('+it.reqLv+')</span>':''}${elv>0?` · <span style="color:var(--orange);font-weight:bold">强化+${elv}</span>`:''}</div>`;
   if(it.setName){
     // 查找该装备所属套装的激活情况
     const setBo=G._activeSetBonuses.find(b=>b.setId===it.setId);
