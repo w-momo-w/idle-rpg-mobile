@@ -4040,9 +4040,23 @@ function gameTick(){
     const atkSpdReduce=G.enemy._atkSpdReduce||0;
     const effectiveAtkSpd=Math.max(20,G.curAtkSpd+atkSpdReduce); // 攻速值越高越慢
     const spd=Math.max(800,(G._slowed?effectiveAtkSpd*1.5:effectiveAtkSpd)*10);
-    if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){G._lastAutoAtk=now();
-      if(G.autoSkill){const sk=G.skills.find(s=>canUseSkill(s));playerAttack(!!sk);}
-      else playerAttack(false);
+    if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){
+      // 自动战斗：交替进行普攻和技能，每次只做一个动作
+      if(G.autoSkill){
+        const sk=G.skills.find(s=>canUseSkill(s));
+        if(sk){
+          // 技能可用 → 放技能
+          G._lastAutoAtk=now();
+          playerAttack(true);
+        }else{
+          // 技能全在冷却 → 普攻
+          G._lastAutoAtk=now();
+          playerAttack(false);
+        }
+      }else{
+        G._lastAutoAtk=now();
+        playerAttack(false);
+      }
     }
   }
   // 为永久被动技能（cdMs=0, type=buff）自动刷新buff，防止10秒后过期
