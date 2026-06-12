@@ -1019,7 +1019,12 @@ const SETS=[
   {id:'wind_set',name:'疾风套装',bonus:{3:{atkSpd:20,critRate:5},5:{atkSpd:40,critRate:12},7:{atkSpd:65,critRate:22,critDmg:30}}},
   {id:'mage_set',name:'智慧套装',bonus:{3:{atk:12},5:{atk:28,hp:50},7:{atk:55,hp:120}}},
   {id:'shadow_set',name:'暗影套装',bonus:{3:{atk:5,critRate:8},5:{atk:15,critRate:18},7:{atk:30,critRate:30,critDmg:40}}},
-  {id:'holy_set',name:'圣光套装',bonus:{3:{def:8,hp:50},5:{def:18,hp:120},7:{def:35,hp:220}}}
+  {id:'holy_set',name:'圣光套装',bonus:{3:{def:8,hp:50},5:{def:18,hp:120},7:{def:35,hp:220}}},
+  {id:'dragon_set',name:'龙魂套装',bonus:{3:{atk:10,hp:30},5:{atk:22,def:10,critRate:5},7:{atk:40,def:20,hp:100,critRate:10}}},
+  {id:'phoenix_set',name:'凤凰套装',bonus:{3:{hp:60},5:{hp:150,def:10},7:{hp:300,def:25,atk:15}}},
+  {id:'frost_set',name:'冰霜套装',bonus:{3:{def:5,critRate:3},5:{def:15,critRate:8,dodge:5},7:{def:30,critRate:18,dodge:12}}},
+  {id:'thunder_set',name:'雷霆套装',bonus:{3:{atkSpd:15,critDmg:15},5:{atkSpd:35,critDmg:35},7:{atkSpd:60,critDmg:60,atk:20}}},
+  {id:'vampire_set',name:'吸血套装',bonus:{3:{atk:5,hp:20},5:{atk:12,hp:50,critRate:5},7:{atk:25,hp:120,critRate:15,critDmg:25}}},
 ];
 
 // Enhancement system: per-slot stat bonus per level
@@ -1869,6 +1874,8 @@ function renderTopBar(){
 }
 function getTotalPower(){
   let p=G.curAtk*5+G.curDef*3+G.maxHp*0.3+G.curCritRate*8+G.curDodge*6+G.curBlock*6+G.curLifesteal*8+G.curDoubleAtk*10;
+  // 加上装备基础战力
+  for(const k in G.equipped){const it=G.equipped[k];if(it)p+=(it.power||0);}
   return Math.floor(p);
 }
 function renderStats(){
@@ -2363,7 +2370,7 @@ function showItemModal(it,source,isEquipped){
   const levelTooLow=!isEquipped&&it.reqLv&&G.level<it.reqLv;
   const elv=isEquipped?(G.slotEnhance[source]||0):0;
   const enhTag=elv>0?` <span style="color:var(--orange);font-size:13px;font-weight:bold">+${elv}</span>`:'';
-  const showPower=it.power+(isEquipped?getEnhancePower(source):0);
+  const showPower=it.power||0;
   let html=`<h3 class="${QCLASS[it.quality]}">${eqIcon(it.slot,it.classReq)} ${it.name}${enhTag}${classBadge}</h3><div style="margin-bottom:4px"><span style="background:${QCOLOR[it.quality]};color:#fff;padding:1px 8px;border-radius:10px;font-size:11px">${it.qName}</span> 战力：${showPower} · 需要Lv${it.reqLv||1}${cantEquip?' <span style="color:var(--red);font-size:10px">⚠️非本职业</span>':''}${levelTooLow?' <span style="color:var(--orange);font-size:10px">⚠️等级不足('+it.reqLv+')</span>':''}${elv>0?` · <span style="color:var(--orange);font-weight:bold">强化+${elv}</span>`:''}</div>`;
   if(it.setName){
     // 查找该装备所属套装的激活情况
@@ -2402,7 +2409,7 @@ function showItemModal(it,source,isEquipped){
     // 当前装备属性
     const eqBasicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
     const eqBasicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
-    for(const k of eqBasicKeys){if(eqIt.stats[k])html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${eqIt.stats[k]}</span></div>`;}
+    for(const k of eqBasicKeys){if(eqIt.stats[k])html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${Math.round(eqIt.stats[k]*10)/10}</span></div>`;}
     if(eqIt.specials&&eqIt.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${eqIt.specials.map(sp=>sp.text).join(' ')}</div>`;}
     html+=`</div>`;
     // 新装备属性（带颜色比对）
@@ -2410,21 +2417,19 @@ function showItemModal(it,source,isEquipped){
         <div style="font-weight:bold;margin-bottom:4px;color:var(--purple)">🆕 新装备</div>
         <div style="font-weight:bold;color:${QCOLOR[it.quality]};margin-bottom:4px">${it.name}</div>
         <div style="font-size:9px;color:${it.reqLv&&G.level<it.reqLv?'var(--orange)':'var(--muted)'};margin-bottom:2px">需要 Lv${it.reqLv||1}</div>`;
-    for(const k of eqBasicKeys){if(it.stats[k]||(eqIt.stats[k]&&!it.stats[k])){const newV=it.stats[k]||0;const oldV=eqIt.stats[k]||0;const diff=newV-oldV;let cls='';if(diff>0)cls='color:var(--green)';else if(diff<0)cls='color:var(--red)';html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${newV} <span class="${cls}">${diff>0?'↑+':(diff<0?'↓':'')}${diff!==0?diff:''}</span></span></div>`;}}
+    for(const k of eqBasicKeys){if(it.stats[k]||(eqIt.stats[k]&&!it.stats[k])){const newV=it.stats[k]||0;const oldV=eqIt.stats[k]||0;const diff=newV-oldV;let cls='';if(diff>0.05)cls='color:var(--green)';else if(diff<-0.05)cls='color:var(--red)';const fmtDiff=Math.abs(diff)<0.01?'':(diff>0?'↑+':'↓')+Math.round(diff*10)/10;html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${Math.round(newV*10)/10} <span style="${cls}">${fmtDiff}</span></span></div>`;}}
     if(it.specials&&it.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${it.specials.map(sp=>sp.text).join(' ')}</div>`;}
     html+=`</div></div>`;
-    // 战力对比
-    const eqEnhPw=getEnhancePower(eqIt.slot);
-    const newEnhPw=getEnhancePower(it.slot);
-    const totalCur=eqIt.power+eqEnhPw;
-    const totalNew=it.power+newEnhPw;
+    // 战力对比（不含强化战力）
+    const totalCur=eqIt.power||0;
+    const totalNew=it.power||0;
     const pwDiff=totalNew-totalCur;
-    html+=`<div style="text-align:center;margin-top:6px;font-size:12px;font-weight:bold;color:${pwDiff>=0?'var(--green)':'var(--red)'}">⚡ 战力对比：${totalCur} → ${totalNew} (${pwDiff>=0?'+':''}${pwDiff})${newEnhPw>0?` <span style="font-size:9px;color:var(--orange)">(含强化+${newEnhPw})</span>`:''}</div>`;
+    html+=`<div style="text-align:center;margin-top:6px;font-size:12px;font-weight:bold;color:${pwDiff>=0?'var(--green)':'var(--red)'}">⚡ 战力对比：${totalCur} → ${totalNew} (${pwDiff>=0?'+':''}${pwDiff})</div>`;
   }else{
     // 无比对时正常显示
     const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
     const basicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
-    for(const k of basicKeys){if(it.stats[k]){html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green)">+${it.stats[k]}</span></div>`;}}
+    for(const k of basicKeys){if(it.stats[k]){html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green)">+${Math.round(it.stats[k]*10)/10}</span></div>`;}}
     if(it.specials&&it.specials.length>0){html+=`<div style="font-size:11px;color:var(--teal);margin-top:4px;font-weight:bold;border-top:1px solid var(--border);padding-top:4px">✨ 特殊属性</div>`;for(const sp of it.specials){html+=`<div class="stat-line"><span>${sp.name}</span><span style="color:var(--teal)">${sp.text}</span></div>`;}}
   }
   box.innerHTML=html;
