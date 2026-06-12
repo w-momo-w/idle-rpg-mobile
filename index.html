@@ -2033,10 +2033,15 @@ function checkQuests(){
 
 function submitQuest(qIndex){
   const q=G.quests[qIndex];if(!q||q.submitted||q.progress<q.target)return;
-  // collect_material: 直接提交材料
+  // 收集类任务：提交时消耗对应资源
   if(q.type==='collect_material'){
     if((G.materials[q.materialId]||0)>=q.target){
       G.materials[q.materialId]-=q.target;
+    }else{return;}
+  }
+  if(q.type==='collect_gold'){
+    if(G.gold>=q.target){
+      G.gold-=q.target;
     }else{return;}
   }
   q.submitted=true;
