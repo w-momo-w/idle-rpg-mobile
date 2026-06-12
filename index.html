@@ -3076,17 +3076,29 @@ function refreshConsumableBtns(){
 // ═══════════════════════════════════════════
 function gameTick(){
   if(G.dead){
-    // Count down death timer
+    // 死亡倒计时提示
     if(now()>=G.deadUntil){
       G.dead=false;G.deadUntil=0;G.hp=Math.floor(G.maxHp*0.5);
       G.enemy=genMonster();G.killStreak=0;
       addLog('🔄 你复活了！怪物已刷新','sys');
     }
-    renderTopBar();renderEnemy();renderLog();refreshQuestUI();renderBuffBar();refreshConsumableBtns();
-    return; // dead — no auto actions
+    // 更新死亡倒计时显示
+    const remainSec=Math.ceil((G.deadUntil-now())/1000);
+    document.getElementById('en-name').textContent=`💀 等待复活... ${remainSec}秒`;
+    document.getElementById('en-hp').textContent=`0/${fmt(G.maxHp)}`;
+    document.getElementById('en-hp-bar').style.width='0%';
+    renderTopBar();renderLog();refreshQuestUI();renderBuffBar();refreshConsumableBtns();
+    return;
   }
-  // 怪物死亡后3秒刷新
-  if(!G.enemy&&(!G._nextMonsterTime||now()>=G._nextMonsterTime)){G.enemy=genMonster();G._nextMonsterTime=0;}
+  // 怪物死亡后3秒刷新，等待时显示倒计时
+  if(!G.enemy&&G._nextMonsterTime&&now()<G._nextMonsterTime){
+    const remainSec=Math.ceil((G._nextMonsterTime-now())/1000);
+    document.getElementById('en-name').textContent=`⏳ 怪物刷新中... ${remainSec}秒`;
+    document.getElementById('en-hp').textContent='-/-';
+    document.getElementById('en-hp-bar').style.width='0%';
+  } else if(!G.enemy&&(!G._nextMonsterTime||now()>=G._nextMonsterTime)){
+    G.enemy=genMonster();G._nextMonsterTime=0;
+  }
   // 小血瓶HoT处理
   if(G._hpSmallHoT&&now()<G._hpSmallHoT.until){
     const n=now();
