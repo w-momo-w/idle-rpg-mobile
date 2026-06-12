@@ -1700,11 +1700,13 @@ function genMonster(){
   const lvScale=Math.max(0.3, 1+lvDiff*0.06);
   const rewardScale=Math.max(0.5, 1+lvDiff*0.04);
   const STAT_BOOST=type==='boss'?1.56:type==='elite'?1.56:1.2;
+  // 新手村以外地图，普通怪×2、精英×1.5、Boss×2
+  const mapMult=(m.id==='village')?1:(type==='boss'?4:type==='elite'?2.5:1.5);
   const mName=type==='boss'?template.name:(type==='elite'?'精英·'+template.name:template.name);
   const mIcon=template.icon;
-  const hp=Math.floor(template.hp*typeMult*diffMult*lvScale*STAT_BOOST);
-  const atk=Math.floor(template.atk*typeMult*diffMult*lvScale*STAT_BOOST);
-  const def=Math.floor(template.def*typeMult*diffMult*lvScale*STAT_BOOST);
+  const hp=Math.floor(template.hp*typeMult*diffMult*lvScale*STAT_BOOST*mapMult);
+  const atk=Math.floor(template.atk*typeMult*diffMult*lvScale*STAT_BOOST*mapMult);
+  const def=Math.floor(template.def*typeMult*diffMult*lvScale*STAT_BOOST*mapMult);
   const xp=Math.floor(template.xp*typeMult*rewardScale);const gold=Math.floor(template.gold*typeMult*rewardScale);
   const dropQ=[template.dropQ[0],Math.min(8,template.dropQ[1]+(type==='boss'?1:0))];
 
