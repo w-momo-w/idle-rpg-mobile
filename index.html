@@ -3041,6 +3041,7 @@ function switchClass(newClassId){
   G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
   for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0});}
   G.skill2=G.level>=10?SKILLS[G.classId].find(sk=>sk.unlockLv===10):null;
+  if(G.skill2&&!G.skills.find(s=>s.id===G.skill2.id))G.skills.push({...G.skill2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});
   addLog(`🔄 转职为：${G.className}！${cost===0?'首次免费！':'消耗'+cost+'💎'}`,'sys');
   if(savedSkills.length>0)addLog(`📖 恢复了${savedSkills.length}个已学技能`,'sys');
   // 卸下非本职业的装备
@@ -3430,7 +3431,7 @@ function calculateOfflineRewards(offlineSec){
     const growth=CLASS_GROWTH[G.classId];
     G.str+=growth.str;G.vit+=growth.vit;G.agi+=growth.agi;G.dex+=growth.dex;G.int+=growth.int;
     G.hp=G.maxHp;
-    if(G.level===10&&!G.skill2){G.skill2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);}
+    if(G.level===10&&!G.skill2){const sk2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);if(sk2){G.skill2={...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0};if(!G.skills.find(s=>s.id===sk2.id))G.skills.push({...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});}}
     if(G.level===50&&!G.classTier)G.classTier=1;
     else if(G.level===150&&G.classTier===1)G.classTier=2;
   }
@@ -3647,7 +3648,13 @@ function restoreGameData(d){
     G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0, gradeIdx:0, grade:'D', xp:0}];
   }
   if(d.skill2Id){
-    G.skill2 = (SKILLS[G.classId] || []).find(s=>s.id===d.skill2Id) || null;
+    const sk2 = (SKILLS[G.classId] || []).find(s=>s.id===d.skill2Id);
+    if(sk2){
+      G.skill2 = {...sk2, lastUsed:0, gradeIdx:0, grade:'D', xp:0};
+      if(!G.skills.find(s=>s.id===sk2.id)){
+        G.skills.push({...sk2, lastUsed:0, gradeIdx:0, grade:'D', xp:0});
+      }
+    }
   }
   
   G.buffs = {};
