@@ -1333,7 +1333,7 @@ let G={
   kills:{},
   logs:[],maxLogs:50,
   consumables:{hpPotion:2,hpLarge:0,atkScroll:0,defScroll:0,hpScroll:0},
-  classSwitchCost:20,switchCount:0,
+  classSwitchCost:200,switchCount:0,
   buffs:{},
   learnedSkills:{},
   dead:false,deadUntil:0, // 死亡状态和复活时间戳
@@ -2719,7 +2719,7 @@ function randomConsumableType(){
   return 'hpScroll';
 }
 function gachaPull(count){
-  const cost=count===10?45:5;
+  const cost=count===10?90:10;
   if(G.diamond<cost)return addLog('⚠️ 钻石不足','sys');
   const needed=G.maxInv-G.inventory.length;
   if(count>needed)return addLog('⚠️ 背包空间不足（剩余'+needed+'格，需要'+count+'格），请先清理背包或使用扩容道具','sys');
@@ -2860,10 +2860,10 @@ function battleAnimEnemy(){
 function switchClass(newClassId){
   const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
   if(newClassId===G.classId)return addLog('⚠️ 已是该职业','sys');
-  const cost=G.switchCount===0?0:G.classSwitchCost+Math.floor(G.switchCount*10);
+  const cost=G.switchCount===0?0:G.classSwitchCost+Math.floor(G.switchCount*100);
   if(G.diamond<cost)return addLog(`⚠️ 钻石不足，需要${cost}💎`,'sys');
   if(cost>0)G.diamond-=cost;
-  G.switchCount++;G.classSwitchCost=cost+10;
+  G.switchCount++;G.classSwitchCost=cost+100;
   G.learnedSkills[G.classId]=G.skills.filter(s=>s.skillType==='passive').map(s=>({...s}));
   G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};
   const savedSkills=G.learnedSkills[newClassId]||[];
@@ -2888,7 +2888,7 @@ function showClassSwitchModal(){
   const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
   const clsIcons={warrior:'⚔️',archer:'🏹',mage:'🧙'};
   const clsDescs={warrior:'高生命防御，近战坦克',archer:'高暴击攻速，远程输出',mage:'超高攻击，范围魔法'};
-  const cost=G.switchCount===0?0:G.classSwitchCost+Math.floor(G.switchCount*10);
+  const cost=G.switchCount===0?0:G.classSwitchCost+Math.floor(G.switchCount*100);
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   box.innerHTML=`<h3>🔄 切换职业</h3><p style="font-size:11px;color:var(--muted);margin-bottom:6px">当前：${clsIcons[G.classId]} ${clsNames[G.classId]} | 消耗 💎${cost===0?'免费':cost}</p>`;
   for(const [id,name] of Object.entries(clsNames)){
@@ -2925,14 +2925,14 @@ function renderShop(){
   const probs=gachaProb();
   ds.innerHTML+=`<div class="gacha-rate">概率：${probs.map(p=>QUALITY[p.q]+p.pct+'%').join(' | ')}</div>`;
   const row1=document.createElement('div');row1.className='shop-item-row';
-  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 5 钻石</div></div>`;
+  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 10 钻石</div></div>`;
   const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
-  b1.disabled=G.diamond<5;b1.addEventListener('click',()=>gachaPull(1));
+  b1.disabled=G.diamond<10;b1.addEventListener('click',()=>gachaPull(1));
   row1.appendChild(b1);ds.appendChild(row1);
   const row10=document.createElement('div');row10.className='shop-item-row';
-  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 45 钻石</div></div>`;
+  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 90 钻石</div></div>`;
   const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
-  b10.disabled=G.diamond<45;b10.addEventListener('click',()=>gachaPull(10));
+  b10.disabled=G.diamond<90;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
   el.appendChild(ds);
   const cs=document.createElement('div');cs.className='shop-section';
