@@ -2151,8 +2151,13 @@ function renderTopBar(){
   const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
   document.getElementById('top-lv').textContent=G.level;
   document.getElementById('top-class').textContent=G.className||clsNames[G.classId]+'学徒';
-  // 装备战力合计
-  let eqPower=0;for(const k in G.equipped){const it=G.equipped[k];if(it)eqPower+=it.power||0;}
+  // 装备战力合计（含强化）
+  let eqPower=0;
+  for(const k in G.equipped){
+    const it=G.equipped[k];if(!it)continue;
+    eqPower+=it.power||0;
+    eqPower+=getEnhancePower(k);
+  }
   document.getElementById('top-eq-power').textContent='⚡'+fmt(eqPower);
   document.getElementById('top-atk').textContent=fmt(G.curAtk);
   document.getElementById('top-def').textContent=fmt(G.curDef);
