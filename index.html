@@ -2540,6 +2540,29 @@ function useMaterial(mid){
 }
 // ═══ 材料合成装备 ═══
 const CLASS_NAMES={warrior:'战士',archer:'射手',mage:'法师',all:'通用'};
+function showCraftResult(it){
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  let html=`<h3>🔨 合成成功！</h3>`;
+  html+=`<div style="text-align:center;padding:16px 0">`;
+  html+=`<div style="font-size:36px;margin-bottom:8px">${eqIcon(it.slot,it.classReq)}</div>`;
+  html+=`<div style="font-size:16px;font-weight:bold;color:${QCOLOR[it.quality]};margin-bottom:4px">${it.name}</div>`;
+  html+=`<div style="font-size:12px;color:var(--muted)">${it.qName} · ${CLASS_NAMES[it.classReq]} · Lv${it.reqLv} · 战力 ${it.power}</div>`;
+  html+=`<div style="margin-top:12px;font-size:12px;line-height:1.6">`;
+  const basicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
+  const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
+  for(const k of basicKeys){if(it.stats[k])html+=`<span style="margin-right:12px">${basicLbls[k]}+${it.stats[k]}</span>`;}
+  html+=`</div>`;
+  if(it.specials&&it.specials.length>0){
+    html+=`<div style="margin-top:8px;font-size:11px;color:var(--orange)">`;
+    html+=it.specials.map(s=>s.text).join(' ');
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+  html+=`<button class="btn btn-purple" style="width:100%" id="btn-craft-ok">✅ 好的</button>`;
+  box.innerHTML=html;
+  document.getElementById('btn-craft-ok').addEventListener('click',closeModal);
+}
 function craftEquip(craftIndex){
   const recipe=MATERIAL_CRAFT[craftIndex];
   if(!recipe)return;
@@ -2567,6 +2590,8 @@ function craftEquip(craftIndex){
     logMsg+=` | 战力${it.power}`;
     if(it.specials&&it.specials.length>0){logMsg+=' | '+it.specials.map(s=>s.text).join(' ');}
     addLog(logMsg,'drop');
+    // 合成成功弹窗提示
+    showCraftResult(it);
     computeStats();renderAll();
   });
 }
