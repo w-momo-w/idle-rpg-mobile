@@ -1095,7 +1095,7 @@ const SPECIAL_ATTRS=[
   {id:'goldBonus',name:'贪婪',desc:'金币获取+{val}%',fmt:v=>'金币+'+v+'%',min:5,max:30,step:5},
   {id:'block',name:'格挡',desc:'{val}%概率格挡本次攻击',fmt:v=>'格挡'+v+'%',min:3,max:15,step:3},
   {id:'dodge',name:'闪避',desc:'{val}%概率闪避本次攻击',fmt:v=>'闪避'+v+'%',min:3,max:15,step:3},
-  {id:'hpRegen',name:'恢复',desc:'每秒恢复{val}点生命值',fmt:v=>'秒回'+v+'HP',min:2,max:25,step:2},
+  {id:'hpRegen',name:'恢复',desc:'每2秒恢复{val}点生命值',fmt:v=>'每2秒回'+v+'HP',min:2,max:25,step:2},
   {id:'doubleAtk',name:'连击',desc:'{val}%概率追加一次攻击',fmt:v=>'连击'+v+'%',min:3,max:12,step:3},
   {id:'armorPierce',name:'破甲',desc:'无视{val}%敌人防御',fmt:v=>'破甲'+v+'%',min:5,max:30,step:5},
   {id:'critBonus',name:'致命',desc:'暴击伤害额外+{val}%',fmt:v=>'暴伤+'+v+'%',min:5,max:25,step:5},
@@ -2190,7 +2190,7 @@ function renderStats(){
       <div style="color:var(--teal);font-weight:bold;margin-bottom:3px;font-size:11px">✨ 装备特殊属性</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px">
         <span>🩸吸血 ${G.curLifesteal}%</span><span>🌵荆棘 ${G.curThorns}%</span><span>💎寻宝 ${G.curMagicFind}%</span>
-        <span>📖经验 ${G.curExpBonus}%</span><span>💰金币 ${G.curGoldBonus}%</span><span>💚恢复 ${G.curHpRegen}/秒</span>
+        <span>📖经验 ${G.curExpBonus}%</span><span>💰金币 ${G.curGoldBonus}%</span><span>💚恢复 ${G.curHpRegen}/2秒</span>
         <span>👊连击 ${G.curDoubleAtk}%</span><span>🗡️破甲 ${G.curArmorPierce}%</span><span>💀汲魂 ${G.curSiphon}%</span>
         <span>🌀闪避 ${G.curDodge.toFixed(1)}%</span><span>🛡️格挡 ${G.curBlock}%</span><span>💥致命 ${G.curCritDmg-150}%</span>
       </div>
