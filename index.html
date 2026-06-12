@@ -1173,46 +1173,46 @@ function skillXpForGrade(gradeIdx){
 // 转职专属技能（转职后解锁对应技能）
 const ADV_SKILLS={
   berserker:[
-    {id:'blood_rage',name:'血怒',icon:'🩸',desc:'攻击力+40%，持续6秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'berserker'},
-    {id:'frenzy',name:'狂热',icon:'🔥',desc:'攻速+30%，持续5秒',cdMs:12000,type:'buff',unlockLv:70,skillType:'passive',advReq:'berserker'},
+    {id:'blood_rage',name:'血怒',icon:'🩸',desc:'攻击力+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'berserker'},
+    {id:'frenzy',name:'狂热',icon:'🔥',desc:'攻速+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'berserker'},
   ],
   paladin:[
-    {id:'holy_shield',name:'圣盾',icon:'✨',desc:'防御+40%，持续8秒',cdMs:20000,type:'buff',unlockLv:50,skillType:'passive',advReq:'paladin'},
-    {id:'divine_heal',name:'圣疗',icon:'💚',desc:'每秒恢复3%HP',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'paladin'},
+    {id:'holy_shield',name:'圣盾',icon:'✨',desc:'防御+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'paladin'},
+    {id:'divine_heal',name:'圣疗',icon:'💚',desc:'每秒恢复3%HP',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'paladin'},
   ],
   sniper:[
-    {id:'headshot',name:'爆头',icon:'💀',desc:'暴击率+25%，持续6秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'sniper'},
-    {id:'long_shot',name:'远射',icon:'🏹',desc:'攻击距离+30%伤害',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'sniper'},
+    {id:'headshot',name:'爆头',icon:'💀',desc:'暴击率+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'sniper'},
+    {id:'long_shot',name:'远射',icon:'🏹',desc:'伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'sniper'},
   ],
   shunter:[
-    {id:'shadow_step',name:'暗影步',icon:'🌑',desc:'闪避+25%，持续5秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'shunter'},
-    {id:'poison_blade',name:'淬毒',icon:'☠️',desc:'攻击附带额外毒伤',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'shunter'},
+    {id:'shadow_step',name:'暗影步',icon:'🌑',desc:'闪避+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'shunter'},
+    {id:'poison_blade',name:'淬毒',icon:'☠️',desc:'攻击附带额外毒伤',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'shunter'},
   ],
   elementalist:[
-    {id:'fire_mastery',name:'火焰精通',icon:'🔥',desc:'火系伤害+30%',cdMs:0,type:'buff',unlockLv:50,skillType:'passive',advReq:'elementalist'},
-    {id:'ice_mastery',name:'冰霜精通',icon:'❄️',desc:'冰系伤害+30%',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'elementalist'},
+    {id:'fire_mastery',name:'火焰精通',icon:'🔥',desc:'火系伤害+30%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'elementalist'},
+    {id:'ice_mastery',name:'冰霜精通',icon:'❄️',desc:'冰系伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'elementalist'},
   ],
   warlock:[
-    {id:'soul_drain',name:'灵魂吸取',icon:'💀',desc:'击杀恢复10%HP',cdMs:0,type:'buff',unlockLv:50,skillType:'passive',advReq:'warlock'},
-    {id:'dark_pact',name:'黑暗契约',icon:'📜',desc:'攻击力+25%但每秒扣1%HP',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'warlock'},
+    {id:'soul_drain',name:'灵魂吸取',icon:'💀',desc:'击杀恢复15%HP，持续10秒',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'warlock'},
+    {id:'dark_pact',name:'黑暗契约',icon:'📜',desc:'攻击力+40%，持续10秒',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'warlock'},
   ],
   warlord:[
-    {id:'war_rage',name:'战争怒火',icon:'👑',desc:'攻击力+50%，持续5秒',cdMs:18000,type:'buff',unlockLv:150,skillType:'passive',advReq:'warlord'},
+    {id:'war_rage',name:'战争怒火',icon:'👑',desc:'攻击力+50%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'warlord'},
   ],
   dknight:[
-    {id:'death_grip',name:'死亡之握',icon:'💀',desc:'攻击吸血+15%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'dknight'},
+    {id:'death_grip',name:'死亡之握',icon:'💀',desc:'攻击吸血+20%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'dknight'},
   ],
   ranger_lord:[
-    {id:'arrow_rain',name:'箭雨风暴',icon:'🌧️',desc:'攻速+35%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'ranger_lord'},
+    {id:'arrow_rain',name:'箭雨风暴',icon:'🌧️',desc:'攻速+35%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'ranger_lord'},
   ],
   assassin:[
-    {id:'lethal_blade',name:'致命利刃',icon:'🗡️',desc:'暴击伤害+80%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'assassin'},
+    {id:'lethal_blade',name:'致命利刃',icon:'🗡️',desc:'暴击伤害+80%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'assassin'},
   ],
   archmage:[
-    {id:'arcane_brilliance',name:'奥术光辉',icon:'✨',desc:'技能伤害+40%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'archmage'},
+    {id:'arcane_brilliance',name:'奥术光辉',icon:'✨',desc:'技能伤害+40%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'archmage'},
   ],
   necromancer:[
-    {id:'undead_army',name:'亡灵大军',icon:'💀',desc:'攻击时30%概率额外造成50%伤害',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'necromancer'},
+    {id:'undead_army',name:'亡灵大军',icon:'💀',desc:'30%概率额外50%伤害',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'necromancer'},
   ],
 };
 
