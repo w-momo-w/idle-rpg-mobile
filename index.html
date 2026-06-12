@@ -1436,7 +1436,7 @@ function rollGachaQuality(){const probs=gachaProb();const r=randi(1,100);let cum
 // ═══════════════════════════════════════════
 //  HELPER
 // ═══════════════════════════════════════════
-const randi=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+const randi=(min,max)=>{if(min>max)[min,max]=[max,min];return Math.floor(Math.random()*(max-min+1))+min;};
 const randf=(min,max)=>Math.random()*(max-min)+min;
 const pick=a=>a[randi(0,a.length-1)];
 const fmt=v=>{if(v>=1e8)return(v/1e8).toFixed(1)+'亿';if(v>=1e4)return(v/1e4).toFixed(1)+'万';return v.toLocaleString()};
@@ -1666,11 +1666,10 @@ function genMonster(){
   if(roll<0.05&&m.boss){template=m.boss;type='boss';}
   else if(roll<0.20&&m.elite){template=m.elite;type='elite';}
   else{template=pick(m.monsters);}
-  // Monster level: character level ±3, lower bound min 1, upper bound map max level
+  // Monster level: between map min level and map max level
   const maxLv = m.maxLv || m.lv + 10;
-  const minLv = Math.max(1, G.level - 3);
-  const upperLv = Math.min(maxLv, G.level + 3);
-  const monLv = randi(minLv, Math.max(minLv, upperLv));
+  const minLv = m.lv;
+  const monLv = randi(minLv, maxLv);
   // Monster level actually matters now: 6%/lv stat scaling + 4%/lv reward scaling
   const typeMult=type==='boss'?5:type==='elite'?2.5:1;
   const diffMult=G.level>=10?1.2:1;
@@ -3744,7 +3743,7 @@ function calculateOfflineRewards(offlineSec){
   const mfBonus = G.curMagicFind / 200;
   const avgDropRate = Math.min(typeBase + lvBonus + mfBonus, 0.65);
   const equipCount = Math.floor(killCount * avgDropRate);
-  const monLv = Math.max(1, G.level - 3);
+  const monLv = Math.floor((m.lv + (m.maxLv||m.lv+10)) / 2);
   for(let i=0;i<Math.min(equipCount,50);i++){
     const slot = pick(Object.keys(EQ_NAMES));
     const it = genEquip(slot, 0, Math.min(8, Math.floor(G.level/20)+2), monLv);
@@ -3778,10 +3777,13 @@ function calculateOfflineRewards(offlineSec){
     }
   }
   
-  // 更新击杀计数
+  // 更新击杀计数（包含精英和Boss）
   G.killAnyCount = (G.killAnyCount||0) + killCount;
-  for(const mo of m.monsters){
-    G.kills[mo.name] = (G.kills[mo.name]||0) + Math.floor(killCount * 0.8 / m.monsters.length);
+  const allMonKills = [...m.monsters];
+  if(m.elite) allMonKills.push(m.elite);
+  if(m.boss) allMonKills.push(m.boss);
+  for(const mo of allMonKills){
+    G.kills[mo.name] = (G.kills[mo.name]||0) + Math.max(1, Math.floor(killCount * 0.8 / allMonKills.length));
   }
   
   G.hp = G.maxHp;
