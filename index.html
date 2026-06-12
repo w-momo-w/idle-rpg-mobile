@@ -1167,9 +1167,54 @@ const SKILL_GRADE_MULT = {D:1.0, C:1.15, B:1.35, A:1.6, S:2.0};
 const SKILL_GRADE_COLOR = {D:'#9ca3af', C:'#22c55e', B:'#3b82f6', A:'#a855f7', S:'#f59e0b'};
 // 技能升级所需经验（缓慢增长）
 function skillXpForGrade(gradeIdx){
-  // D→C: 100, C→B: 300, B→A: 900, A→S: 2700
   return [0, 100, 300, 900, 2700][gradeIdx] || 10000;
 }
+
+// 转职专属技能（转职后解锁对应技能）
+const ADV_SKILLS={
+  berserker:[
+    {id:'blood_rage',name:'血怒',icon:'🩸',desc:'攻击力+40%，持续6秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'berserker'},
+    {id:'frenzy',name:'狂热',icon:'🔥',desc:'攻速+30%，持续5秒',cdMs:12000,type:'buff',unlockLv:70,skillType:'passive',advReq:'berserker'},
+  ],
+  paladin:[
+    {id:'holy_shield',name:'圣盾',icon:'✨',desc:'防御+40%，持续8秒',cdMs:20000,type:'buff',unlockLv:50,skillType:'passive',advReq:'paladin'},
+    {id:'divine_heal',name:'圣疗',icon:'💚',desc:'每秒恢复3%HP',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'paladin'},
+  ],
+  sniper:[
+    {id:'headshot',name:'爆头',icon:'💀',desc:'暴击率+25%，持续6秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'sniper'},
+    {id:'long_shot',name:'远射',icon:'🏹',desc:'攻击距离+30%伤害',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'sniper'},
+  ],
+  shunter:[
+    {id:'shadow_step',name:'暗影步',icon:'🌑',desc:'闪避+25%，持续5秒',cdMs:15000,type:'buff',unlockLv:50,skillType:'passive',advReq:'shunter'},
+    {id:'poison_blade',name:'淬毒',icon:'☠️',desc:'攻击附带额外毒伤',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'shunter'},
+  ],
+  elementalist:[
+    {id:'fire_mastery',name:'火焰精通',icon:'🔥',desc:'火系伤害+30%',cdMs:0,type:'buff',unlockLv:50,skillType:'passive',advReq:'elementalist'},
+    {id:'ice_mastery',name:'冰霜精通',icon:'❄️',desc:'冰系伤害+30%',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'elementalist'},
+  ],
+  warlock:[
+    {id:'soul_drain',name:'灵魂吸取',icon:'💀',desc:'击杀恢复10%HP',cdMs:0,type:'buff',unlockLv:50,skillType:'passive',advReq:'warlock'},
+    {id:'dark_pact',name:'黑暗契约',icon:'📜',desc:'攻击力+25%但每秒扣1%HP',cdMs:0,type:'buff',unlockLv:70,skillType:'passive',advReq:'warlock'},
+  ],
+  warlord:[
+    {id:'war_rage',name:'战争怒火',icon:'👑',desc:'攻击力+50%，持续5秒',cdMs:18000,type:'buff',unlockLv:150,skillType:'passive',advReq:'warlord'},
+  ],
+  dknight:[
+    {id:'death_grip',name:'死亡之握',icon:'💀',desc:'攻击吸血+15%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'dknight'},
+  ],
+  ranger_lord:[
+    {id:'arrow_rain',name:'箭雨风暴',icon:'🌧️',desc:'攻速+35%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'ranger_lord'},
+  ],
+  assassin:[
+    {id:'lethal_blade',name:'致命利刃',icon:'🗡️',desc:'暴击伤害+80%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'assassin'},
+  ],
+  archmage:[
+    {id:'arcane_brilliance',name:'奥术光辉',icon:'✨',desc:'技能伤害+40%',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'archmage'},
+  ],
+  necromancer:[
+    {id:'undead_army',name:'亡灵大军',icon:'💀',desc:'攻击时召唤亡灵',cdMs:0,type:'buff',unlockLv:150,skillType:'passive',advReq:'necromancer'},
+  ],
+};
 
 const CLASS_ADV=[
   {lv:50,warrior:[{id:'berserker',name:'狂战士',icon:'😡',bonus:{atk:15,hp:80}},{id:'paladin',name:'圣骑士',icon:'🛡️',bonus:{def:12,hp:120}}],
@@ -1641,7 +1686,16 @@ function doAdvance(opt){
   G.classStatsAdv=G.classStatsAdv||{};
   for(const k in opt.bonus){G.classStatsAdv[k]=(G.classStatsAdv[k]||0)+opt.bonus[k];}
   G.className=opt.name;G.classIcon=opt.icon;
+  G.classAdvId=opt.id; // 记录转职ID
   if(G.level>=150)G.classTier=2;else G.classTier=1;
+  // 解锁转职专属技能
+  const advSkills=ADV_SKILLS[opt.id]||[];
+  for(const sk of advSkills){
+    if(!G.skills.find(s=>s.id===sk.id)){
+      G.skills.push({...sk,lastUsed:0,gradeIdx:0,grade:'D',xp:0});
+      addLog(`📖 转职解锁：【${sk.name}】！`,'sys');
+    }
+  }
   addLog(`🌟 转职成功！成为${opt.name}`,'sys');
   closeModal();computeStats();renderAll();
 }
@@ -2971,7 +3025,7 @@ function switchClass(newClassId){
   if(cost>0)G.diamond-=cost;
   G.switchCount++;G.classSwitchCost=cost+100;
   G.learnedSkills[G.classId]=G.skills.filter(s=>s.skillType==='passive').map(s=>({...s}));
-  G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};
+  G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};G.classAdvId=null;
   const savedSkills=G.learnedSkills[newClassId]||[];
   G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
   for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0});}
@@ -3507,6 +3561,7 @@ function restoreGameData(d){
   G.slotEnhance = d.slotEnhance || {};
   G.classStatsAdv = d.classStatsAdv || {};
   G.classIcon = d.classIcon || null;
+  G.classAdvId = d.classAdvId || null;
   G.logs = d.logs || [];
   G._lastSaveTime = d.timestamp || 0; // 离线收益用
   
@@ -3665,6 +3720,7 @@ function buildSaveData(now_){
     slotEnhance: G.slotEnhance,
     classStatsAdv: G.classStatsAdv || {},
     classIcon: G.classIcon || null,
+    classAdvId: G.classAdvId || null,
     logs: G.logs.slice(0, 8),
   };
   const buffs = {};
