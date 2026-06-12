@@ -1089,16 +1089,16 @@ const MATERIALS={
 
 // Material synthesis: combine materials to craft specific-slot equipment
 const MATERIAL_CRAFT=[
-  {name:'主手武器',icon:'🗡️',desc:'合成一把主手武器',costs:{dragonScale:3,ironOre:5,crystalShard:1},slot:'mainHand',minQ:2,maxQ:6},
-  {name:'铠甲',icon:'👘',desc:'合成一件铠甲',costs:{beastHide:5,ironOre:3},slot:'armor',minQ:1,maxQ:5},
-  {name:'副手盾牌',icon:'🛡️',desc:'合成一面副手装备',costs:{beastHide:3,ironOre:2,dragonScale:1},slot:'offHand',minQ:1,maxQ:5},
-  {name:'头盔',icon:'⛑️',desc:'合成一顶头盔',costs:{beastHide:3,ironOre:2},slot:'helmet',minQ:1,maxQ:5},
-  {name:'护腕',icon:'🧤',desc:'合成一副护腕',costs:{beastHide:2,ironOre:2},slot:'bracer',minQ:1,maxQ:4},
-  {name:'裤子',icon:'👖',desc:'合成一条裤子',costs:{beastHide:3,ironOre:2},slot:'pants',minQ:1,maxQ:4},
-  {name:'靴子',icon:'👢',desc:'合成一双靴子',costs:{beastHide:2,ironOre:2},slot:'boots',minQ:1,maxQ:4},
-  {name:'项链',icon:'📿',desc:'合成一条项链',costs:{crystalShard:3,dragonScale:1},slot:'necklace',minQ:1,maxQ:5},
-  {name:'戒指',icon:'💍',desc:'合成一枚戒指',costs:{crystalShard:2,dragonScale:1},slot:'ring1',minQ:1,maxQ:5},
-  {name:'护符',icon:'🔮',desc:'合成一个护符',costs:{crystalShard:3,beastHide:2},slot:'pendant',minQ:1,maxQ:4},
+  {name:'主手武器',icon:'🗡️',desc:'合成一把主手武器',costs:{dragonScale:8,ironOre:12,crystalShard:4},slot:'mainHand',minQ:2,maxQ:6},
+  {name:'铠甲',icon:'👘',desc:'合成一件铠甲',costs:{beastHide:12,ironOre:8},slot:'armor',minQ:1,maxQ:5},
+  {name:'副手盾牌',icon:'🛡️',desc:'合成一面副手装备',costs:{beastHide:8,ironOre:6,dragonScale:3},slot:'offHand',minQ:1,maxQ:5},
+  {name:'头盔',icon:'⛑️',desc:'合成一顶头盔',costs:{beastHide:8,ironOre:6},slot:'helmet',minQ:1,maxQ:5},
+  {name:'护腕',icon:'🧤',desc:'合成一副护腕',costs:{beastHide:6,ironOre:5},slot:'bracer',minQ:1,maxQ:4},
+  {name:'裤子',icon:'👖',desc:'合成一条裤子',costs:{beastHide:7,ironOre:5},slot:'pants',minQ:1,maxQ:4},
+  {name:'靴子',icon:'👢',desc:'合成一双靴子',costs:{beastHide:6,ironOre:5},slot:'boots',minQ:1,maxQ:4},
+  {name:'项链',icon:'📿',desc:'合成一条项链',costs:{crystalShard:7,dragonScale:3},slot:'necklace',minQ:1,maxQ:5},
+  {name:'戒指',icon:'💍',desc:'合成一枚戒指',costs:{crystalShard:6,dragonScale:3},slot:'ring1',minQ:1,maxQ:5},
+  {name:'护符',icon:'🔮',desc:'合成一个护符',costs:{crystalShard:7,beastHide:5},slot:'pendant',minQ:1,maxQ:4},
 ];
 
 // Skill data
@@ -1375,11 +1375,11 @@ function genQuestReward(G,base){
   // ~55%概率随机给1~4颗钻石（独立于其他奖励）
   if(Math.random()<0.55){rew.diamond=randi(1,4);}
   // 5%概率给1~2个重铸石
-  if(Math.random()<0.05){rew.material='recastStone';rew.materialCount=randi(1,2);}
+  if(Math.random()<0.01){rew.material='recastStone';rew.materialCount=randi(1,2);}
   else{
     const r=Math.random();
     // 30%概率给装备
-    if(r<0.30){rew.equipQ=Math.min(randi(0,Math.floor(G.level/20)),7);}
+    if(r<0.30){rew.equipQ=Math.min(randi(1, Math.floor(G.level/10)+1), 7);}
     // 30%概率给药水
     else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
     // 25%概率给材料（排除重铸石）
