@@ -2762,6 +2762,12 @@ function showItemModal(it,source,isEquipped,activeTab){
     const totalNew=it.power||0;
     const pwDiff=totalNew-totalCur;
     html+=`<div style="text-align:center;margin-top:6px;font-size:12px;font-weight:bold;color:${pwDiff>=0?'var(--green)':'var(--red)'}">⚡ 战力对比：${totalCur} → ${totalNew} (${pwDiff>=0?'+':''}${pwDiff})</div>`;
+  }else if(!isEquipped){
+    // 无比对时显示装备属性
+    const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
+    const basicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
+    for(const k of basicKeys){if(it.stats[k]){const v=Math.round(it.stats[k]*10)/10;const r=it.statRanges&&it.statRanges[k];html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green)">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
+    if(it.specials&&it.specials.length>0){html+=`<div style="font-size:11px;color:var(--teal);margin-top:4px;font-weight:bold;border-top:1px solid var(--border);padding-top:4px">✨ 特殊属性</div>`;for(const sp of it.specials){const sr=it.statRanges&&it.statRanges[sp.id];html+=`<div class="stat-line"><span>${sp.name}</span><span style="color:var(--teal)">${sp.text}${sr?` <span style="font-size:8px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:''}</span></div>`;}}
   }
   box.innerHTML=html;
   const acts=document.createElement('div');acts.className='modal-actions';acts.style.marginTop='8px';
