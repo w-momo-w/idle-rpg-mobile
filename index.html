@@ -1980,7 +1980,7 @@ function onKill(){
     }
   }
   // 技能书掉落：10级后怪物可掉落，普通1%/精英5%/Boss10%，随机种类
-  if(monLv>10){
+  if(monLv>=10){
     const bookRate = G.enemy.type==='boss'?0.05:G.enemy.type==='elite'?0.025:0.005;
     if(Math.random()<bookRate){
       // 随机所有职业的技能书
