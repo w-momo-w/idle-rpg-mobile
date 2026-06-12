@@ -1467,10 +1467,10 @@ function eqIcon(slot,cls){const ic=EQ_ICONS[slot];return ic?((cls in ic&&ic[cls]
 function eqNamePick(slot,cls){const arr=EQ_NAMES[slot];const pool=(arr&&arr[cls])||(arr&&arr.all)||['未知装备'];return pick(pool);}
 function rollWeightedQ(minQ,maxQ){
   // 从可用品质范围中按权重随机，高品质概率极低
-  const pool=[];const totalW=100;
+  const pool=[];
   for(let q=minQ;q<=maxQ;q++){pool.push({q,w:Q_WEIGHT[q]||1});}
   const sumW=pool.reduce((s,p)=>s+p.w,0);
-  let r=randi(1,sumW),cum=0;
+  let r=Math.random()*sumW,cum=0;
   for(const p of pool){cum+=p.w;if(r<=cum)return p.q;}
   return pool[pool.length-1].q;
 }
@@ -2521,7 +2521,7 @@ function useMaterial(mid){
       if(G.inventory.length<G.maxInv){G.inventory.push(it);addLog(`🎁 使用${md.use.count}个${md.name}兑换获得：${it.name}`,'drop');autoEquipCheck(it);}
       else{addLog('⚠️ 背包已满','sys');G.materials[mid]+=md.use.count;return;}
     }
-    computeStats();renderAll();renderBag();
+    computeStats();renderAll();
   });
 }
 // ═══ 材料合成装备 ═══
@@ -2553,7 +2553,7 @@ function craftEquip(craftIndex){
     logMsg+=` | 战力${it.power}`;
     if(it.specials&&it.specials.length>0){logMsg+=' | '+it.specials.map(s=>s.text).join(' ');}
     addLog(logMsg,'drop');
-    computeStats();renderAll();renderBag();
+    computeStats();renderAll();
   });
 }
 function renderSkills(){
