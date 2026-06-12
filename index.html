@@ -1434,12 +1434,12 @@ function genQuestReward(G,base){
 }
 
 const GOLD_SHOP=[
-  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:250,buy:function(){if(G.gold<250)return addLog('⚠️ 金币不足','sys');confirmAction('购买小血瓶','🧪 确定花费 💰250 金币购买小血瓶吗？',()=>{G.gold-=250;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');renderShop();});}},
-  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:600,buy:function(){if(G.gold<600)return addLog('⚠️ 金币不足','sys');confirmAction('购买大血瓶','💉 确定花费 💰600 金币购买大血瓶吗？',()=>{G.gold-=600;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');renderShop();});}},
-  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:1000,buy:function(){if(G.gold<1000)return addLog('⚠️ 金币不足','sys');confirmAction('购买攻击卷轴','📜 确定花费 💰1000 金币购买攻击卷轴吗？',()=>{G.gold-=1000;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');renderShop();});}},
-  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:900,buy:function(){if(G.gold<900)return addLog('⚠️ 金币不足','sys');confirmAction('购买防御卷轴','🛡️ 确定花费 💰900 金币购买防御卷轴吗？',()=>{G.gold-=900;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');renderShop();});}},
-  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:950,buy:function(){if(G.gold<950)return addLog('⚠️ 金币不足','sys');confirmAction('购买生命卷轴','❤️ 确定花费 💰950 金币购买生命卷轴吗？',()=>{G.gold-=950;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');renderShop();});}},
-  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:1500,buy:function(){const cost=1500+G.bagExpansions*900;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');confirmAction('背包扩容','🎒 确定花费 💰'+cost+' 金币扩容背包（上限+10）吗？',()=>{G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');renderShop();});}},
+  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:250,buy:function(){if(G.gold<250)return addLog('⚠️ 金币不足','sys');confirmAction('购买小血瓶','🧪 确定花费 💰250 金币购买小血瓶吗？',()=>{G.gold-=250;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');renderAll();renderShop();});}},
+  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:600,buy:function(){if(G.gold<600)return addLog('⚠️ 金币不足','sys');confirmAction('购买大血瓶','💉 确定花费 💰600 金币购买大血瓶吗？',()=>{G.gold-=600;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');renderAll();renderShop();});}},
+  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:1000,buy:function(){if(G.gold<1000)return addLog('⚠️ 金币不足','sys');confirmAction('购买攻击卷轴','📜 确定花费 💰1000 金币购买攻击卷轴吗？',()=>{G.gold-=1000;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');renderAll();renderShop();});}},
+  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:900,buy:function(){if(G.gold<900)return addLog('⚠️ 金币不足','sys');confirmAction('购买防御卷轴','🛡️ 确定花费 💰900 金币购买防御卷轴吗？',()=>{G.gold-=900;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');renderAll();renderShop();});}},
+  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:950,buy:function(){if(G.gold<950)return addLog('⚠️ 金币不足','sys');confirmAction('购买生命卷轴','❤️ 确定花费 💰950 金币购买生命卷轴吗？',()=>{G.gold-=950;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');renderAll();renderShop();});}},
+  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:1500,buy:function(){const cost=1500+G.bagExpansions*900;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');confirmAction('背包扩容','🎒 确定花费 💰'+cost+' 金币扩容背包（上限+10）吗？',()=>{G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');renderAll();renderShop();});}},
 ];
 
 function gachaProb(){
@@ -3225,7 +3225,7 @@ function gachaPull(count){
       equips.push(genEquip(slot,q,q,G.level));
     }
   }
-  if(count===10&&equips.length>0){equips[randi(0,equips.length-1)]=genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level);}
+  if(count===10){equips.push(genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level));}
   let lostCount=0;
   for(const it of equips){
     if(G.inventory.length<G.maxInv){G.inventory.push(it);autoEquipCheck(it);}
@@ -3399,7 +3399,7 @@ function renderShop(){
     const bagFull=(isBag&&G.maxInv>=300);
     btn.textContent=bagFull?'已满':'购买';
     btn.disabled=G.gold<(isBag?bagCost:item.cost)||bagFull;
-    btn.addEventListener('click',()=>{item.buy();renderAll();renderShop();});
+    btn.addEventListener('click',()=>{item.buy();});
     row.appendChild(btn);gs.appendChild(row);
   }
   el.appendChild(gs);
