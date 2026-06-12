@@ -1096,20 +1096,68 @@ const SKILLS={
   warrior:[
     {id:'heavy_strike',name:'重击',icon:'💥',desc:'造成攻击力伤害',cdMs:2500,mult:1.6,unlockLv:0,skillType:'active'},
     {id:'whirlwind',name:'旋风斩',icon:'🌀',desc:'造成攻击力伤害×2次',cdMs:4000,mult:0.9,hits:2,unlockLv:10,skillType:'active'},
+    {id:'cleave',name:'顺劈斩',icon:'🗡️',desc:'造成攻击力伤害×3次',cdMs:5000,mult:0.6,hits:3,unlockLv:20,skillType:'active'},
+    {id:'power_strike',name:'强力一击',icon:'👊',desc:'造成攻击力伤害',cdMs:3500,mult:2.2,unlockLv:35,skillType:'active'},
+    {id:'thunder_clap',name:'雷霆一击',icon:'⚡',desc:'造成伤害+减速2秒',cdMs:6000,mult:1.5,unlockLv:55,skillType:'active'},
+    {id:'bladestorm',name:'剑刃风暴',icon:'🌪️',desc:'造成伤害×4次',cdMs:8000,mult:0.8,hits:4,unlockLv:80,skillType:'active'},
+    {id:'execute',name:'斩杀',icon:'💀',desc:'敌人HP<30%时伤害翻倍',cdMs:7000,mult:1.8,unlockLv:110,skillType:'active'},
+    {id:'charge',name:'冲锋',icon:'🏃',desc:'造成伤害+自身攻速+30%',cdMs:4500,mult:1.3,unlockLv:150,skillType:'active'},
+    {id:'earth_shatter',name:'裂地斩',icon:'💥',desc:'造成伤害+无视50%防御',cdMs:5500,mult:2.0,ignoreDef:0.5,unlockLv:200,skillType:'active'},
+    {id:'rage_strike',name:'怒火一击',icon:'🔥',desc:'造成高额伤害',cdMs:9000,mult:3.0,unlockLv:260,skillType:'active'},
     {id:'berserk',name:'狂暴',icon:'😡',desc:'攻击力+30%，持续5秒',cdMs:12000,type:'buff',unlockLv:0,skillType:'passive'},
     {id:'shield_wall',name:'盾墙',icon:'🛡️',desc:'防御+50%，持续5秒',cdMs:15000,type:'buff',unlockLv:0,skillType:'passive'},
+    {id:'iron_skin',name:'铁壁',icon:'🪨',desc:'永久防御+15%',cdMs:0,type:'buff',unlockLv:15,skillType:'passive'},
+    {id:'blood_thirst',name:'嗜血',icon:'🩸',desc:'永久吸血+5%',cdMs:0,type:'buff',unlockLv:30,skillType:'passive'},
+    {id:'war_cry',name:'战吼',icon:'📢',desc:'攻击力+15%持续8秒',cdMs:18000,type:'buff',unlockLv:50,skillType:'passive'},
+    {id:'unyielding',name:'不屈',icon:'💪',desc:'生命低于30%时防御翻倍',cdMs:0,type:'buff',unlockLv:70,skillType:'passive'},
+    {id:'counter_strike',name:'反击',icon:'⚔️',desc:'被攻击时有概率反击',cdMs:0,type:'buff',unlockLv:100,skillType:'passive'},
+    {id:'second_wind',name:'复苏之风',icon:'🌬️',desc:'每秒恢复HP',cdMs:0,type:'buff',unlockLv:140,skillType:'passive'},
+    {id:'titan_strength',name:'泰坦之力',icon:'🏋️',desc:'永久攻击力+20%',cdMs:0,type:'buff',unlockLv:190,skillType:'passive'},
+    {id:'immortal',name:'不死之身',icon:'👼',desc:'死亡时复活一次',cdMs:300000,type:'buff',unlockLv:250,skillType:'passive'},
   ],
   archer:[
-    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成攻击力伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0,skillType:'active'},
-    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成攻击力伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:10,skillType:'active'},
+    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0,skillType:'active'},
+    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:10,skillType:'active'},
+    {id:'barrage',name:'箭雨',icon:'🌧️',desc:'造成伤害×5次',cdMs:6000,mult:0.5,hits:5,unlockLv:20,skillType:'active'},
+    {id:'snipe',name:'狙击',icon:'🔭',desc:'造成高额伤害+无视防御',cdMs:5000,mult:2.5,ignoreDef:1,unlockLv:35,skillType:'active'},
+    {id:'frost_arrow',name:'冰霜箭',icon:'❄️',desc:'造成伤害+减速3秒',cdMs:4000,mult:1.5,unlockLv:55,skillType:'active'},
+    {id:'explosive_shot',name:'爆裂箭',icon:'💣',desc:'造成伤害+溅射50%',cdMs:7000,mult:1.8,unlockLv:80,skillType:'active'},
+    {id:'shadow_shot',name:'暗影箭',icon:'🌑',desc:'造成伤害+吸血30%',cdMs:4500,mult:1.6,unlockLv:110,skillType:'active'},
+    {id:'wind_arrow',name:'疾风箭',icon:'💨',desc:'造成伤害+自身攻速+40%',cdMs:3000,mult:1.2,unlockLv:150,skillType:'active'},
+    {id:'piercing_shot',name:'穿透箭',icon:'🏹',desc:'造成伤害+无视70%防御',cdMs:5500,mult:1.9,ignoreDef:0.7,unlockLv:200,skillType:'active'},
+    {id:'arrow_storm',name:'箭刃风暴',icon:'🌪️',desc:'造成伤害×6次',cdMs:10000,mult:0.7,hits:6,unlockLv:260,skillType:'active'},
     {id:'poison_arrow',name:'毒箭',icon:'☠️',desc:'造成伤害+5秒毒',cdMs:6000,mult:1.2,type:'dot',unlockLv:0,skillType:'passive'},
     {id:'hawk_eye',name:'鹰眼',icon:'👁️',desc:'暴击率+20%，持续8秒',cdMs:15000,type:'buff',unlockLv:0,skillType:'passive'},
+    {id:'agility',name:'敏捷身法',icon:'🏃',desc:'永久闪避+8%',cdMs:0,type:'buff',unlockLv:15,skillType:'passive'},
+    {id:'poison_master',name:'毒药大师',icon:'🧪',desc:'永久DOT伤害+50%',cdMs:0,type:'buff',unlockLv:30,skillType:'passive'},
+    {id:'critical_focus',name:'致命专注',icon:'🎯',desc:'暴击伤害+40%持续8秒',cdMs:18000,type:'buff',unlockLv:50,skillType:'passive'},
+    {id:'shadow_veil',name:'暗影面纱',icon:'🌫️',desc:'闪避+20%持续6秒',cdMs:20000,type:'buff',unlockLv:70,skillType:'passive'},
+    {id:'hunter_mark',name:'猎人标记',icon:'🎯',desc:'对标记目标伤害+25%',cdMs:0,type:'buff',unlockLv:100,skillType:'passive'},
+    {id:'rapid_fire',name:'速射',icon:'⚡',desc:'永久攻速+20%',cdMs:0,type:'buff',unlockLv:140,skillType:'passive'},
+    {id:'true_shot',name:'真实射击',icon:'👁️',desc:'永久无视防御+15%',cdMs:0,type:'buff',unlockLv:190,skillType:'passive'},
+    {id:'death_mark',name:'死亡标记',icon:'💀',desc:'暴击时额外+100%伤害',cdMs:0,type:'buff',unlockLv:250,skillType:'passive'},
   ],
   mage:[
     {id:'fireball',name:'火球术',icon:'🔥',desc:'造成攻击力伤害',cdMs:3000,mult:2.0,unlockLv:0,skillType:'active'},
-    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成攻击力伤害，减速敌人2秒',cdMs:4000,mult:1.3,unlockLv:10,skillType:'active'},
-    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成攻击力伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:0,skillType:'passive'},
-    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成攻击力伤害',cdMs:8000,mult:2.5,unlockLv:0,skillType:'passive'},
+    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成伤害+减速2秒',cdMs:4000,mult:1.3,unlockLv:10,skillType:'active'},
+    {id:'chain_lightning',name:'连锁闪电',icon:'⚡',desc:'造成伤害×3次',cdMs:5000,mult:0.9,hits:3,unlockLv:20,skillType:'active'},
+    {id:'arcane_blast',name:'奥术冲击',icon:'💫',desc:'造成高额伤害',cdMs:4500,mult:2.8,unlockLv:35,skillType:'active'},
+    {id:'flame_storm',name:'烈焰风暴',icon:'🔥',desc:'造成伤害+5秒灼烧',cdMs:7000,mult:1.6,type:'dot',unlockLv:55,skillType:'active'},
+    {id:'frost_nova',name:'冰霜新星',icon:'❄️',desc:'造成伤害+冻结2秒',cdMs:8000,mult:1.5,unlockLv:80,skillType:'active'},
+    {id:'void_bolt',name:'虚空箭',icon:'🕳️',desc:'造成伤害+无视50%防御',cdMs:4000,mult:2.2,ignoreDef:0.5,unlockLv:110,skillType:'active'},
+    {id:'mana_surge',name:'魔力涌动',icon:'✨',desc:'造成伤害+冷却-2秒',cdMs:3500,mult:1.8,unlockLv:150,skillType:'active'},
+    {id:'arcane_nova',name:'奥术新星',icon:'🌟',desc:'造成伤害+溅射',cdMs:6000,mult:2.0,unlockLv:200,skillType:'active'},
+    {id:'apocalypse',name:'末日审判',icon:'☄️',desc:'造成巨额伤害',cdMs:12000,mult:4.0,unlockLv:260,skillType:'active'},
+    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:0,skillType:'passive'},
+    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成高额伤害',cdMs:8000,mult:2.5,unlockLv:0,skillType:'passive'},
+    {id:'mana_shield',name:'法力护盾',icon:'🛡️',desc:'永久防御+12%',cdMs:0,type:'buff',unlockLv:15,skillType:'passive'},
+    {id:'arcane_intellect',name:'奥术智慧',icon:'🧠',desc:'永久攻击力+15%',cdMs:0,type:'buff',unlockLv:30,skillType:'passive'},
+    {id:'frost_armor',name:'冰霜护甲',icon:'❄️',desc:'防御+30%持续8秒',cdMs:18000,type:'buff',unlockLv:50,skillType:'passive'},
+    {id:'spell_vamp',name:'法术吸血',icon:'🩸',desc:'永久技能吸血+10%',cdMs:0,type:'buff',unlockLv:70,skillType:'passive'},
+    {id:'elemental_fury',name:'元素狂暴',icon:'🔥',desc:'技能伤害+20%',cdMs:0,type:'buff',unlockLv:100,skillType:'passive'},
+    {id:'arcane_power',name:'奥术强化',icon:'💎',desc:'攻击力+30%持续6秒',cdMs:20000,type:'buff',unlockLv:140,skillType:'passive'},
+    {id:'mana_burn',name:'法力燃烧',icon:'🔥',desc:'攻击额外造成伤害',cdMs:0,type:'buff',unlockLv:190,skillType:'passive'},
+    {id:'time_warp',name:'时间扭曲',icon:'⏳',desc:'永久冷却时间-20%',cdMs:0,type:'buff',unlockLv:250,skillType:'passive'},
   ]
 };
 
@@ -1620,7 +1668,7 @@ function playerAttack(useSkill){
     sk.lastUsed=now();
     // 技能经验
     if(sk.gradeIdx<4){
-      sk.xp=(sk.xp||0)+randi(1,3);
+      sk.xp=(sk.xp||0)+randi(0,1);
       const nextXp=skillXpForGrade(sk.gradeIdx+1);
       if(sk.xp>=nextXp){
         sk.xp-=nextXp;
