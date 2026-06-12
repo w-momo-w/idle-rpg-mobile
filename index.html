@@ -2684,7 +2684,7 @@ function renderLog(){
     const p=document.createElement('p');p.className=l.cls||'';p.innerHTML=`<span style="color:var(--muted);margin-right:4px;font-size:10px">${l.time}</span>${l.msg}`;el.appendChild(p);
   }
 }
-function showItemModal(it,source,isEquipped){
+function showItemModal(it,source,isEquipped,activeTab){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   const eqIt=!isEquipped?G.equipped[it.slot]:null;
   const clsNames2={warrior:'战士',archer:'射手',mage:'法师',all:'通用'};
@@ -2758,7 +2758,6 @@ function showItemModal(it,source,isEquipped){
     const attrOrder=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
     const refineAttrs=[];
     for(const k of attrOrder){if(it.stats[k])refineAttrs.push(k);}
-    if(it.specials){for(const sp of it.specials)refineAttrs.push(sp.id);}
     // 构建详情Tab内容
     let infoHtml='';
     const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
@@ -2843,6 +2842,11 @@ function showItemModal(it,source,isEquipped){
         document.getElementById('equip-tab-recast').classList.toggle('active',tn==='recast');
       });
     });
+    // 如果指定了激活Tab，切换到对应Tab
+    if(activeTab&&activeTab!=='info'){
+      const targetBtn=box.querySelector('[data-equiptab="'+activeTab+'"]');
+      if(targetBtn)targetBtn.click();
+    }
     // 逐条洗炼按钮事件
     box.querySelectorAll('.refine-attr-btn').forEach(btn=>{
       btn.addEventListener('click',function(){doRefineAttr(source,this.dataset.key);});
@@ -2995,9 +2999,8 @@ function doRefineAttr(slot,key){
   }
   it.power=itemPower(it);
   computeStats();renderAll();
-  closeModal();showItemModal(it,slot,true);
+  closeModal();showItemModal(it,slot,true,'refine');
 }
-function doRecastAttr(slot,key){
   const it=G.equipped[slot];if(!it)return;
   const q=it.quality;
   // 消耗重铸石
@@ -3030,9 +3033,8 @@ function doRecastAttrInner(slot,key,it,sa,range){
   it.power=itemPower(it);
   addLog(`♻️ 重铸：${sa.name} → ${sa.fmt(newVal)}（消耗♻️重铸石×1）`,'sys');
   computeStats();renderAll();
-  closeModal();showItemModal(it,slot,true);
+  closeModal();showItemModal(it,slot,true,'recast');
 }
-function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，上限+300，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
   const slotNames={mainHand:'主手武器',offHand:'副武器',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰',cloak:'披风'};
