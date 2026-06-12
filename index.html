@@ -3974,10 +3974,15 @@ function calculateOfflineRewards(offlineSec){
   const mfBonus = G.curMagicFind / 200;
   const avgDropRate = Math.min(typeBase + lvBonus + mfBonus, 0.65);
   const equipCount = Math.floor(killCount * avgDropRate);
-  const monLv = Math.floor((m.lv + (m.maxLv||m.lv+10)) / 2);
+  // 离线装备等级：取人物等级±3范围随机，受地图上下限约束
+  const mapMaxLv = m.maxLv || m.lv + 10;
+  const mapMinLv = m.lv;
+  const offlineMinLv = Math.max(mapMinLv, G.level - 3);
+  const offlineMaxLv = Math.min(mapMaxLv, G.level + 3);
+  const offlineMonLv = randi(Math.max(offlineMinLv, 1), Math.max(offlineMaxLv, 1));
   for(let i=0;i<Math.min(equipCount,50);i++){
     const slot = pick(Object.keys(EQ_NAMES));
-    const it = genEquip(slot, 0, Math.min(8, Math.floor(G.level/20)+2), monLv);
+    const it = genEquip(slot, 0, Math.min(8, Math.floor(G.level/20)+2), offlineMonLv);
     // 检查自动分解
     const nonClass=G.decomposeNonClass&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
     if(nonClass||(G.autoDecompose&&it.quality<=G.decomposeThreshold)){
