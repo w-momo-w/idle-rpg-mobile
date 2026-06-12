@@ -1641,17 +1641,19 @@ function genEquip(slot,minQ,maxQ,monsterLv){
   const s={};
   const statRanges={};
   const m=QMULT[q];
-  if(slot==='mainHand'){s.atk=randi(2,6)*m;statRanges.atk={min:Math.floor(2*m),max:Math.floor(6*m)};s.critRate=randf(0,1)*m;statRanges.critRate={min:0,max:Math.round(m*10)/10};}
-  else if(slot==='offHand'){s.def=randi(1,4)*m;statRanges.def={min:Math.floor(1*m),max:Math.floor(4*m)};s.block=randi(1,3)*m;statRanges.block={min:Math.floor(1*m),max:Math.floor(3*m)};}
-  else if(slot==='armor'){s.def=randi(2,5)*m;statRanges.def={min:Math.floor(2*m),max:Math.floor(5*m)};s.hp=randi(5,20)*m;statRanges.hp={min:Math.floor(5*m),max:Math.floor(20*m)};}
-  else if(slot==='helmet'){s.hp=randi(5,15)*m;statRanges.hp={min:Math.floor(5*m),max:Math.floor(15*m)};s.def=randi(1,3)*m;statRanges.def={min:Math.floor(1*m),max:Math.floor(3*m)};}
-  else if(slot==='bracer'){s.atk=randi(1,4)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(4*m)};s.critRate=randf(0,2)*m;statRanges.critRate={min:0,max:Math.round(2*m*10)/10};}
-  else if(slot==='pants'){s.def=randi(2,4)*m;statRanges.def={min:Math.floor(2*m),max:Math.floor(4*m)};s.hp=randi(5,15)*m;statRanges.hp={min:Math.floor(5*m),max:Math.floor(15*m)};}
-  else if(slot==='boots'){s.atkSpd=randi(2,8)*m;statRanges.atkSpd={min:Math.floor(2*m),max:Math.floor(8*m)};s.dodge=randf(0.5,2)*m;statRanges.dodge={min:Math.round(0.5*m*10)/10,max:Math.round(2*m*10)/10};}
-  else if(slot==='necklace'){s.critDmg=randi(5,20)*m;statRanges.critDmg={min:Math.floor(5*m),max:Math.floor(20*m)};s.atk=randi(1,3)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(3*m)};}
-  else if(slot==='ring1'||slot==='ring2'){s.atk=randi(1,4)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(4*m)};s.critRate=randf(0.5,2)*m;statRanges.critRate={min:Math.round(0.5*m*10)/10,max:Math.round(2*m*10)/10};}
-  else if(slot==='pendant'){s.atk=randi(1,5)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(5*m)};s.hp=randi(5,20)*m;statRanges.hp={min:Math.floor(5*m),max:Math.floor(20*m)};s.def=randi(1,3)*m;statRanges.def={min:Math.floor(1*m),max:Math.floor(3*m)};}
-  else if(slot==='cloak'){s.hp=randi(3,12)*m;statRanges.hp={min:Math.floor(3*m),max:Math.floor(12*m)};s.dodge=randf(1,4)*m;statRanges.dodge={min:Math.round(1*m*10)/10,max:Math.round(4*m*10)/10};}
+  const lvFactor=1+((monsterLv||1)-1)*0.02;
+  const mm=m*lvFactor;
+  if(slot==='mainHand'){s.atk=randi(2,6)*mm;statRanges.atk={min:Math.floor(2*mm),max:Math.floor(6*mm)};s.critRate=randf(0,1)*mm;statRanges.critRate={min:0,max:Math.round(mm*10)/10};}
+  else if(slot==='offHand'){s.def=randi(1,4)*mm;statRanges.def={min:Math.floor(1*mm),max:Math.floor(4*mm)};s.block=randi(1,3)*mm;statRanges.block={min:Math.floor(1*mm),max:Math.floor(3*mm)};}
+  else if(slot==='armor'){s.def=randi(2,5)*mm;statRanges.def={min:Math.floor(2*mm),max:Math.floor(5*mm)};s.hp=randi(5,20)*mm;statRanges.hp={min:Math.floor(5*mm),max:Math.floor(20*mm)};}
+  else if(slot==='helmet'){s.hp=randi(5,15)*mm;statRanges.hp={min:Math.floor(5*mm),max:Math.floor(15*mm)};s.def=randi(1,3)*mm;statRanges.def={min:Math.floor(1*mm),max:Math.floor(3*mm)};}
+  else if(slot==='bracer'){s.atk=randi(1,4)*mm;statRanges.atk={min:Math.floor(1*mm),max:Math.floor(4*mm)};s.critRate=randf(0,2)*mm;statRanges.critRate={min:0,max:Math.round(2*mm*10)/10};}
+  else if(slot==='pants'){s.def=randi(2,4)*mm;statRanges.def={min:Math.floor(2*mm),max:Math.floor(4*mm)};s.hp=randi(5,15)*mm;statRanges.hp={min:Math.floor(5*mm),max:Math.floor(15*mm)};}
+  else if(slot==='boots'){s.atkSpd=randi(2,8)*mm;statRanges.atkSpd={min:Math.floor(2*mm),max:Math.floor(8*mm)};s.dodge=randf(0.5,2)*mm;statRanges.dodge={min:Math.round(0.5*mm*10)/10,max:Math.round(2*mm*10)/10};}
+  else if(slot==='necklace'){s.critDmg=randi(5,20)*mm;statRanges.critDmg={min:Math.floor(5*mm),max:Math.floor(20*mm)};s.atk=randi(1,3)*mm;statRanges.atk={min:Math.floor(1*mm),max:Math.floor(3*mm)};}
+  else if(slot==='ring1'||slot==='ring2'){s.atk=randi(1,4)*mm;statRanges.atk={min:Math.floor(1*mm),max:Math.floor(4*mm)};s.critRate=randf(0.5,2)*mm;statRanges.critRate={min:Math.round(0.5*mm*10)/10,max:Math.round(2*mm*10)/10};}
+  else if(slot==='pendant'){s.atk=randi(1,5)*mm;statRanges.atk={min:Math.floor(1*mm),max:Math.floor(5*mm)};s.hp=randi(5,20)*mm;statRanges.hp={min:Math.floor(5*mm),max:Math.floor(20*mm)};s.def=randi(1,3)*mm;statRanges.def={min:Math.floor(1*mm),max:Math.floor(3*mm)};}
+  else if(slot==='cloak'){s.hp=randi(3,12)*mm;statRanges.hp={min:Math.floor(3*mm),max:Math.floor(12*mm)};s.dodge=randf(1,4)*mm;statRanges.dodge={min:Math.round(1*mm*10)/10,max:Math.round(4*mm*10)/10};}
   // round all basic stats
   for(const k in s){if(typeof s[k]==='number')s[k]=Math.round(s[k]*10)/10;}
   s.atk=Math.floor(s.atk||0);s.def=Math.floor(s.def||0);s.hp=Math.floor(s.hp||0);
@@ -1667,8 +1669,8 @@ function genEquip(slot,minQ,maxQ,monsterLv){
     const shuffled=[...pool].sort(()=>Math.random()-0.5);
     for(let i=0;i<Math.min(numSpecials,shuffled.length);i++){
       const sa=shuffled[i];
-      const val=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;
-      s[sa.id]=val;statRanges[sa.id]={min:sa.min,max:sa.max};chosen.push({...sa,val,text:sa.fmt(val)});
+      const val=randi(Math.floor(sa.min*lvFactor/sa.step),Math.floor(sa.max*lvFactor/sa.step))*sa.step;
+      s[sa.id]=val;statRanges[sa.id]={min:Math.round(sa.min*lvFactor*10)/10,max:Math.round(sa.max*lvFactor*10)/10};chosen.push({...sa,val,text:sa.fmt(val)});
     }
     specials.push(...chosen);
   }
@@ -2979,7 +2981,7 @@ function doRefineAttr(slot,key){
     const isSpecial=it.specials&&it.specials.find(sp=>sp.id===key);
     if(isSpecial){
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+      if(sa){const rf=1+((it.reqLv||1)-1)*0.02;newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;}
       else{const isIntFb=['atk','def','hp','critDmg','atkSpd','block'].includes(key);if(isIntFb){newVal=randi(range.min,range.max);}else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}}
     }else{
       const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
@@ -2988,46 +2990,48 @@ function doRefineAttr(slot,key){
     }
   }else{
     const m=QMULT[q];
+    const rf=1+((it.reqLv||1)-1)*0.02;
+    const mm=m*rf;
     if(key==='atk'){
-      if(slot==='mainHand')newVal=randi(2,6)*m;
-      else if(slot==='bracer')newVal=randi(1,4)*m;
-      else if(slot==='necklace')newVal=randi(1,3)*m;
-      else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
-      else if(slot==='pendant')newVal=randi(1,5)*m;
+      if(slot==='mainHand')newVal=randi(2,6)*mm;
+      else if(slot==='bracer')newVal=randi(1,4)*mm;
+      else if(slot==='necklace')newVal=randi(1,3)*mm;
+      else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*mm;
+      else if(slot==='pendant')newVal=randi(1,5)*mm;
       else newVal=0;
       newVal=Math.floor(newVal);
     }else if(key==='def'){
-      if(slot==='offHand')newVal=randi(1,4)*m;
-      else if(slot==='armor')newVal=randi(2,5)*m;
-      else if(slot==='helmet')newVal=randi(1,3)*m;
-      else if(slot==='pants')newVal=randi(2,4)*m;
-      else if(slot==='pendant')newVal=randi(1,3)*m;
+      if(slot==='offHand')newVal=randi(1,4)*mm;
+      else if(slot==='armor')newVal=randi(2,5)*mm;
+      else if(slot==='helmet')newVal=randi(1,3)*mm;
+      else if(slot==='pants')newVal=randi(2,4)*mm;
+      else if(slot==='pendant')newVal=randi(1,3)*mm;
       else newVal=0;
       newVal=Math.floor(newVal);
     }else if(key==='hp'){
-      if(slot==='armor')newVal=randi(5,20)*m;
-      else if(slot==='helmet')newVal=randi(5,15)*m;
-      else if(slot==='pants')newVal=randi(5,15)*m;
-      else if(slot==='pendant')newVal=randi(5,20)*m;
+      if(slot==='armor')newVal=randi(5,20)*mm;
+      else if(slot==='helmet')newVal=randi(5,15)*mm;
+      else if(slot==='pants')newVal=randi(5,15)*mm;
+      else if(slot==='pendant')newVal=randi(5,20)*mm;
       else newVal=0;
       newVal=Math.floor(newVal);
     }else if(key==='critRate'){
-      if(slot==='mainHand')newVal=randf(0,1)*m;
-      else if(slot==='bracer')newVal=randf(0,2)*m;
-      else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
+      if(slot==='mainHand')newVal=randf(0,1)*mm;
+      else if(slot==='bracer')newVal=randf(0,2)*mm;
+      else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*mm;
       else newVal=0;
       newVal=Math.round(newVal*10)/10;
     }else if(key==='critDmg'){
-      if(slot==='necklace')newVal=randi(5,20)*m;
+      if(slot==='necklace')newVal=randi(5,20)*mm;
       else newVal=0;
       newVal=Math.floor(newVal);
     }else if(key==='atkSpd'){
-      if(slot==='boots')newVal=randi(2,8)*m;
+      if(slot==='boots')newVal=randi(2,8)*mm;
       else newVal=0;
       newVal=Math.floor(newVal);
     }else{
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+      if(sa){const rf2=1+((it.reqLv||1)-1)*0.02;newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;}
       else newVal=0;
     }
   }
@@ -3070,11 +3074,12 @@ function doRecastAttr(slot,key){
 }
 function doRecastAttrInner(slot,key,it,sa,range){
   G.materials.recastStone--;
+  const rf=1+((it.reqLv||1)-1)*0.02;
   let newVal;
   if(range){
-    newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;
+    newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;
   }else{
-    newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;
+    newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;
   }
   it.stats[key]=newVal;
   const spEntry=it.specials?it.specials.find(sp=>sp.id===key):null;
