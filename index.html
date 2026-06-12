@@ -2416,13 +2416,13 @@ function doDecompose(threshold,nonClassOnly){
 }
 function toggleDecomposePanel(){
   const p=document.getElementById('decompose-panel');
-  p.style.display=p.style.display==='none'?'flex':'none';
-  const dq=document.getElementById('decompose-quality');
-  if(p.style.display==='flex'&&dq)dq.value=G.decomposeThreshold;
-  const acb=document.getElementById('auto-decompose');
-  if(p.style.display==='flex'&&acb)acb.checked=G.autoDecompose;
-  const dnc=document.getElementById('decompose-nonclass');
-  if(p.style.display==='flex'&&dnc)dnc.checked=G.decomposeNonClass;
+  const isHidden=window.getComputedStyle(p).display==='none';
+  p.style.display=isHidden?'flex':'none';
+  if(p.style.display==='flex'){
+    const dq=document.getElementById('decompose-quality');if(dq)dq.value=G.decomposeThreshold;
+    const acb=document.getElementById('auto-decompose');if(acb)acb.checked=G.autoDecompose;
+    const dnc=document.getElementById('decompose-nonclass');if(dnc)dnc.checked=G.decomposeNonClass;
+  }
 }
 // ═══ 技能书系统 ═══
 function learnSkillBook(index){
