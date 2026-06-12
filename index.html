@@ -1376,17 +1376,17 @@ const MAPS=[
 
 // Enemy specials (elite/boss only)
 const ENEMY_SPECIALS=[
-  {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力+30%',apply(e){e.atk=Math.floor(e.atk*1.3);}},
-  {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+40%',apply(e){e.def=Math.floor(e.def*1.4);}},
-  {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复3%HP',isRegen:true,regenPct:0.03},
-  {id:'evasive',icon:'🌀',name:'闪避',desc:'15%闪避攻击',dodge:15},
-  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹20%伤害',thorns:20},
-  {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血25%',lifesteal:25},
-  {id:'tough',icon:'💪',name:'坚韧',desc:'生命+40%',apply(e){e.hp=Math.floor(e.hp*1.4);e.maxHp=e.hp;}},
-  // 减益效果 — 精英30%概率，Boss 50%概率附带
-  {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害40%',dmgReduce:0.4},
-  {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率30%',critReduce:30},
-  {id:'drain',icon:'🕳️',name:'汲取',desc:'降低玩家攻速25%',atkSpdReduce:25},
+  {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力+40%',apply(e){e.atk=Math.floor(e.atk*1.4);}},
+  {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+50%',apply(e){e.def=Math.floor(e.def*1.5);}},
+  {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复4%HP',isRegen:true,regenPct:0.04},
+  {id:'evasive',icon:'🌀',name:'闪避',desc:'20%闪避攻击',dodge:20},
+  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹25%伤害',thorns:25},
+  {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血30%',lifesteal:30},
+  {id:'tough',icon:'💪',name:'坚韧',desc:'生命+50%',apply(e){e.hp=Math.floor(e.hp*1.5);e.maxHp=e.hp;}},
+  // 减益效果 — 精英30%概率，Boss 60%概率附带
+  {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害50%',dmgReduce:0.5},
+  {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率40%',critReduce:40},
+  {id:'drain',icon:'🕳️',name:'汲取',desc:'降低玩家攻速35%',atkSpdReduce:35},
 ];
 // Boss skills
 const ENEMY_SKILLS=[
@@ -1600,12 +1600,12 @@ function computeStats(){
   G.rawArmorPierce=armorPierce;G.rawSiphon=siphon;
 
   // 硬上限裁剪（仅限制装备部分，敏捷基础闪避不受限）
-  const equipDodge=Math.min(dodge-baseDodge,50);
+  const equipDodge=Math.min(dodge-baseDodge,65);
   G.equipDodge=equipDodge; // 装备闪避生效值
-  G.curDodge=baseDodge+equipDodge;G.curBlock=Math.min(block,45);G.curLifesteal=Math.min(lifesteal,50);
-  G.curThorns=Math.min(thorns,45);G.curMagicFind=Math.min(magicFind,100);G.curExpBonus=Math.min(expBonus,300);
-  G.curGoldBonus=Math.min(goldBonus,300);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,40);
-  G.curArmorPierce=Math.min(armorPierce,60);G.curSiphon=Math.min(siphon,40);
+  G.curDodge=baseDodge+equipDodge;G.curBlock=Math.min(block,60);G.curLifesteal=Math.min(lifesteal,65);
+  G.curThorns=Math.min(thorns,60);G.curMagicFind=Math.min(magicFind,150);G.curExpBonus=Math.min(expBonus,400);
+  G.curGoldBonus=Math.min(goldBonus,400);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,55);
+  G.curArmorPierce=Math.min(armorPierce,75);G.curSiphon=Math.min(siphon,55);
   // store raw stats for display
   G.rawST=ST||0;G.rawVT=VT||0;G.rawAG=AG||0;G.rawDX=DX||0;G.rawIN=IN||0;
 
@@ -1622,11 +1622,11 @@ function computeStats(){
     else if(id==='hpRegen')G.curHpRegen=b.val||0;else if(id==='cdReduce')G.curAtkSpd-=b.val||0;
   }
   // buff叠加后重新裁剪硬上限（仅装备部分，保留敏捷基础）
-  const equipDodge2=Math.min(G.curDodge-baseDodge,50);
-  G.equipDodge=equipDodge2;G.curDodge=baseDodge+equipDodge2;G.curBlock=Math.min(G.curBlock,45);
-  G.curLifesteal=Math.min(G.curLifesteal,50);G.curThorns=Math.min(G.curThorns,45);
-  G.curDoubleAtk=Math.min(G.curDoubleAtk,40);G.curArmorPierce=Math.min(G.curArmorPierce,60);
-  G.curSiphon=Math.min(G.curSiphon,40);
+  const equipDodge2=Math.min(G.curDodge-baseDodge,65);
+  G.equipDodge=equipDodge2;G.curDodge=baseDodge+equipDodge2;G.curBlock=Math.min(G.curBlock,60);
+  G.curLifesteal=Math.min(G.curLifesteal,65);G.curThorns=Math.min(G.curThorns,60);
+  G.curDoubleAtk=Math.min(G.curDoubleAtk,55);G.curArmorPierce=Math.min(G.curArmorPierce,75);
+  G.curSiphon=Math.min(G.curSiphon,55);
   if(G.hp>G.maxHp)G.hp=G.maxHp;
 }
 function playerDie(msg){
@@ -1732,14 +1732,14 @@ function genEquip(slot,minQ,maxQ,monsterLv){
       // 吸血保留一位小数
       if(sa.id==='lifesteal')val=Math.round(val*10)/10;
       // 单件装备特殊属性上限（防止百分比属性溢出）
-      if(sa.id==='lifesteal')val=Math.min(val,10);
-      else if(sa.id==='dodge')val=Math.min(val,10);
-      else if(sa.id==='block')val=Math.min(val,8);
-      else if(sa.id==='doubleAtk')val=Math.min(val,8);
-      else if(sa.id==='thorns')val=Math.min(val,10);
-      else if(sa.id==='armorPierce')val=Math.min(val,15);
-      else if(sa.id==='critBonus')val=Math.min(val,15);
-      else if(sa.id==='siphon')val=Math.min(val,8);
+      if(sa.id==='lifesteal')val=Math.min(val,15);
+      else if(sa.id==='dodge')val=Math.min(val,15);
+      else if(sa.id==='block')val=Math.min(val,12);
+      else if(sa.id==='doubleAtk')val=Math.min(val,12);
+      else if(sa.id==='thorns')val=Math.min(val,15);
+      else if(sa.id==='armorPierce')val=Math.min(val,20);
+      else if(sa.id==='critBonus')val=Math.min(val,20);
+      else if(sa.id==='siphon')val=Math.min(val,12);
       s[sa.id]=val;statRanges[sa.id]={min:Math.round(sa.min*spFactor*10)/10,max:Math.round(sa.max*spFactor*10)/10};chosen.push({...sa,val,text:sa.fmt(val)});
     }
     specials.push(...chosen);
@@ -1796,6 +1796,17 @@ function genMonster(){
     if(sp.dmgReduce)enemy._dmgReduce=sp.dmgReduce;
     if(sp.critReduce)enemy._critReduce=sp.critReduce;
     if(sp.atkSpdReduce)enemy._atkSpdReduce=sp.atkSpdReduce;
+    // 精英40%概率额外附带一个减益效果
+    if(Math.random()<0.4){
+      const debuffs=ENEMY_SPECIALS.filter(s=>s.dmgReduce||s.critReduce||s.atkSpdReduce);
+      if(debuffs.length>0){
+        const db=pick(debuffs);
+        if(db.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,db.dmgReduce);
+        if(db.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,db.critReduce);
+        if(db.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,db.atkSpdReduce);
+        enemy.specials.push({...db});
+      }
+    }
   }
   if(type==='boss'){
     const shuffled=[...ENEMY_SPECIALS].sort(()=>Math.random()-0.5);
@@ -1810,6 +1821,17 @@ function genMonster(){
       if(sp.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp.dmgReduce);
       if(sp.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp.critReduce);
       if(sp.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp.atkSpdReduce);
+    }
+    // Boss 70%概率额外附带一个减益效果
+    if(Math.random()<0.7){
+      const debuffs=ENEMY_SPECIALS.filter(s=>s.dmgReduce||s.critReduce||s.atkSpdReduce);
+      if(debuffs.length>0){
+        const db=pick(debuffs);
+        if(db.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,db.dmgReduce);
+        if(db.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,db.critReduce);
+        if(db.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,db.atkSpdReduce);
+        enemy.specials.push({...db});
+      }
     }
     // Boss gets one skill
     enemy.skill={...pick(ENEMY_SKILLS)};
@@ -2263,10 +2285,10 @@ function renderStats(){
     <div style="border-top:1px solid var(--teal);margin-top:6px;padding-top:4px;font-size:10px">
       <div style="color:var(--teal);font-weight:bold;margin-bottom:3px;font-size:11px">✨ 装备特殊属性</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px">
-        <span>🩸吸血 ${fmtStat(G.rawLifesteal,G.curLifesteal,50,'%')}</span><span>🌵荆棘 ${fmtStat(G.rawThorns,G.curThorns,45,'%')}</span><span>💎寻宝 ${fmtStat(G.rawMagicFind,G.curMagicFind,100,'%')}</span>
-        <span>📖经验 ${fmtStat(G.rawExpBonus,G.curExpBonus,300,'%')}</span><span>💰金币 ${fmtStat(G.rawGoldBonus,G.curGoldBonus,300,'%')}</span><span>💚恢复 ${G.curHpRegen}/2秒</span>
-        <span>👊连击 ${fmtStat(G.rawDoubleAtk,G.curDoubleAtk,40,'%')}</span><span>🗡️破甲 ${fmtStat(G.rawArmorPierce,G.curArmorPierce,60,'%')}</span><span>💀汲魂 ${fmtStat(G.rawSiphon,G.curSiphon,40,'%')}</span>
-        <span>🌀闪避 ${fmtStat(G.rawDodge,G.equipDodge||0,50,'%')}${G.rawAG>0?`<span style="color:var(--muted);font-size:9px"> +${(G.rawAG*0.3).toFixed(1)}%敏</span>`:''}</span><span>🛡️格挡 ${fmtStat(G.rawBlock,G.curBlock,45,'%')}</span><span>💥致命 ${G.curCritDmg-150}%</span>
+        <span>🩸吸血 ${fmtStat(G.rawLifesteal,G.curLifesteal,65,'%')}</span><span>🌵荆棘 ${fmtStat(G.rawThorns,G.curThorns,60,'%')}</span><span>💎寻宝 ${fmtStat(G.rawMagicFind,G.curMagicFind,150,'%')}</span>
+        <span>📖经验 ${fmtStat(G.rawExpBonus,G.curExpBonus,400,'%')}</span><span>💰金币 ${fmtStat(G.rawGoldBonus,G.curGoldBonus,400,'%')}</span><span>💚恢复 ${G.curHpRegen}/2秒</span>
+        <span>👊连击 ${fmtStat(G.rawDoubleAtk,G.curDoubleAtk,55,'%')}</span><span>🗡️破甲 ${fmtStat(G.rawArmorPierce,G.curArmorPierce,75,'%')}</span><span>💀汲魂 ${fmtStat(G.rawSiphon,G.curSiphon,55,'%')}</span>
+        <span>🌀闪避 ${fmtStat(G.rawDodge,G.equipDodge||0,65,'%')}${G.rawAG>0?`<span style="color:var(--muted);font-size:9px"> +${(G.rawAG*0.3).toFixed(1)}%敏</span>`:''}</span><span>🛡️格挡 ${fmtStat(G.rawBlock,G.curBlock,60,'%')}</span><span>💥致命 ${G.curCritDmg-150}%</span>
       </div>
     </div>`;
   // 套装属性单独显示
@@ -3102,14 +3124,14 @@ function doRefineAttr(slot,key){
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
       if(sa){const rf=(1+((it.reqLv||1)-1)*0.005)*(0.7+q*0.10);newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;
         // 单件上限
-        if(sa.id==='lifesteal')newVal=Math.min(newVal,10);
-        else if(sa.id==='dodge')newVal=Math.min(newVal,10);
-        else if(sa.id==='block')newVal=Math.min(newVal,8);
-        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,8);
-        else if(sa.id==='thorns')newVal=Math.min(newVal,10);
-        else if(sa.id==='armorPierce')newVal=Math.min(newVal,15);
-        else if(sa.id==='critBonus')newVal=Math.min(newVal,15);
-        else if(sa.id==='siphon')newVal=Math.min(newVal,8);
+        if(sa.id==='lifesteal')newVal=Math.min(newVal,15);
+        else if(sa.id==='dodge')newVal=Math.min(newVal,15);
+        else if(sa.id==='block')newVal=Math.min(newVal,12);
+        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,12);
+        else if(sa.id==='thorns')newVal=Math.min(newVal,15);
+        else if(sa.id==='armorPierce')newVal=Math.min(newVal,20);
+        else if(sa.id==='critBonus')newVal=Math.min(newVal,20);
+        else if(sa.id==='siphon')newVal=Math.min(newVal,12);
       }
       else{const isIntFb=['atk','def','hp','critDmg','atkSpd','block'].includes(key);if(isIntFb){newVal=randi(range.min,range.max);}else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}}
     }else{
@@ -3162,14 +3184,14 @@ function doRefineAttr(slot,key){
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
       if(sa){const rf2=(1+((it.reqLv||1)-1)*0.005)*(0.7+q*0.10);newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;
         // 单件上限
-        if(sa.id==='lifesteal')newVal=Math.min(newVal,10);
-        else if(sa.id==='dodge')newVal=Math.min(newVal,10);
-        else if(sa.id==='block')newVal=Math.min(newVal,8);
-        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,8);
-        else if(sa.id==='thorns')newVal=Math.min(newVal,10);
-        else if(sa.id==='armorPierce')newVal=Math.min(newVal,15);
-        else if(sa.id==='critBonus')newVal=Math.min(newVal,15);
-        else if(sa.id==='siphon')newVal=Math.min(newVal,8);
+        if(sa.id==='lifesteal')newVal=Math.min(newVal,15);
+        else if(sa.id==='dodge')newVal=Math.min(newVal,15);
+        else if(sa.id==='block')newVal=Math.min(newVal,12);
+        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,12);
+        else if(sa.id==='thorns')newVal=Math.min(newVal,15);
+        else if(sa.id==='armorPierce')newVal=Math.min(newVal,20);
+        else if(sa.id==='critBonus')newVal=Math.min(newVal,20);
+        else if(sa.id==='siphon')newVal=Math.min(newVal,12);
       }
       else newVal=0;
     }
