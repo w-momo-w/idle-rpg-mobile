@@ -622,6 +622,8 @@ body{
   border-bottom:1px solid var(--border);
 }
 #modal-box .modal-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+#modal-box .modal-hd{font-size:16px;font-weight:bold;margin-bottom:10px;color:var(--gold,#f0a500)}
+#modal-box .modal-bd{max-height:50vh;overflow-y:auto;padding:4px 0}
 
 /* ═══ 品质颜色 ═══ */
 .q0{color:#888}.q1{color:#10b981}.q2{color:#3b82f6}.q3{color:#f0a500}
@@ -1801,14 +1803,12 @@ function playerAttack(useSkill){
   let dmg,isCrit=false;
   if(sk){
     dmg=Math.floor(G.curAtk*sk.mult);
+    let defReduction=0.3;
+    if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
     if(sk.ignoreDef===1)dmg=Math.max(1,dmg); // 完全无视防御
     else if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef)); // 部分无视防御
-    else{
-      let defReduction=0.3;
-      if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
-      dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
-    }
-    if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
+    else dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
+    if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*defReduction));}dmg=td;}
     sk.lastUsed=now();
     // 技能经验
     if(sk.gradeIdx<4){
@@ -1864,14 +1864,12 @@ function playerAttackWithSkill(sk){
   const e=G.enemy;
   if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了你的攻击！`,'sys');enemyAttack();renderAll();return;}
   let dmg=Math.floor(G.curAtk*sk.mult);
+  let defReduction=0.3;
+  if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
   if(sk.ignoreDef===1)dmg=Math.max(1,dmg);
   else if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef));
-  else{
-    let defReduction=0.3;
-    if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
-    dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
-  }
-  if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
+  else dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
+  if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*defReduction));}dmg=td;}
   sk.lastUsed=now();
   // 技能经验（使用一次+1~3，缓慢升级）
   if(sk.gradeIdx<4){
@@ -1902,10 +1900,12 @@ function playerAttackWithSkill(sk){
     if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了连击！`,'sys');}
     else{
       // 连击重新计算伤害（考虑防御与破甲）
+      let dr=0.3;
+      if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)dr=0.1;
       let d2=sk.ignoreDef===1?Math.max(1,Math.floor(G.curAtk*sk.mult)):
         sk.ignoreDef?Math.floor(G.curAtk*sk.mult*(1-sk.ignoreDef)):
-        Math.max(1,Math.floor(G.curAtk*sk.mult)-Math.floor(G.enemy.def*0.3));
-      if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}d2=td;}
+        Math.max(1,Math.floor(G.curAtk*sk.mult)-Math.floor(G.enemy.def*dr));
+      if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*dr));}d2=td;}
       // 连击也能暴击
       if(G.curCritRate&&Math.random()*100<G.curCritRate){d2=Math.floor(d2*G.curCritDmg/100);addLog(`💥 连击暴击！追加 ${d2} 点伤害`,'crit');}
       else{addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');}
@@ -2030,7 +2030,7 @@ function changeMap(mapId){
   flash.classList.add('show');
   setTimeout(()=>{
     flash.classList.remove('show');
-    G.curMap=mapId;G.enemy=genMonster();addLog(`🗺️ 进入：${m.name}`,'sys');
+    G.curMap=mapId;G.enemy=genMonster();G.hp=G.maxHp;addLog(`🗺️ 进入：${m.name}`,'sys');
     // 切换地图时刷新任务（不计CD）
     G.quests=[];for(let i=0;i<3;i++){const t=pick(QUEST_TEMPLATES);G.quests.push(t.gen(G));}
     addLog('📋 任务已更新','sys');
@@ -3277,28 +3277,6 @@ function gachaPull(count){
   });
   });
 }
-function useHpPotion(isAuto){
-  if(!G.consumables.hpPotion&&!G.consumables.hpLarge)return addLog('⚠️ 没有血瓶','sys');
-  if(G.hp>=G.maxHp)return addLog('⚠️ 生命值已满','sys');
-  const n=now();
-  // 手动使用也共享冷却：手动用了，自动10秒内也不会再用
-  // 优先使用大血瓶
-  if(G.consumables.hpLarge&&(!isAuto||(G.autoHpLarge&&n-G._lastHpLargeUse>=10000))){
-    G.consumables.hpLarge--;G._consumableUseHistory.hpLarge=(G._consumableUseHistory.hpLarge||0)+1;
-    G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*0.4));
-    G._lastHpLargeUse=n; // 手动和自动共享冷却
-    addLog('💉 使用大血瓶！瞬间恢复40%'+(isAuto?'（自动）':''),'heal');
-  }
-  else if(G.consumables.hpPotion&&(!isAuto||(G.autoHpSmall&&n-G._lastHpSmallUse>=10000))){
-    G.consumables.hpPotion--;G._consumableUseHistory.hpPotion=(G._consumableUseHistory.hpPotion||0)+1;
-    const perTick=Math.floor(G.maxHp*0.05);
-    G._hpSmallHoT={until:n+5000,perTick,totalTicks:5,tickInterval:1000,lastTick:n};
-    G._lastHpSmallUse=n; // 手动和自动共享冷却
-    addLog('🧪 使用小血瓶！每秒恢复5%生命值，持续5秒'+(isAuto?'（自动）':''),'heal');
-  }
-    else if(!isAuto){addLog('⚠️ 正在冷却中或有其他限制，稍后再试','sys');return;}
-  renderAll();
-}
 function useHpPotionSmall(isAuto){
   if(!G.consumables.hpPotion)return addLog('⚠️ 没有小血瓶','sys');
   if(G.hp>=G.maxHp)return addLog('⚠️ 生命值已满','sys');
@@ -3688,15 +3666,20 @@ function gameTick(){
   const n2=now();const expiredKeys=[];for(const id in G.buffs){if(G.buffs[id].until<n2)expiredKeys.push(id);}for(const id of expiredKeys)delete G.buffs[id];
   if(Object.keys(G.buffs).length>0)computeStats();
 }
-function init(){
-  // 初始化存档系统（异步，不阻塞启动）
-  initSaveSystem();
+async function init(){
+  // 初始化存档系统（等待OPFS就绪）
+  await initSaveSystem();
   
-  // 先尝试同步从 localStorage 加载（不阻塞渲染）
-  const loaded = loadGameSync();
+  // 先尝试同步从 localStorage 加载
+  let loaded = loadGameSync();
   let offlineSec = 0;
+  
+  // localStorage无数据时，尝试OPFS本地文件
+  if(!loaded && _useOPFS){
+    loaded = await loadGame();
+  }
+  
   if(loaded){
-    G = loaded;
     // 计算离线时长
     if(G._lastSaveTime > 0){
       offlineSec = Math.floor((Date.now() - G._lastSaveTime) / 1000);
