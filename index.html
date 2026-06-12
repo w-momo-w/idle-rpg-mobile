@@ -1157,7 +1157,7 @@ const SKILLS={
     {id:'counter_strike',name:'反击',icon:'⚔️',desc:'受到敌人攻击时有概率立即发动反击，造成一次普攻伤害。永久被动，让敌人在攻击你时也要付出代价。',cdMs:0,type:'buff',unlockLv:100,skillType:'passive'},
     {id:'second_wind',name:'复苏之风',icon:'🌬️',desc:'战斗中源源不断地恢复生命值，每秒自动回复一定HP。永久被动，大幅减少对血瓶的依赖。',cdMs:0,type:'buff',unlockLv:140,skillType:'passive'},
     {id:'titan_strength',name:'泰坦之力',icon:'🏋️',desc:'觉醒远古泰坦的血脉之力，永久提升攻击力。后期战士的核心输出被动，让每一击都重如泰山。',cdMs:0,type:'buff',unlockLv:190,skillType:'passive'},
-    {id:'immortal',name:'不死之身',icon:'👼',desc:'受到致命伤害时自动复活一次，恢复50%生命值。冷却300秒。战士终极生存技能，等同于多一条命。',cdMs:300000,type:'buff',unlockLv:250,skillType:'passive'},
+    {id:'immortal',name:'不死之身',icon:'👼',desc:'受到致命伤害时自动复活一次，恢复一定比例生命值（随等级提升）。冷却300秒。战士终极生存技能，等同于多一条命。',cdMs:300000,type:'buff',unlockLv:250,skillType:'passive'},
   ],
   archer:[
     {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'屏息凝神瞄准敌人要害，造成伤害并无视部分防御。是射手最频繁使用的精准打击。',cdMs:4000,mult:1.4,ignoreDef:0.3,unlockLv:0,skillType:'active'},
@@ -1638,9 +1638,10 @@ function computeStats(){
 function playerDie(msg){
   // 不死之身：有revive buff时自动复活
   if(G.buffs.revive&&G.buffs.revive.until>now()){
+    const healPct=G.buffs.revive.healPct||0.5;
     delete G.buffs.revive;
-    G.hp=Math.floor(G.maxHp*0.5);G.dead=false;G.deadUntil=0;
-    addLog('👼 不死之身触发！你复活了（50%HP）！','sys');
+    G.hp=Math.floor(G.maxHp*healPct);G.dead=false;G.deadUntil=0;
+    addLog(`👼 不死之身触发！你复活了（${Math.round(healPct*100)}%HP）！`,'sys');
     return false;
   }
   G.hp=0;G.dead=true;G.deadUntil=now()+5000;
@@ -3864,7 +3865,7 @@ function applySkillBuff(sk,gradeMult){
     case 'counter_strike': G.buffs.thorns={val:Math.floor(15*gradeMult),until:n+dur,...meta}; break;
     case 'second_wind': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.02*gradeMult),until:n+dur,...meta}; break;
     case 'titan_strength': G.buffs.atk={val:Math.floor(G.curAtk*0.20*gradeMult),until:n+dur,...meta}; break;
-    case 'immortal': G.buffs.revive={val:1,until:n+300000,...meta}; break;
+    case 'immortal': G.buffs.revive={val:1,until:n+300000,healPct:Math.min(0.8,0.5*gradeMult),...meta}; break;
     // 被动技能 — 雷电术/陨石术/毒箭/鹰眼
     case 'lightning': G.buffs.armorPierce={val:Math.floor(12*gradeMult),until:n+dur,...meta}; break;
     case 'meteor': G.buffs.doubleAtk={val:Math.floor(10*gradeMult),until:n+dur,...meta}; break;
@@ -3909,7 +3910,9 @@ function renderBuffBar(){
     const skillIcon=buff.skillIcon||icons[id]||'';
     const skillName=buff.skillName||labels[id]||id;
     let valStr='';
-    if(buff.val!=null)valStr=buff.val;else if(buff.dmg!=null)valStr=buff.dmg;else valStr='?';
+    if(id==='revive'&&buff.healPct!=null){
+      valStr=Math.round(buff.healPct*100)+'%HP';
+    }else if(buff.val!=null)valStr=buff.val;else if(buff.dmg!=null)valStr=buff.dmg;else valStr='?';
     const valPrefix=(id==='maxhp_cd')?'+':(buff.val>=0?'+':'');
     // 检查是否为永久被动（cdMs=0），永久被动不显示倒计时
     const skillDef=buff.skillId?getSkillDefById(buff.skillId):null;
