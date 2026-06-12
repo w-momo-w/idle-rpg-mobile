@@ -2539,9 +2539,13 @@ function closeModal(){document.getElementById('modal-overlay').classList.remove(
 function doEnhance(slot){
   const it=G.equipped[slot];if(!it)return;
   const elv=G.slotEnhance[slot]||0;
-  const goldCost=200+elv*200;
-  const oreCost=3+elv*2;
-  const successRate=Math.max(5,100-elv*7);
+  if(elv>=300){addLog('⚠️ 已达到强化上限(+300)','sys');return;}
+  // 消耗随等级递增
+  const tier=Math.floor(elv/10);
+  const goldCost=200+elv*150+tier*500;
+  const oreCost=3+elv*2+tier*3;
+  // 成功率：每10级递减，每级-0.8%，基础100%
+  const successRate=Math.max(3,100-(elv+1)*0.8);
   if(G.gold<goldCost){addLog('⚠️ 金币不足','sys');return;}
   if((G.materials.ironOre||0)<oreCost){addLog('⚠️ 铁矿石不足','sys');return;}
   G.gold-=goldCost;G.materials.ironOre-=oreCost;
@@ -2557,14 +2561,16 @@ function doEnhance(slot){
 }
 function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
-  let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
+  let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，上限+300，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
   const slotNames={mainHand:'主手武器',offHand:'副手',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指1',ring2:'戒指2',pendant:'吊坠'};
   let hasItems=false;
   for(const slot in G.equipped){
     const it=G.equipped[slot];if(!it)continue;hasItems=true;
     const elv=G.slotEnhance[slot]||0;
-    const goldCost=200+elv*200;const oreCost=3+elv*2;
-    const successRate=Math.max(5,100-elv*7);
+    if(elv>=300)continue;
+    const tier=Math.floor(elv/10);
+    const goldCost=200+elv*150+tier*500;const oreCost=3+elv*2+tier*3;
+    const successRate=Math.max(3,100-(elv+1)*0.8);
     const hasOre=(G.materials.ironOre||0)>=oreCost;const hasGold=G.gold>=goldCost;
     const canEnhance=hasOre&&hasGold;
     html+=`<div class="shop-item-row" style="cursor:pointer;${!canEnhance?'opacity:0.5':''}">
