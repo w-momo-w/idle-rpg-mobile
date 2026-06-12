@@ -2161,8 +2161,9 @@ function doDecompose(threshold,nonClassOnly){
     const it=G.inventory[i];
     const matchQuality=it.quality<=threshold;
     const matchNonClass=nonClassOnly&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
-    // 一键分解：非本职业+品质都分解
-    if(matchNonClass||matchQuality){
+    // 一键分解：勾选非本职业→非本职业装备；品质阈值→所有低于阈值装备都分解
+    const shouldDecompose = matchNonClass || matchQuality;
+    if(shouldDecompose){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
       decomposed++;
