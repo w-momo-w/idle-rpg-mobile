@@ -3818,9 +3818,9 @@ function calculateOfflineRewards(offlineSec){
   const hitsToKill = Math.ceil(avgHp / Math.max(1, effDmg));
   const avgKillTimeMs = hitsToKill * atkInterval;
   
-  // 离线击杀数（在线80%效率）
+  // 离线击杀数（全额击杀，装备/材料/技能书不打折）
   const offlineMs = offlineSec * 1000;
-  let killCount = Math.floor(offlineMs / avgKillTimeMs * 0.8);
+  let killCount = Math.floor(offlineMs / avgKillTimeMs);
   if(killCount < 1) killCount = 1;
   if(killCount > 100000) killCount = 100000;
   
@@ -3832,7 +3832,8 @@ function calculateOfflineRewards(offlineSec){
   const levelBefore = G.level;
   let equipKept = 0; // 实际保留的装备数量
   
-  totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100));
+  // 经验、金币、技能经验按在线80%打折
+  totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100) * 0.8);
   G.xp += totalXp;
   // 离线升级：直接操作属性，避免触发转职弹窗
   while(G.xp >= xpForLevel(G.level) && G.level < 300){
@@ -3845,8 +3846,8 @@ function calculateOfflineRewards(offlineSec){
   computeStats();G.hp=G.maxHp;
   const levelAfter = G.level;
   
-  // 离线技能经验（在线每次使用+0~1，离线按击杀数×50%效率计算）
-  const offlineSkillUses = Math.floor(killCount * 0.5); // 假设每只怪物用一次技能，效率50%
+  // 离线技能经验（在线50%效率）
+  const offlineSkillUses = Math.floor(killCount * 0.5);
   for(const sk of G.skills){
     if(sk.gradeIdx >= 4) continue;
     let gained = 0;
@@ -3864,7 +3865,7 @@ function calculateOfflineRewards(offlineSec){
     totalSkillXp += gained;
   }
   
-  totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100));
+  totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100) * 0.8);
   G.gold += totalGold;
   // 更新 collect_gold 任务离线进度
   for(const q of G.quests){
