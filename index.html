@@ -756,6 +756,7 @@ body{
           <div id="buff-bar"></div>
           <div class="act-btns" id="skill-btns">
             <button class="btn btn-red btn-lg" id="btn-attack">⚔️ 攻击</button>
+            <button class="btn btn-gold" id="btn-change-map">🗺️ 切换地图</button>
           </div>
           <div class="act-btns act-btns-sm" id="consumable-btns">
             <button class="btn btn-green" id="btn-use-hp-small">🧪 小血瓶</button>
@@ -765,9 +766,6 @@ body{
             <button class="btn btn-pink" id="btn-use-atk-scroll">📜 攻击</button>
             <button class="btn btn-blue2" id="btn-use-def-scroll">🛡️ 防御</button>
             <button class="btn btn-red2" id="btn-use-hp-scroll">❤️ 生命</button>
-          </div>
-          <div class="act-btns act-btns-sm">
-            <button class="btn btn-gold" id="btn-change-map">🗺️ 切换地图</button>
           </div>
           <div id="combat-log"></div>
         </div>
@@ -1081,24 +1079,34 @@ const MATERIAL_CRAFT=[
 // Skill data
 const SKILLS={
   warrior:[
-    {id:'heavy_strike',name:'重击',icon:'💥',desc:'造成160%攻击力伤害',cdMs:2500,mult:1.6,unlockLv:0},
-    {id:'whirlwind',name:'旋风斩',icon:'🌀',desc:'造成90%攻击力伤害×2次',cdMs:4000,mult:0.9,hits:2,unlockLv:10},
-    {id:'berserk',name:'狂暴',icon:'😡',desc:'5秒内攻击力+30%',cdMs:12000,type:'buff',unlockLv:0,bookOnly:true},
-    {id:'shield_wall',name:'盾墙',icon:'🛡️',desc:'5秒内防御+50%',cdMs:15000,type:'buff',unlockLv:0,bookOnly:true},
+    {id:'heavy_strike',name:'重击',icon:'💥',desc:'造成攻击力伤害',cdMs:2500,mult:1.6,unlockLv:0,skillType:'active'},
+    {id:'whirlwind',name:'旋风斩',icon:'🌀',desc:'造成攻击力伤害×2次',cdMs:4000,mult:0.9,hits:2,unlockLv:10,skillType:'active'},
+    {id:'berserk',name:'狂暴',icon:'😡',desc:'攻击力+30%，持续5秒',cdMs:12000,type:'buff',unlockLv:0,skillType:'passive'},
+    {id:'shield_wall',name:'盾墙',icon:'🛡️',desc:'防御+50%，持续5秒',cdMs:15000,type:'buff',unlockLv:0,skillType:'passive'},
   ],
   archer:[
-    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成140%攻击力伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0},
-    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成70%攻击力伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:10},
-    {id:'poison_arrow',name:'毒箭',icon:'☠️',desc:'造成120%伤害+5秒毒(攻击力×0.2/秒)',cdMs:6000,mult:1.2,type:'dot',unlockLv:0,bookOnly:true},
-    {id:'hawk_eye',name:'鹰眼',icon:'👁️',desc:'暴击率+20%，持续8秒',cdMs:15000,type:'buff',unlockLv:0,bookOnly:true},
+    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成攻击力伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0,skillType:'active'},
+    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成攻击力伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:10,skillType:'active'},
+    {id:'poison_arrow',name:'毒箭',icon:'☠️',desc:'造成伤害+5秒毒',cdMs:6000,mult:1.2,type:'dot',unlockLv:0,skillType:'passive'},
+    {id:'hawk_eye',name:'鹰眼',icon:'👁️',desc:'暴击率+20%，持续8秒',cdMs:15000,type:'buff',unlockLv:0,skillType:'passive'},
   ],
   mage:[
-    {id:'fireball',name:'火球术',icon:'🔥',desc:'造成200%攻击力伤害',cdMs:3000,mult:2.0,unlockLv:0},
-    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成130%攻击力伤害，减速敌人2秒',cdMs:4000,mult:1.3,unlockLv:10},
-    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成180%伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:0,bookOnly:true},
-    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成250%攻击力伤害',cdMs:8000,mult:2.5,unlockLv:0,bookOnly:true},
+    {id:'fireball',name:'火球术',icon:'🔥',desc:'造成攻击力伤害',cdMs:3000,mult:2.0,unlockLv:0,skillType:'active'},
+    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成攻击力伤害，减速敌人2秒',cdMs:4000,mult:1.3,unlockLv:10,skillType:'active'},
+    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成攻击力伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:0,skillType:'passive'},
+    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成攻击力伤害',cdMs:8000,mult:2.5,unlockLv:0,skillType:'passive'},
   ]
 };
+
+// 技能等级配置 D/C/B/A/S
+const SKILL_GRADES = ['D','C','B','A','S'];
+const SKILL_GRADE_MULT = {D:1.0, C:1.15, B:1.35, A:1.6, S:2.0};
+const SKILL_GRADE_COLOR = {D:'#9ca3af', C:'#22c55e', B:'#3b82f6', A:'#a855f7', S:'#f59e0b'};
+// 技能升级所需经验（缓慢增长）
+function skillXpForGrade(gradeIdx){
+  // D→C: 100, C→B: 300, B→A: 900, A→S: 2700
+  return [0, 100, 300, 900, 2700][gradeIdx] || 10000;
+}
 
 const CLASS_ADV=[
   {lv:50,warrior:[{id:'berserker',name:'狂战士',icon:'😡',bonus:{atk:15,hp:80}},{id:'paladin',name:'圣骑士',icon:'🛡️',bonus:{def:12,hp:120}}],
@@ -1112,8 +1120,8 @@ const CLASS_ADV=[
 // Class stat per level: {str, vit, agi, dex, int} — 5 points total
 const CLASS_GROWTH={
   warrior:{str:2,vit:1,agi:1,dex:1,int:0},
-  archer:{str:1,vit:0,agi:2,dex:2,int:0},
-  mage:{str:0,vit:0,agi:1,dex:1,int:3}
+  archer:{str:1,vit:1,agi:2,dex:1,int:0},
+  mage:{str:0,vit:1,agi:1,dex:1,int:2}
 };
 
 // Maps with monster pools + boss/elite
@@ -1327,15 +1335,16 @@ let G={
 
 function classBaseStats(){
   if(G.classId==='warrior')return{str:10,vit:8,agi:4,dex:3,int:1};
-  if(G.classId==='archer')return{str:5,vit:4,agi:10,dex:8,int:1};
-  return{str:2,vit:3,agi:5,dex:4,int:12};
+  if(G.classId==='archer')return{str:5,vit:6,agi:10,dex:6,int:1};
+  return{str:2,vit:5,agi:5,dex:4,int:12};
 }
 
 function computeStats(){
   const cb=classBaseStats();
   let ST=cb.str+G.str, VT=cb.vit+G.vit, AG=cb.agi+G.agi, DX=cb.dex+G.dex, IN=cb.int+G.int;
-  // Str→ATK, Vit→HP, Agi→ATK_SPD+Dodge, Dex→CritRate, Int→ATK(mage only)
-  let a=ST*2, d=VT*1, h=VT*15, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
+  // Str→ATK, Vit→HP(法师/射手额外加成), Agi→ATK_SPD+Dodge, Dex→CritRate, Int→ATK(mage only)
+  const vitHpMult = G.classId==='warrior'?15:G.classId==='archer'?18:20;
+  let a=ST*2, d=VT*1.2, h=VT*vitHpMult, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
   if(G.classId==='mage')a+=IN*3;
   let dodge=AG*0.3, block=0, lifesteal=0, thorns=0, magicFind=0, expBonus=0, goldBonus=0, hpRegen=0, doubleAtk=0, armorPierce=0, siphon=0;
 
@@ -1584,6 +1593,17 @@ function playerAttack(useSkill){
     }
     if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
     sk.lastUsed=now();
+    // 技能经验
+    if(sk.gradeIdx<4){
+      sk.xp=(sk.xp||0)+randi(1,3);
+      const nextXp=skillXpForGrade(sk.gradeIdx+1);
+      if(sk.xp>=nextXp){
+        sk.xp-=nextXp;
+        sk.gradeIdx++;
+        sk.grade=SKILL_GRADES[sk.gradeIdx];
+        addLog(`⭐ ${sk.name} 升级为 <span style="color:${SKILL_GRADE_COLOR[sk.grade]}">${sk.grade}级</span>！`,'skill');
+      }
+    }
     if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
     addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   }else{
@@ -1630,6 +1650,17 @@ function playerAttackWithSkill(sk){
   }
   if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
   sk.lastUsed=now();
+  // 技能经验（使用一次+1~3，缓慢升级）
+  if(sk.gradeIdx<4){
+    sk.xp=(sk.xp||0)+randi(1,3);
+    const nextXp=skillXpForGrade(sk.gradeIdx+1);
+    if(sk.xp>=nextXp){
+      sk.xp-=nextXp;
+      sk.gradeIdx++;
+      sk.grade=SKILL_GRADES[sk.gradeIdx];
+      addLog(`⭐ ${sk.name} 升级为 <span style="color:${SKILL_GRADE_COLOR[sk.grade]}">${sk.grade}级</span>！`,'skill');
+    }
+  }
   if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
   addLog(`📖 ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   // lifesteal
@@ -1712,14 +1743,27 @@ function onKill(){
       else addLog('⚠️ 背包已满，装备丢失！','sys');
     }
   }
-  // 技能书掉落：仅怪物>10级，1.2%概率，进入背包
-  if(monLv>10&&Math.random()<0.012){
-    const clsSkills=SKILLS[G.classId];const bookSkills=clsSkills.filter(s=>s.bookOnly&&!G.skills.find(gs=>gs.id===s.id));
-    if(bookSkills.length>0){
-      const sb=pick(bookSkills);
-      const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:G.classId,reqLv:10};
-      G.skillBooks.push(sbit);
-      addLog(`📖 掉落技能书：【${sb.name}】已放入背包`,'drop');
+  // 技能书掉落：10级后怪物可掉落，普通1%/精英5%/Boss10%，随机种类
+  if(monLv>10){
+    const bookRate = G.enemy.type==='boss'?0.10:G.enemy.type==='elite'?0.05:0.01;
+    if(Math.random()<bookRate){
+      // 随机所有职业的技能书
+      const allClasses=['warrior','archer','mage'];
+      const allBooks=[];
+      for(const cls of allClasses){
+        const clsSkills=SKILLS[cls];
+        for(const s of clsSkills){
+          if(s.skillType==='passive'){
+            allBooks.push({...s,classReq:cls});
+          }
+        }
+      }
+      if(allBooks.length>0){
+        const sb=pick(allBooks);
+        const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:10};
+        G.skillBooks.push(sbit);
+        addLog(`📖 掉落技能书：【${sb.name}】已放入背包`,'drop');
+      }
     }
   }
   // 材料掉落
@@ -1916,17 +1960,33 @@ function renderEnemy(){
   // Enemy specials display
   let specialsHtml='';
   if(e.specials&&e.specials.length>0){
-    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal)">';
+    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal);cursor:pointer;text-decoration:underline" id="enemy-specials-click" title="点击查看详情">';
     for(const sp of e.specials){specialsHtml+=`${sp.icon}${sp.name} `;}
     specialsHtml+='</div>';
   }
-  // Skill display
   if(e.skill){specialsHtml+=`<div style="font-size:10px;color:var(--purple);margin-top:2px">${e.skill.icon}技能：${e.skill.name}</div>`;}
-  // Insert into enemy card
   const cardEl=document.getElementById('enemy-card');
   let infoEl=document.getElementById('enemy-specials');
   if(!infoEl){infoEl=document.createElement('div');infoEl.id='enemy-specials';cardEl.appendChild(infoEl);}
   infoEl.innerHTML=specialsHtml;
+  // 点击查看怪物特殊属性详情
+  const spClick=document.getElementById('enemy-specials-click');
+  if(spClick&&e.specials&&e.specials.length>0){
+    spClick.addEventListener('click',()=>{
+      const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+      ov.classList.add('show');
+      let html=`<h3>${e.icon} ${e.name} 特殊属性</h3>`;
+      for(const sp of e.specials){
+        html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border)"><b>${sp.icon} ${sp.name}</b><span style="color:var(--muted);font-size:11px;display:block">${sp.desc||'特殊能力'}</span></div>`;
+      }
+      if(e.skill){
+        html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border)"><b>${e.skill.icon} ${e.skill.name}</b><span style="color:var(--muted);font-size:11px;display:block">伤害×${e.skill.mult}，CD${e.skill.cdMs/1000}秒</span></div>`;
+      }
+      html+=`<button class="btn btn-sm" style="width:100%;margin-top:8px" id="btn-sp-close">关闭</button>`;
+      box.innerHTML=html;
+      document.getElementById('btn-sp-close').addEventListener('click',closeModal);
+    });
+  }
 }
 function renderBag(){
   // 更新装备格子数
@@ -2087,47 +2147,71 @@ function learnSkillBook(index){
   if(G.skills.find(s=>s.id===sb.skillId)){addLog('⚠️ 已学会该技能','sys');return;}
   const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
   if(!skillDef)return;
-  G.skills.push({...skillDef,lastUsed:0});G.skillBooks.splice(index,1);
-  addLog(`📖 学会技能：【${sb.name}】！`,'sys');refreshSkillBtns();
-  renderBag();renderSkills();renderAll();
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  box.innerHTML=`<h3>📖 学习技能</h3><p style="font-size:12px;margin:8px 0">确定学习 <b>${sb.icon} ${sb.name}</b> 吗？</p><p style="font-size:10px;color:var(--muted)">${sb.desc} · 等级：<span style="color:${SKILL_GRADE_COLOR.D}">D</span></p>
+    <div style="display:flex;gap:8px"><button class="btn btn-purple" style="flex:1" id="btn-learn-yes">✅ 学习</button><button class="btn btn-sm" style="flex:1" id="btn-learn-no">❌ 取消</button></div>`;
+  document.getElementById('btn-learn-no').addEventListener('click',closeModal);
+  document.getElementById('btn-learn-yes').addEventListener('click',()=>{
+    closeModal();
+    G.skills.push({...skillDef,lastUsed:0,gradeIdx:0,grade:'D',xp:0});G.skillBooks.splice(index,1);
+    addLog(`📖 学会技能：【${sb.name}】(D级)`,'sys');refreshSkillBtns();
+    renderBag();renderSkills();renderAll();
+  });
 }
 function exchangeSkillBook(index){
   const sb=G.skillBooks[index];if(!sb)return;
-  G.skillBooks.splice(index,1);G.diamond+=1;
-  addLog(`💎 【${sb.name}】兑换为1钻石`,'sys');
-  renderBag();renderAll();
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  box.innerHTML=`<h3>💎 兑换技能书</h3><p style="font-size:12px;margin:8px 0">确定将 <b>${sb.icon} ${sb.name}</b> 兑换为 <b style="color:var(--purple)">💎1钻石</b> 吗？</p>
+    <div style="display:flex;gap:8px"><button class="btn btn-pink" style="flex:1" id="btn-exch-yes">✅ 兑换</button><button class="btn btn-sm" style="flex:1" id="btn-exch-no">❌ 取消</button></div>`;
+  document.getElementById('btn-exch-no').addEventListener('click',closeModal);
+  document.getElementById('btn-exch-yes').addEventListener('click',()=>{
+    closeModal();
+    G.skillBooks.splice(index,1);G.diamond+=1;
+    addLog(`💎 【${sb.name}】兑换为1钻石`,'sys');
+    renderBag();renderAll();
+  });
 }
 // ═══ 材料使用 ═══
 function useMaterial(mid){
   const md=MATERIALS[mid];const count=G.materials[mid]||0;
   if(md.id==='ironOre'){
-    // 铁矿石：打开装备选择界面进行强化
     showEnhanceSelectModal();
     return;
   }
   if(count<md.use.count){addLog(`⚠️ 材料不足，需要${md.use.count}个${md.name}`,'sys');return;}
-  G.materials[mid]-=md.use.count;
-  if(md.use.gold){G.gold+=md.use.gold;addLog(`💰 使用${md.use.count}个${md.name}兑换${md.use.gold}金币`,'sys');}
-  else if(md.use.diamond){G.diamond+=md.use.diamond;addLog(`💎 使用${md.use.count}个${md.name}兑换${md.use.diamond}钻石`,'sys');}
-  else if(md.use.potion){G.consumables[md.use.potion]=(G.consumables[md.use.potion]||0)+1;addLog(`🧪 使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}`,'sys');}
-  else if(md.use.atkBoost){
-    // 随机选择一件已装备的装备强化 +1~3 攻击力
-    const eqSlots=Object.keys(G.equipped).filter(k=>G.equipped[k]);
-    if(eqSlots.length===0){addLog('⚠️ 没有可强化的装备','sys');G.materials[mid]+=md.use.count;return;}
-    const slot=pick(eqSlots);const boost=randi(1,3);
-    if(!G.equipped[slot].stats.atk)G.equipped[slot].stats.atk=0;
-    G.equipped[slot].stats.atk+=boost;
-    G.equipped[slot].power=itemPower(G.equipped[slot]);
-    addLog(`⚒️ 使用${md.use.count}个${md.name}强化${G.equipped[slot].name}，攻击力+${boost}`,'sys');
-    computeStats();
-  }
-  else if(md.use.equipMinQ!==undefined){
-    const q=rollWeightedQ(md.use.equipMinQ,8);const slot=pick(Object.keys(EQ_NAMES));
-    const it=genEquip(slot,q,8,G.level);
-    if(G.inventory.length<G.maxInv){G.inventory.push(it);addLog(`🎁 使用${md.use.count}个${md.name}兑换获得：${it.name}`,'drop');autoEquipCheck(it);}
-    else{addLog('⚠️ 背包已满','sys');G.materials[mid]+=md.use.count;return;}
-  }
-  computeStats();renderAll();renderBag();
+  // 确认提示
+  let desc='';
+  if(md.use.gold)desc=`使用${md.use.count}个${md.name}兑换 ${md.use.gold}金币，确定吗？`;
+  else if(md.use.diamond)desc=`使用${md.use.count}个${md.name}兑换 ${md.use.diamond}钻石，确定吗？`;
+  else if(md.use.potion)desc=`使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}，确定吗？`;
+  else if(md.use.atkBoost)desc=`使用${md.use.count}个${md.name}随机强化已装备武器攻击力+1~3，确定吗？`;
+  else if(md.use.equipMinQ!==undefined)desc=`使用${md.use.count}个${md.name}兑换随机装备，确定吗？`;
+  else desc=`使用${md.use.count}个${md.name}，确定吗？`;
+  confirmAction('使用材料',desc,()=>{
+    G.materials[mid]-=md.use.count;
+    if(md.use.gold){G.gold+=md.use.gold;addLog(`💰 使用${md.use.count}个${md.name}兑换${md.use.gold}金币`,'sys');}
+    else if(md.use.diamond){G.diamond+=md.use.diamond;addLog(`💎 使用${md.use.count}个${md.name}兑换${md.use.diamond}钻石`,'sys');}
+    else if(md.use.potion){G.consumables[md.use.potion]=(G.consumables[md.use.potion]||0)+1;addLog(`🧪 使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}`,'sys');}
+    else if(md.use.atkBoost){
+      const eqSlots=Object.keys(G.equipped).filter(k=>G.equipped[k]);
+      if(eqSlots.length===0){addLog('⚠️ 没有可强化的装备','sys');G.materials[mid]+=md.use.count;return;}
+      const slot=pick(eqSlots);const boost=randi(1,3);
+      if(!G.equipped[slot].stats.atk)G.equipped[slot].stats.atk=0;
+      G.equipped[slot].stats.atk+=boost;
+      G.equipped[slot].power=itemPower(G.equipped[slot]);
+      addLog(`⚒️ 使用${md.use.count}个${md.name}强化${G.equipped[slot].name}，攻击力+${boost}`,'sys');
+      computeStats();
+    }
+    else if(md.use.equipMinQ!==undefined){
+      const q=rollWeightedQ(md.use.equipMinQ,8);const slot=pick(Object.keys(EQ_NAMES));
+      const it=genEquip(slot,q,8,G.level);
+      if(G.inventory.length<G.maxInv){G.inventory.push(it);addLog(`🎁 使用${md.use.count}个${md.name}兑换获得：${it.name}`,'drop');autoEquipCheck(it);}
+      else{addLog('⚠️ 背包已满','sys');G.materials[mid]+=md.use.count;return;}
+    }
+    computeStats();renderAll();renderBag();
+  });
 }
 // ═══ 材料合成装备 ═══
 const CLASS_NAMES={warrior:'战士',archer:'射手',mage:'法师',all:'通用'};
@@ -2171,8 +2255,13 @@ function renderSkills(){
   const el=document.getElementById('skill-list');el.innerHTML='';
   for(const sk of G.skills){
     const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
+    const grade=sk.grade||'D';const gradeIdx=sk.gradeIdx||0;
+    const nextXp=skillXpForGrade(gradeIdx+1);
+    const gradeColor=SKILL_GRADE_COLOR[grade]||'#9ca3af';
+    const xpPct=gradeIdx<4?Math.min(100,Math.floor((sk.xp||0)/nextXp*100)):100;
+    const typeTag=sk.skillType==='passive'?'<span style="font-size:8px;background:#374151;color:#9ca3af;padding:1px 3px;border-radius:3px;margin-left:4px">被动</span>':'';
     const div=document.createElement('div');div.className='skill-item';
-    div.innerHTML=`<div class="skill-icon">${sk.icon}</div><div class="skill-info"><div class="skill-name">${sk.name}${sk.bookOnly?' 📖':''}</div><div class="skill-desc">${sk.desc}</div></div><div class="skill-cd">${ready?'就绪':(cdLeft/1000).toFixed(1)+'s'}</div>`;
+    div.innerHTML=`<div class="skill-icon">${sk.icon}</div><div class="skill-info"><div class="skill-name">${sk.name}${typeTag} <span style="font-size:9px;color:${gradeColor};font-weight:bold">${grade}</span></div><div class="skill-desc">${sk.desc}${gradeIdx<4?` · 升级进度 ${sk.xp||0}/${nextXp} (${xpPct}%)`:''}</div></div><div class="skill-cd">${ready?'就绪':(cdLeft/1000).toFixed(1)+'s'}</div>`;
     el.appendChild(div);
   }
   refreshSkillBtns();
@@ -2184,10 +2273,10 @@ function refreshSkillBtns(){
   const attackBtn=document.getElementById('btn-attack');
   // 清除除攻击按钮外的所有技能按钮
   container.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
-  // 过滤主动技能（排除 buff 类型被动技能）
-  const activeSkills=G.skills.filter(s=>s.type!=='buff');
+  // 过滤主动技能
+  const activeSkills=G.skills.filter(s=>s.skillType==='active');
   // 同时也添加 skill2
-  if(G.skill2&&G.skill2.type!=='buff')activeSkills.push(G.skill2);
+  if(G.skill2&&G.skill2.skillType==='active')activeSkills.push(G.skill2);
   // 按 id 去重
   const seen=new Set();const uniqueSkills=[];
   for(const sk of activeSkills){
@@ -2195,28 +2284,36 @@ function refreshSkillBtns(){
   }
   for(const sk of uniqueSkills){
     const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
+    const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
     const btn=document.createElement('button');
-    btn.className='btn btn-purple skill-dyn-btn'+(sk===G.skill2?'':' btn-sm');
+    btn.className='btn btn-purple skill-dyn-btn btn-sm';
     btn.textContent=sk.icon+' '+sk.name+(ready?'':` (${(cdLeft/1000).toFixed(1)}s)`);
     btn.disabled=!ready;
     btn.addEventListener('click',()=>{
       if(!G.enemy||G.dead)return;
-      if(sk===G.skill2||sk.unlockLv===10)playerAttackWithSkill(sk);
-      else{const s=G.skills.find(x=>x.id===sk.id);if(s)playerAttackWithSkill(s);}
+      playerAttackWithSkill(sk);
     });
     container.appendChild(btn);
   }
 }
 function renderMaps(){
   const el=document.getElementById('map-list');
-  if(!el)return; // 地图列表在弹窗中动态创建，不存在时跳过
+  if(!el)return;
   el.innerHTML='';
   for(const m of MAPS){
     const div=document.createElement('div');const locked=m.lv>G.level;
     div.className='map-item'+(m.id===G.curMap?' active':'')+(locked?' locked':'');
-    const allMonsters=[...m.monsters];if(m.elite)allMonsters.push(m.elite);if(m.boss)allMonsters.push(m.boss);
-    const monList=allMonsters.map(x=>{const cls=x===m.boss?'map-boss':x===m.elite?'map-elite':'';return`<span class="${cls}">${x.icon}${x.name}</span>`;}).join('');
-    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''} ⚡击杀${G.killStreak}</div><div class="map-monsters">${monList}</div></div>`;
+    // 统计当前地图各怪物击杀数
+    const normalKills = m.monsters.reduce((s,mo)=>s+(G.kills[mo.name]||0),0);
+    const eliteKills = m.elite ? (G.kills[m.elite.name]||0) : 0;
+    const bossKills = m.boss ? (G.kills[m.boss.name]||0) : 0;
+    const totalKills = normalKills + eliteKills + bossKills;
+    // 怪物列表分类显示
+    let monList = '';
+    monList += m.monsters.map(x=>`<span class="map-normal">${x.icon}${x.name}×${G.kills[x.name]||0}</span>`).join('');
+    if(m.elite) monList += `<span class="map-elite">${m.elite.icon}精英·${m.elite.name}×${eliteKills}</span>`;
+    if(m.boss) monList += `<span class="map-boss">${m.boss.icon}${m.boss.name}×${bossKills}</span>`;
+    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''} ⚡总击杀${totalKills}</div><div class="map-monsters">${monList}</div></div>`;
     if(!locked)div.addEventListener('click',()=>changeMap(m.id));
     el.appendChild(div);
   }
@@ -2371,7 +2468,12 @@ function showItemModal(it,source,isEquipped){
     eqb.addEventListener('click',()=>{const old=G.equipped[it.slot];G.equipped[it.slot]=it;G.inventory.splice(source,1);if(old)G.inventory.push(old);addLog(`🛡️ 装备：${it.name}`,'sys');closeModal();computeStats();renderAll();checkQuests();});
     acts.appendChild(eqb);
     const selb=document.createElement('button');selb.className='btn btn-red btn-sm';selb.textContent='出售（💰'+fmt(Math.floor(it.power*2))+')';
-    selb.addEventListener('click',()=>{G.gold+=Math.floor(it.power*2);G.inventory.splice(source,1);addLog(`💰 出售：${it.name}，获得${fmt(Math.floor(it.power*2))}金币`,'sys');closeModal();renderAll();checkQuests();});
+    selb.addEventListener('click',()=>{
+      box.innerHTML=`<h3>💰 确认出售</h3><p style="font-size:12px;margin:8px 0">确定出售 <b style="color:${QCOLOR[it.quality]}">${it.name}</b> 获得 <b style="color:var(--gold)">${fmt(Math.floor(it.power*2))}金币</b> 吗？</p>
+        <div style="display:flex;gap:8px"><button class="btn btn-red" style="flex:1" id="btn-sell-yes">✅ 出售</button><button class="btn btn-sm" style="flex:1" id="btn-sell-no">❌ 取消</button></div>`;
+      document.getElementById('btn-sell-no').addEventListener('click',()=>{showItemModal(it,source,isEquipped);});
+      document.getElementById('btn-sell-yes').addEventListener('click',()=>{G.gold+=Math.floor(it.power*2);G.inventory.splice(source,1);addLog(`💰 出售：${it.name}，获得${fmt(Math.floor(it.power*2))}金币`,'sys');closeModal();renderAll();checkQuests();});
+    });
     acts.appendChild(selb);
   }
   box.appendChild(acts);
@@ -2566,7 +2668,15 @@ function gachaPull(count){
   if(G.diamond<cost)return addLog('⚠️ 钻石不足','sys');
   const needed=G.maxInv-G.inventory.length;
   if(count>needed)return addLog('⚠️ 背包空间不足（剩余'+needed+'格，需要'+count+'格），请先清理背包或使用扩容道具','sys');
-  G.diamond-=cost;
+  // 确认提示
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  box.innerHTML=`<h3>💎 确认抽奖</h3><p style="font-size:12px;margin:8px 0">确定使用 <b style="color:var(--purple)">💎${cost}钻石</b> 进行${count===10?'十连':'单次'}抽取吗？</p>
+    <div style="display:flex;gap:8px"><button class="btn btn-pink" style="flex:1" id="btn-gacha-yes">✅ 确定抽取</button><button class="btn btn-sm" style="flex:1" id="btn-gacha-no">❌ 取消</button></div>`;
+  document.getElementById('btn-gacha-no').addEventListener('click',closeModal);
+  document.getElementById('btn-gacha-yes').addEventListener('click',()=>{
+    closeModal();
+    G.diamond-=cost;
   const equips=[];
   const consObtained=[];
   for(let i=0;i<count;i++){
@@ -2594,6 +2704,7 @@ function gachaPull(count){
   }
   addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');
   renderAll();renderShop();
+  });
 }
 function useHpPotion(isAuto){
   if(!G.consumables.hpPotion&&!G.consumables.hpLarge)return addLog('⚠️ 没有血瓶','sys');
@@ -2643,25 +2754,40 @@ function useHpPotionLarge(isAuto){
 function useAtkScroll(){
   if(!G.consumables.atkScroll)return addLog('⚠️ 没有攻击卷轴','sys');
   if(G.buffs.atk&&G.buffs.atk.until>now())return addLog('⚠️ 攻击卷轴已在生效中','sys');
-  G.consumables.atkScroll--;G.buffs.atk={val:Math.floor(G.curAtk*0.25),until:now()+180000};
-  addLog('📜 使用攻击卷轴！攻击力+25%，持续3分钟','sys');
-  computeStats();renderAll();
+  confirmAction('使用攻击卷轴','📜 攻击卷轴：3分钟内攻击力+25%，确定使用吗？',()=>{
+    G.consumables.atkScroll--;G.buffs.atk={val:Math.floor(G.curAtk*0.25),until:now()+180000};
+    addLog('📜 使用攻击卷轴！攻击力+25%，持续3分钟','sys');
+    computeStats();renderAll();
+  });
 }
 function useDefScroll(){
   if(!G.consumables.defScroll)return addLog('⚠️ 没有防御卷轴','sys');
   if(G.buffs.def&&G.buffs.def.until>now())return addLog('⚠️ 防御卷轴已在生效中','sys');
-  G.consumables.defScroll--;G.buffs.def={val:Math.floor(G.curDef*0.30),until:now()+180000};
-  addLog('🛡️ 使用防御卷轴！防御+30%，持续3分钟','sys');
-  computeStats();renderAll();
+  confirmAction('使用防御卷轴','🛡️ 防御卷轴：3分钟内防御+30%，确定使用吗？',()=>{
+    G.consumables.defScroll--;G.buffs.def={val:Math.floor(G.curDef*0.30),until:now()+180000};
+    addLog('🛡️ 使用防御卷轴！防御+30%，持续3分钟','sys');
+    computeStats();renderAll();
+  });
 }
 function useHpScroll(){
   if(!G.consumables.hpScroll)return addLog('⚠️ 没有生命卷轴','sys');
   if(G.buffs.maxhp_cd&&G.buffs.maxhp_cd.until>now())return addLog('⚠️ 生命卷轴已在生效中','sys');
-  G.consumables.hpScroll--;const bonus=Math.floor(G.maxHp*0.30);
-  G.buffs.maxhp_cd={val:bonus,until:now()+180000};
-  G.hp=Math.min(G.maxHp+bonus,G.hp+bonus);
-  addLog('❤️ 使用生命卷轴！最大生命+30%（+'+bonus+'），持续3分钟','sys');
-  computeStats();renderAll();
+  confirmAction('使用生命卷轴','❤️ 生命卷轴：3分钟内最大生命+30%，确定使用吗？',()=>{
+    G.consumables.hpScroll--;const bonus=Math.floor(G.maxHp*0.30);
+    G.buffs.maxhp_cd={val:bonus,until:now()+180000};
+    G.hp=Math.min(G.maxHp+bonus,G.hp+bonus);
+    addLog('❤️ 使用生命卷轴！最大生命+30%（+'+bonus+'），持续3分钟','sys');
+    computeStats();renderAll();
+  });
+}
+// ═══ 通用确认弹窗 ═══
+function confirmAction(title,desc,callback){
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  box.innerHTML=`<h3>${title}</h3><p style="font-size:12px;margin:8px 0">${desc}</p>
+    <div style="display:flex;gap:8px"><button class="btn btn-green" style="flex:1" id="btn-confirm-yes">✅ 确定</button><button class="btn btn-sm" style="flex:1" id="btn-confirm-no">❌ 取消</button></div>`;
+  document.getElementById('btn-confirm-no').addEventListener('click',closeModal);
+  document.getElementById('btn-confirm-yes').addEventListener('click',()=>{closeModal();callback();});
 }
 function switchClass(newClassId){
   const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
@@ -2673,7 +2799,7 @@ function switchClass(newClassId){
   G.learnedSkills[G.classId]=G.skills.filter(s=>s.bookOnly).map(s=>({...s}));
   G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};
   const savedSkills=G.learnedSkills[newClassId]||[];
-  G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0}];
+  G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
   for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0});}
   G.skill2=G.level>=10?SKILLS[G.classId].find(sk=>sk.unlockLv===10):null;
   addLog(`🔄 转职为：${G.className}！${cost===0?'首次免费！':'消耗'+cost+'💎'}`,'sys');
@@ -2873,7 +2999,7 @@ function init(){
     addLog('💾 存档已加载，欢迎回来！','sys');
   }else{
     const cb=classBaseStats();G.str=0;G.vit=0;G.agi=0;G.dex=0;G.int=0;
-    G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0}];
+    G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
     G.enemy=genMonster();refreshQuests();computeStats();G.hp=G.maxHp;
     G.consumables={hpPotion:2,hpLarge:0,atkScroll:0,defScroll:0,hpScroll:0};
     addLog('⚔️ 踏入传奇世界...','sys');
@@ -3150,11 +3276,14 @@ function restoreGameData(d){
     const clsSkills = SKILLS[G.classId] || [];
     for(const sid of d.skillIds){
       const sk = clsSkills.find(s=>s.id===sid);
-      if(sk) G.skills.push({...sk, lastUsed: 0});
+      if(sk){
+        const savedGrade = (d.skillGrades||[]).find(g=>g.id===sid);
+        G.skills.push({...sk, lastUsed: 0, gradeIdx:savedGrade?savedGrade.gradeIdx||0:0, grade:savedGrade?savedGrade.grade||'D':'D', xp:savedGrade?savedGrade.xp||0:0});
+      }
     }
   }
   if(G.skills.length === 0 && SKILLS[G.classId]){
-    G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0}];
+    G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0, gradeIdx:0, grade:'D', xp:0}];
   }
   if(d.skill2Id){
     G.skill2 = (SKILLS[G.classId] || []).find(s=>s.id===d.skill2Id) || null;
@@ -3275,6 +3404,7 @@ function buildSaveData(now_){
     hp: G.hp, maxHp: G.maxHp,
     equipped: G.equipped, inventory: G.inventory, maxInv: G.maxInv,
     skillIds: G.skills.map(s=>s.id),
+    skillGrades: G.skills.map(s=>({id:s.id,gradeIdx:s.gradeIdx||0,grade:s.grade||'D',xp:s.xp||0})),
     skill2Id: G.skill2 ? G.skill2.id : null,
     curMap: G.curMap,
     kills: G.kills,
