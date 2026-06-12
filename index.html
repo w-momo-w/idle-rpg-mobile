@@ -3642,6 +3642,7 @@ function gameTick(){
     if(now()>=G.deadUntil){
       G.dead=false;G.deadUntil=0;G.hp=Math.floor(G.maxHp*0.5);
       G.enemy=genMonster();G.killStreak=0;
+      G._monsterSpawnTime=now(); // 复活后延迟1秒再战斗
       addLog('🔄 你复活了！怪物已刷新','sys');
     }
     // 更新死亡倒计时显示
@@ -3660,6 +3661,7 @@ function gameTick(){
     document.getElementById('en-hp-bar').style.width='0%';
   } else if(!G.enemy&&(!G._nextMonsterTime||now()>=G._nextMonsterTime)){
     G.enemy=genMonster();G._nextMonsterTime=0;
+    G._monsterSpawnTime=now(); // 记录怪物刷新时间，用于1秒战斗延迟
   }
   // 小血瓶HoT处理
   if(G._hpSmallHoT&&now()<G._hpSmallHoT.until){
@@ -3704,6 +3706,8 @@ function gameTick(){
   // Slow debuff consumption
   if(G._slowUntil&&now()<G._slowUntil){G._slowed=true;}else{G._slowed=false;}
   if(G.autoAtk&&G.enemy&&G.enemy.hp>0){
+    // 怪物刷新/复活后等待1秒再开始战斗，让玩家看清怪物
+    if(G._monsterSpawnTime&&now()-G._monsterSpawnTime<1000)return;
     const spd=Math.max(800,(G._slowed?G.curAtkSpd*1.5:G.curAtkSpd)*10);
     if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){G._lastAutoAtk=now();
       if(G.autoSkill){const sk=G.skills.find(s=>canUseSkill(s));playerAttack(!!sk);}
