@@ -130,7 +130,6 @@ body{
 #topbar .char-info{flex:1;min-width:0}
 #topbar .char-info .name{font-size:15px;font-weight:bold;line-height:1.3}
 #topbar .char-info .sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
-#topbar .top-map-btn{flex-shrink:0;margin-left:4px}
 
 .top-stats-row{
   display:flex;
@@ -254,8 +253,6 @@ body{
 /* 操作按钮 */
 .act-btns{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .act-btns-sm{gap:4px}
-.act-btns-xs{gap:3px}
-.act-btns-xs .btn{padding:4px 8px;font-size:11px;min-height:30px}
 
 /* 自动战斗设置条 */
 .auto-battle-bar{
@@ -284,13 +281,6 @@ body{
 .save-btns-bar .btn{min-height:32px;padding:5px 10px;font-size:12px}
 #save-indicator{font-size:11px;color:var(--muted);margin-right:4px;white-space:nowrap}
 
-/* 区域标签 */
-.section-label{
-  font-size:11px;color:var(--muted);font-weight:600;
-  margin:10px 0 4px;padding-left:2px;letter-spacing:1px;
-}
-.section-label:first-of-type{margin-top:0}
-
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:4px;
   padding:8px 14px;border-radius:8px;border:1px solid transparent;
@@ -317,8 +307,6 @@ body{
 .btn-pink:active{background:rgba(236,72,153,.3)}
 .btn-orange{background:rgba(249,115,22,.15);border-color:var(--orange);color:var(--orange)}
 .btn-red2{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
-.btn-teal{background:rgba(20,184,166,.15);border-color:var(--teal);color:var(--teal)}
-.btn-teal:active{background:rgba(20,184,166,.3)}
 
 .btn-sm{padding:6px 10px;font-size:12px;min-height:34px}
 .btn-xs{padding:3px 7px;font-size:10px;min-height:28px}
@@ -503,7 +491,6 @@ body{
 .skill-name{font-size:14px;font-weight:bold}
 .skill-desc{font-size:12px;color:var(--muted)}
 .skill-cd{font-size:11px;color:var(--red)}
-.passive-skill{border-left:3px solid var(--green)}
 
 /* 任务 */
 .quest-item{
@@ -725,7 +712,6 @@ body{
       <div class="name" id="char-name">战士学徒</div>
       <div class="sub">Lv.<span id="top-lv">1</span> · <span id="top-class">战士</span> <button class="btn btn-pink btn-xs" id="btn-class-switch">🔄</button> <span id="death-indicator">💀 已阵亡</span></div>
     </div>
-    <button class="btn btn-gold btn-xs top-map-btn" id="btn-change-map">🗺️</button>
     <div class="top-stats-row">
       <div class="top-stat"><div class="val" id="top-atk">5</div><div class="lbl">攻击力</div></div>
       <div class="top-stat"><div class="val" id="top-def">2</div><div class="lbl">防御力</div></div>
@@ -768,25 +754,19 @@ body{
             <div class="enemy-info"><span>❤️ <span id="en-hp">40</span></span><span>⚔️ <span id="en-atk">4</span></span><span>🛡️ <span id="en-def">1</span></span></div>
           </div>
           <div id="buff-bar"></div>
-          <!-- 战斗技能 -->
-          <div class="section-label">⚔️ 战斗技能</div>
-          <div class="act-btns act-btns-xs" id="battle-skill-btns">
-            <button class="btn btn-red btn-xs" id="btn-attack">⚔️ 攻击</button>
-            <button class="btn btn-blue btn-xs" id="btn-skill">✨ 技能</button>
+          <div class="act-btns">
+            <button class="btn btn-red btn-lg" id="btn-attack">⚔️ 攻击</button>
+            <button class="btn btn-blue btn-lg" id="btn-skill">✨ 技能</button>
+            <button class="btn btn-purple" id="btn-skill2">📖 技能2</button>
           </div>
-          <div class="act-btns act-btns-xs" id="extra-skill-btns"></div>
-          <!-- 消耗品 -->
-          <div class="section-label">🧪 消耗品</div>
-          <div class="act-btns act-btns-xs" id="consumable-btns">
-            <button class="btn btn-green btn-xs" id="btn-use-hp-small">🧪 小血瓶</button>
-            <button class="btn btn-blue btn-xs" id="btn-use-hp-large">💉 大血瓶</button>
-          </div>
-          <!-- 卷轴 -->
-          <div class="section-label">📜 卷轴</div>
-          <div class="act-btns act-btns-xs" id="scroll-btns">
-            <button class="btn btn-pink btn-xs" id="btn-use-atk-scroll">📜 攻击</button>
-            <button class="btn btn-blue2 btn-xs" id="btn-use-def-scroll">🛡️ 防御</button>
-            <button class="btn btn-red2 btn-xs" id="btn-use-hp-scroll">❤️ 生命</button>
+          <div class="act-btns act-btns-sm">
+            <button class="btn btn-green" id="btn-use-hp-small">🧪 小血瓶</button>
+            <button class="btn btn-blue" id="btn-use-hp-large">💉 大血瓶</button>
+            <button class="btn btn-pink" id="btn-use-atk-scroll">📜 攻击</button>
+            <button class="btn btn-blue2" id="btn-use-def-scroll">🛡️ 防御</button>
+            <button class="btn btn-red2" id="btn-use-hp-scroll">❤️ 生命</button>
+            <button class="btn btn-pink" id="btn-use-scroll">📜 卷轴</button>
+            <button class="btn btn-gold" id="btn-change-map">🗺️ 切换地图</button>
           </div>
           <div id="combat-log"></div>
         </div>
@@ -813,7 +793,6 @@ body{
               <button class="tab-btn active" data-bagtab="equip">⚔️ 装备 <span class="bag-count-badge" id="bag-equip-count"></span></button>
               <button class="tab-btn" data-bagtab="material">📦 材料 <span class="bag-count-badge" id="bag-material-count"></span></button>
               <button class="tab-btn" data-bagtab="consumable">🧪 消耗品 <span class="bag-count-badge" id="bag-consumable-count"></span></button>
-              <button class="tab-btn" data-bagtab="craft">🔨 合成</button>
             </div>
             <div id="decompose-panel">
               <span>分解品质 ≤</span>
@@ -828,7 +807,6 @@ body{
             <div class="bag-tab-content active" id="bag-tab-equip"><div class="inv-grid" id="inv-grid"></div></div>
             <div class="bag-tab-content" id="bag-tab-material"><div id="material-list"></div></div>
             <div class="bag-tab-content" id="bag-tab-consumable"><div id="consumable-list"></div></div>
-            <div class="bag-tab-content" id="bag-tab-craft"><div id="craft-list"></div></div>
           </div>
         </div>
       </div>
@@ -1035,7 +1013,7 @@ const EQ_NAMES={
   ring2:{warrior:['铁环','秘银环','力量之环','勇气环','战神环'],archer:['轻环','疾风环','暗影环','鹰眼环','精准环'],mage:['魔力环','智慧之环','元素环','暗影环','星辰环'],all:['铁环','秘银环','魔力环','生命之环']},
   pendant:{warrior:['战士护符','龙晶','战斗宝珠','勇气符','战神符'],archer:['猎手护符','鹰眼符','疾风宝珠','精准符','暗影符'],mage:['魔法护符','元素符','圣光宝珠','奥术符','星辰符'],all:['木符','玉符','水晶','龙晶']},
 };
-const Q_PREFIX=['破损的','普通的','精良的','优质的','卓越的','史诗的','传说的','神话的'];
+const Q_PREFIX=['破损的','普通的','精良的','优质的','卓越的','史诗的','传说的','神话的','超神的'];
 
 const SETS=[
   {id:'warrior_set',name:'战神套装',bonus:{3:{atk:8,hp:40},5:{atk:18,def:8},7:{atk:35,def:18,hp:120}}},
@@ -1100,86 +1078,24 @@ const MATERIAL_CRAFT=[
 ];
 
 // Skill data
-const SKILL_RANK=['D','C','B','A','S'];
-const SKILL_RANK_COLOR={D:'#9ca3af',C:'#22c55e',B:'#3b82f6',A:'#a78bfa',S:'#f59e0b'};
-const SKILL_XP_PER_USE=0.5; // 每次使用获得的技能经验（原10，降为1/20）
-function skillXpForLevel(lv){return Math.floor(50*Math.pow(lv,1.8)+30*lv);} // 升到lv级所需经验
-// 技能书兑换钻石：每5级要求+1钻石，最低1
-function skillBookDiamond(skillDef){return Math.max(1,Math.floor((skillDef.reqLv||skillDef.unlockLv||0)/5)+1);}
-function getSkillRank(lv){return SKILL_RANK[Math.min(lv,4)];}
-function getSkillRankColor(lv){return SKILL_RANK_COLOR[getSkillRank(lv)];}
-function getSkillLevelBonus(sk){const lv=sk.level||0;return 1+(lv*0.06);} // 每级+6%效果
-
 const SKILLS={
   warrior:[
-    // 主动技能 (15个)
-    {id:'heavy_strike',name:'重击',icon:'💥',desc:'造成160%攻击力伤害',cdMs:2500,mult:1.6,unlockLv:0,skillType:'active'},
-    {id:'whirlwind',name:'旋风斩',icon:'🌀',desc:'造成90%攻击力伤害×2次',cdMs:4000,mult:0.9,hits:2,unlockLv:5,skillType:'active'},
-    {id:'berserk',name:'狂暴',icon:'😡',desc:'5秒内攻击力+30%',cdMs:12000,type:'buff',unlockLv:10,skillType:'active'},
-    {id:'shield_wall',name:'盾墙',icon:'🛡️',desc:'5秒内防御+50%',cdMs:15000,type:'buff',unlockLv:15,skillType:'active'},
-    {id:'cleave',name:'顺劈斩',icon:'🔪',desc:'造成130%攻击力伤害×3次',cdMs:5000,mult:1.3,hits:3,unlockLv:20,skillType:'active'},
-    {id:'war_cry',name:'战吼',icon:'📯',desc:'8秒内攻击力+40%',cdMs:18000,type:'buff',unlockLv:25,skillType:'active'},
-    {id:'thunder_strike',name:'雷霆一击',icon:'⚡',desc:'造成220%攻击力伤害，无视40%防御',cdMs:7000,mult:2.2,ignoreDef:0.4,unlockLv:30,skillType:'active'},
-    {id:'revenge',name:'复仇',icon:'💢',desc:'造成160%伤害，HP越低伤害越高(最高+50%)',cdMs:6000,mult:1.6,unlockLv:35,skillType:'active'},
-    {id:'earth_shaker',name:'撼地',icon:'🌍',desc:'造成180%伤害，减速敌人3秒',cdMs:8000,mult:1.8,unlockLv:40,skillType:'active'},
-    {id:'battle_fury',name:'战斗狂热',icon:'🔥',desc:'10秒内攻击力+50%，防御+25%',cdMs:25000,type:'buff',unlockLv:50,skillType:'active'},
-    {id:'execution',name:'斩杀',icon:'☠️',desc:'造成300%伤害，对HP<30%敌人伤害翻倍',cdMs:10000,mult:3.0,unlockLv:60,skillType:'active'},
-    {id:'bladestorm',name:'剑刃风暴',icon:'🌪️',desc:'造成100%攻击力伤害×5次',cdMs:12000,mult:1.0,hits:5,unlockLv:70,skillType:'active'},
-    {id:'unyielding',name:'不屈',icon:'🛡️',desc:'5秒内无敌，冷却60秒',cdMs:60000,type:'buff',unlockLv:80,skillType:'active'},
-    {id:'warlord_crush',name:'霸王碎',icon:'👊',desc:'造成400%攻击力伤害',cdMs:15000,mult:4.0,unlockLv:100,skillType:'active'},
-    {id:'rage_strike',name:'怒击',icon:'💢',desc:'造成250%伤害+5秒流血(攻击力×0.3/秒)',cdMs:9000,mult:2.5,type:'dot',unlockLv:120,skillType:'active'},
-    // 被动技能 (5个)
-    {id:'iron_will',name:'钢铁意志',icon:'💪',desc:'被动：防御力+10%',unlockLv:10,skillType:'passive',passiveBonus:{defPct:10}},
-    {id:'toughness',name:'坚韧',icon:'🧱',desc:'被动：最大生命+8%',unlockLv:25,skillType:'passive',passiveBonus:{hpPct:8}},
-    {id:'counter_attack',name:'反击',icon:'🔄',desc:'被动：受击时15%概率反击造成80%伤害',unlockLv:45,skillType:'passive',passiveBonus:{counterChance:15,counterDmg:0.8}},
-    {id:'berserker_rage',name:'狂战士之怒',icon:'😤',desc:'被动：攻击力+12%',unlockLv:65,skillType:'passive',passiveBonus:{atkPct:12}},
-    {id:'iron_body',name:'钢铁之躯',icon:'🦾',desc:'被动：防御力+15%，最大生命+5%',unlockLv:90,skillType:'passive',passiveBonus:{defPct:15,hpPct:5}},
+    {id:'heavy_strike',name:'重击',icon:'💥',desc:'造成160%攻击力伤害',cdMs:2500,mult:1.6,unlockLv:0},
+    {id:'whirlwind',name:'旋风斩',icon:'🌀',desc:'造成90%攻击力伤害×2次',cdMs:4000,mult:0.9,hits:2,unlockLv:10},
+    {id:'berserk',name:'狂暴',icon:'😡',desc:'5秒内攻击力+30%',cdMs:12000,type:'buff',unlockLv:0,bookOnly:true},
+    {id:'shield_wall',name:'盾墙',icon:'🛡️',desc:'5秒内防御+50%',cdMs:15000,type:'buff',unlockLv:0,bookOnly:true},
   ],
   archer:[
-    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成140%攻击力伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0,skillType:'active'},
-    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成70%攻击力伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:5,skillType:'active'},
-    {id:'poison_arrow',name:'毒箭',icon:'☠️',desc:'造成120%伤害+5秒毒(攻击力×0.2/秒)',cdMs:6000,mult:1.2,type:'dot',unlockLv:10,skillType:'active'},
-    {id:'hawk_eye',name:'鹰眼',icon:'👁️',desc:'暴击率+20%，持续8秒',cdMs:15000,type:'buff',unlockLv:15,skillType:'active'},
-    {id:'barrage',name:'弹幕',icon:'🌧️',desc:'造成60%攻击力伤害×5次',cdMs:5000,mult:0.6,hits:5,unlockLv:20,skillType:'active'},
-    {id:'snipe',name:'狙击',icon:'🔭',desc:'造成280%伤害，无视50%防御',cdMs:8000,mult:2.8,ignoreDef:0.5,unlockLv:25,skillType:'active'},
-    {id:'wind_walker',name:'风行',icon:'💨',desc:'8秒内攻速+30%，闪避+15%',cdMs:20000,type:'buff',unlockLv:30,skillType:'active'},
-    {id:'explosive_shot',name:'爆裂箭',icon:'💥',desc:'造成200%伤害+2秒眩晕',cdMs:9000,mult:2.0,unlockLv:35,skillType:'active'},
-    {id:'shadow_strike',name:'暗影突袭',icon:'🌑',desc:'造成250%伤害，必定暴击',cdMs:10000,mult:2.5,unlockLv:40,skillType:'active'},
-    {id:'arrow_rain',name:'箭雨',icon:'🌧️',desc:'造成80%攻击力伤害×7次',cdMs:12000,mult:0.8,hits:7,unlockLv:50,skillType:'active'},
-    {id:'piercing_shot',name:'穿心箭',icon:'💘',desc:'造成350%伤害，无视防御',cdMs:15000,mult:3.5,ignoreDef:1,unlockLv:60,skillType:'active'},
-    {id:'hunters_mark',name:'猎人标记',icon:'🎯',desc:'10秒内对目标伤害+40%',cdMs:25000,type:'buff',unlockLv:70,skillType:'active'},
-    {id:'rapid_fire',name:'急速射击',icon:'⚡',desc:'造成150%伤害×4次',cdMs:8000,mult:1.5,hits:4,unlockLv:80,skillType:'active'},
-    {id:'death_mark',name:'死亡标记',icon:'💀',desc:'造成500%伤害，冷却30秒',cdMs:30000,mult:5.0,unlockLv:100,skillType:'active'},
-    {id:'venom_rain',name:'毒雨',icon:'🟢',desc:'造成120%伤害+8秒毒(攻击力×0.25/秒)×4次',cdMs:14000,mult:1.2,hits:4,type:'dot',unlockLv:120,skillType:'active'},
-    // 被动技能 (5个)
-    {id:'agility',name:'敏捷身法',icon:'💨',desc:'被动：闪避率+5%',unlockLv:10,skillType:'passive',passiveBonus:{dodge:5}},
-    {id:'eagle_eye',name:'鹰眼',icon:'👁️',desc:'被动：暴击率+5%',unlockLv:25,skillType:'passive',passiveBonus:{critRate:5}},
-    {id:'quick_draw',name:'快速拔箭',icon:'🏹',desc:'被动：攻击速度+10%',unlockLv:45,skillType:'passive',passiveBonus:{atkSpd:10}},
-    {id:'head_hunter',name:'猎头者',icon:'🎯',desc:'被动：攻击力+12%',unlockLv:65,skillType:'passive',passiveBonus:{atkPct:12}},
-    {id:'shadow_master',name:'暗影大师',icon:'🌑',desc:'被动：闪避+10%，暴击伤害+20%',unlockLv:90,skillType:'passive',passiveBonus:{dodge:10,critDmg:20}},
+    {id:'precise_shot',name:'精准射击',icon:'🎯',desc:'造成140%攻击力伤害，无视30%防御',cdMs:2500,mult:1.4,ignoreDef:0.3,unlockLv:0},
+    {id:'multi_shot',name:'多重射击',icon:'🏹',desc:'造成70%攻击力伤害×3次',cdMs:3500,mult:0.7,hits:3,unlockLv:10},
+    {id:'poison_arrow',name:'毒箭',icon:'☠️',desc:'造成120%伤害+5秒毒(攻击力×0.2/秒)',cdMs:6000,mult:1.2,type:'dot',unlockLv:0,bookOnly:true},
+    {id:'hawk_eye',name:'鹰眼',icon:'👁️',desc:'暴击率+20%，持续8秒',cdMs:15000,type:'buff',unlockLv:0,bookOnly:true},
   ],
   mage:[
-    {id:'fireball',name:'火球术',icon:'🔥',desc:'造成200%攻击力伤害',cdMs:3000,mult:2.0,unlockLv:0,skillType:'active'},
-    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成130%攻击力伤害，减速敌人2秒',cdMs:4000,mult:1.3,unlockLv:5,skillType:'active'},
-    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成180%伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:10,skillType:'active'},
-    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成250%攻击力伤害',cdMs:8000,mult:2.5,unlockLv:15,skillType:'active'},
-    {id:'arcane_missile',name:'奥术飞弹',icon:'💫',desc:'造成120%攻击力伤害×3次',cdMs:4500,mult:1.2,hits:3,unlockLv:20,skillType:'active'},
-    {id:'frost_nova',name:'冰霜新星',icon:'❄️',desc:'造成160%伤害+冻结2秒',cdMs:7000,mult:1.6,unlockLv:25,skillType:'active'},
-    {id:'mana_shield',name:'法力护盾',icon:'🔮',desc:'8秒内吸收伤害(最大生命30%)',cdMs:20000,type:'buff',unlockLv:30,skillType:'active'},
-    {id:'chain_lightning',name:'连锁闪电',icon:'⚡',desc:'造成150%攻击力伤害×4次',cdMs:8000,mult:1.5,hits:4,unlockLv:35,skillType:'active'},
-    {id:'pyroblast',name:'炎爆术',icon:'💥',desc:'造成350%伤害，冷却12秒',cdMs:12000,mult:3.5,unlockLv:40,skillType:'active'},
-    {id:'blizzard',name:'暴风雪',icon:'🌨️',desc:'造成90%攻击力伤害×8次',cdMs:14000,mult:0.9,hits:8,unlockLv:50,skillType:'active'},
-    {id:'arcane_explosion',name:'奥术爆炸',icon:'✨',desc:'造成300%伤害，无视50%防御',cdMs:10000,mult:3.0,ignoreDef:0.5,unlockLv:60,skillType:'active'},
-    {id:'time_warp',name:'时间扭曲',icon:'⏳',desc:'6秒内技能冷却减半',cdMs:30000,type:'buff',unlockLv:70,skillType:'active'},
-    {id:'doom_bolt',name:'末日之箭',icon:'💀',desc:'造成450%伤害，冷却20秒',cdMs:20000,mult:4.5,unlockLv:80,skillType:'active'},
-    {id:'phoenix_flame',name:'凤凰烈焰',icon:'🔥',desc:'造成600%伤害，冷却30秒',cdMs:30000,mult:6.0,unlockLv:100,skillType:'active'},
-    {id:'void_eruption',name:'虚空爆发',icon:'🕳️',desc:'造成350%伤害+5秒诅咒(攻击力×0.4/秒)',cdMs:18000,mult:3.5,type:'dot',unlockLv:120,skillType:'active'},
-    // 被动技能 (5个)
-    {id:'arcane_power',name:'奥术强化',icon:'✨',desc:'被动：攻击力+8%',unlockLv:10,skillType:'passive',passiveBonus:{atkPct:8}},
-    {id:'mana_flow',name:'法力涌动',icon:'🌀',desc:'被动：技能伤害+10%',unlockLv:25,skillType:'passive',passiveBonus:{skillDmg:10}},
-    {id:'elemental_mastery',name:'元素精通',icon:'🔥',desc:'被动：暴击率+5%',unlockLv:45,skillType:'passive',passiveBonus:{critRate:5}},
-    {id:'arcane_intellect',name:'奥术智慧',icon:'🧠',desc:'被动：攻击力+12%',unlockLv:65,skillType:'passive',passiveBonus:{atkPct:12}},
-    {id:'immortal_soul',name:'不朽之魂',icon:'👻',desc:'被动：最大生命+10%，每5秒恢复2%HP',unlockLv:90,skillType:'passive',passiveBonus:{hpPct:10,hpRegen:2}},
+    {id:'fireball',name:'火球术',icon:'🔥',desc:'造成200%攻击力伤害',cdMs:3000,mult:2.0,unlockLv:0},
+    {id:'ice_storm',name:'冰风暴',icon:'❄️',desc:'造成130%攻击力伤害，减速敌人2秒',cdMs:4000,mult:1.3,unlockLv:10},
+    {id:'lightning',name:'雷电术',icon:'⚡',desc:'造成180%伤害，无视防御',cdMs:5000,mult:1.8,ignoreDef:1,unlockLv:0,bookOnly:true},
+    {id:'meteor',name:'陨石术',icon:'☄️',desc:'造成250%攻击力伤害',cdMs:8000,mult:2.5,unlockLv:0,bookOnly:true},
   ]
 };
 
@@ -1195,8 +1111,8 @@ const CLASS_ADV=[
 // Class stat per level: {str, vit, agi, dex, int} — 5 points total
 const CLASS_GROWTH={
   warrior:{str:2,vit:1,agi:1,dex:1,int:0},
-  archer:{str:1,vit:1,agi:2,dex:1,int:0},
-  mage:{str:0,vit:1,agi:1,dex:1,int:2}
+  archer:{str:1,vit:0,agi:2,dex:2,int:0},
+  mage:{str:0,vit:0,agi:1,dex:1,int:3}
 };
 
 // Maps with monster pools + boss/elite
@@ -1306,17 +1222,17 @@ const QUEST_TEMPLATES=[
     const m=MAPS.find(x=>x.lv<=G.level)||MAPS[0];
     const allMon=[...m.monsters];if(m.elite)allMon.push(m.elite);if(m.boss)allMon.push(m.boss);
     const mo=pick(allMon);const tgt=randi(2,5)+Math.floor(G.level/10);
-    return{type:'kill',text:`在${m.name}击杀${tgt}只${mo.name}`,reward:genQuestReward(G,{gold:randi(40,120)*Math.floor(G.level/5+1),xp:randi(30,100)*Math.floor(G.level/5+1)}),mapId:m.id,monster:mo.name,target:tgt,progress:0,_startCount:(G.kills[mo.name]||0),submitted:false}}},
+    return{type:'kill',text:`在${m.name}击杀${tgt}只${mo.name}`,reward:genQuestReward(G,{gold:randi(40,120)*Math.floor(G.level/5+1),xp:randi(100,350)*Math.floor(G.level/5+1)}),mapId:m.id,monster:mo.name,target:tgt,progress:0,_startCount:(G.kills[mo.name]||0),submitted:false}}},
   {type:'collect_gold',gen:function(G){
     const tgt=randi(80,250)*Math.floor(G.level/3+1);
-    return{type:'collect_gold',text:`收集${tgt}金币`,reward:genQuestReward(G,{gold:randi(50,150)*Math.floor(G.level/5+1),xp:randi(25,80)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_goldCollected:0,submitted:false}}},
+    return{type:'collect_gold',text:`收集${tgt}金币`,reward:genQuestReward(G,{gold:randi(50,150)*Math.floor(G.level/5+1),xp:randi(80,250)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_goldCollected:0,submitted:false}}},
   {type:'collect_equip',gen:function(G){
     const q=Math.min(randi(0,Math.floor(G.level/30)),7);
     const tgt=randi(1,3);
     return{type:'collect_equip',text:`收集${tgt}件${QUALITY[q]}及以上品质装备（提交装备后完成任务）`,reward:genQuestReward(G,{gold:randi(80,250)*Math.floor(G.level/5+1)}),target:tgt,quality:q,progress:0,submitted:false}}},
   {type:'kill_any',gen:function(G){
     const tgt=randi(5,15)+Math.floor(G.level/5);
-    return{type:'kill_any',text:`击杀任意怪物${tgt}只`,reward:genQuestReward(G,{gold:randi(50,180)*Math.floor(G.level/5+1),xp:randi(30,90)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_startCount:(G.killAnyCount||0),submitted:false}}},
+    return{type:'kill_any',text:`击杀任意怪物${tgt}只`,reward:genQuestReward(G,{gold:randi(50,180)*Math.floor(G.level/5+1),xp:randi(100,300)*Math.floor(G.level/5+1)}),target:tgt,progress:0,_startCount:(G.killAnyCount||0),submitted:false}}},
 ];
 
 function genQuestReward(G,base){
@@ -1335,12 +1251,12 @@ function genQuestReward(G,base){
 }
 
 const GOLD_SHOP=[
-  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:80,buy:function(){if(G.gold<80)return addLog('⚠️ 金币不足','sys');G.gold-=80;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');showToast('<span style="font-size:28px">🧪</span><br>购买成功<br><span style="font-size:16px;font-weight:bold">小血瓶 ×1</span><br><span style="color:var(--muted)">-80 💰</span>');renderShop();}},
-  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:200,buy:function(){if(G.gold<200)return addLog('⚠️ 金币不足','sys');G.gold-=200;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');showToast('<span style="font-size:28px">💉</span><br>购买成功<br><span style="font-size:16px;font-weight:bold">大血瓶 ×1</span><br><span style="color:var(--muted)">-200 💰</span>');renderShop();}},
-  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:350,buy:function(){if(G.gold<350)return addLog('⚠️ 金币不足','sys');G.gold-=350;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');showToast('<span style="font-size:28px">📜</span><br>购买成功<br><span style="font-size:16px;font-weight:bold">攻击卷轴 ×1</span><br><span style="color:var(--muted)">-350 💰</span>');renderShop();}},
-  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:300,buy:function(){if(G.gold<300)return addLog('⚠️ 金币不足','sys');G.gold-=300;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');showToast('<span style="font-size:28px">🛡️</span><br>购买成功<br><span style="font-size:16px;font-weight:bold">防御卷轴 ×1</span><br><span style="color:var(--muted)">-300 💰</span>');renderShop();}},
-  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:320,buy:function(){if(G.gold<320)return addLog('⚠️ 金币不足','sys');G.gold-=320;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');showToast('<span style="font-size:28px">❤️</span><br>购买成功<br><span style="font-size:16px;font-weight:bold">生命卷轴 ×1</span><br><span style="color:var(--muted)">-320 💰</span>');renderShop();}},
-  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:500,buy:function(){const cost=500+G.bagExpansions*300;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');showToast('<span style="font-size:28px">🎒</span><br>背包扩容<br><span style="font-size:16px;font-weight:bold">+' + (G.bagExpansions*10) + '格</span><br><span style="color:var(--muted)">-' + fmt(cost) + ' 💰</span>');renderShop();}},
+  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:80,buy:function(){if(G.gold<80)return addLog('⚠️ 金币不足','sys');G.gold-=80;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');renderShop();}},
+  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:200,buy:function(){if(G.gold<200)return addLog('⚠️ 金币不足','sys');G.gold-=200;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');renderShop();}},
+  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:350,buy:function(){if(G.gold<350)return addLog('⚠️ 金币不足','sys');G.gold-=350;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');renderShop();}},
+  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:300,buy:function(){if(G.gold<300)return addLog('⚠️ 金币不足','sys');G.gold-=300;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');renderShop();}},
+  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:320,buy:function(){if(G.gold<320)return addLog('⚠️ 金币不足','sys');G.gold-=320;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');renderShop();}},
+  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:500,buy:function(){const cost=500+G.bagExpansions*300;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');renderShop();}},
 ];
 
 function gachaProb(){
@@ -1389,8 +1305,6 @@ let G={
   skills:[],skill2:null,
   curMap:'village',enemy:null,killStreak:0,
   quests:[],questRefreshTime:0,killAnyCount:0,
-  killNormalCount:0,killEliteCount:0,killBossCount:0,
-  mapKills:{}, // 按地图和类型统计: {village:{normal:5,elite:2,boss:1}}
   autoAtk:false,autoSkill:false,autoEquip:false,
   kills:{},
   logs:[],maxLogs:50,
@@ -1398,7 +1312,6 @@ let G={
   classSwitchCost:20,switchCount:0,
   buffs:{},
   learnedSkills:{},
-  skillXp:{}, // 技能经验 {skillId: xp}
   dead:false,deadUntil:0, // 死亡状态和复活时间戳
   autoDecompose:false,decomposeThreshold:0,decomposeNonClass:false, // 自动分解
   autoHpSmall:false,autoHpLarge:false, // 自动用药
@@ -1413,15 +1326,15 @@ let G={
 
 function classBaseStats(){
   if(G.classId==='warrior')return{str:10,vit:8,agi:4,dex:3,int:1};
-  if(G.classId==='archer')return{str:5,vit:6,agi:10,dex:6,int:1};
-  return{str:2,vit:5,agi:5,dex:4,int:12};
+  if(G.classId==='archer')return{str:5,vit:4,agi:10,dex:8,int:1};
+  return{str:2,vit:3,agi:5,dex:4,int:12};
 }
 
 function computeStats(){
   const cb=classBaseStats();
   let ST=cb.str+G.str, VT=cb.vit+G.vit, AG=cb.agi+G.agi, DX=cb.dex+G.dex, IN=cb.int+G.int;
   // Str→ATK, Vit→HP, Agi→ATK_SPD+Dodge, Dex→CritRate, Int→ATK(mage only)
-  let a=ST*2, d=VT*1.2, h=VT*15, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
+  let a=ST*2, d=VT*1, h=VT*15, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
   if(G.classId==='mage')a+=IN*3;
   let dodge=AG*0.3, block=0, lifesteal=0, thorns=0, magicFind=0, expBonus=0, goldBonus=0, hpRegen=0, doubleAtk=0, armorPierce=0, siphon=0;
 
@@ -1467,7 +1380,7 @@ function computeStats(){
       if(cnt>=need&&s.bonus[need]){
         const bo=s.bonus[need];
         if(bo.atk)a+=bo.atk;if(bo.def)d+=bo.def;if(bo.hp)h+=bo.hp;
-        if(bo.critRate)cr+=bo.critRate;if(bo.critDmg)cd+=bo.critDmg;if(bo.atkSpd)sp=Math.max(30,sp-bo.atkSpd);
+        if(bo.critRate)cr+=bo.critRate;if(bo.critDmg)cd+=bo.critDmg;if(bo.atkSpd)sp=Math.max(20,sp-bo.atkSpd);
         G._activeSetBonuses.push({setName:s.name,setId:s.id,pieceCount:cnt,bonusLevel:need,bonus:{...bo}});
         break;
       }
@@ -1475,25 +1388,6 @@ function computeStats(){
   }
   // class advancement bonuses
   if(G.classStatsAdv){const ba=G.classStatsAdv;if(ba.atk)a+=ba.atk;if(ba.def)d+=ba.def;if(ba.hp)h+=ba.hp;if(ba.critRate)cr+=ba.critRate;}
-
-  // passive skill bonuses
-  for(const sk of G.skills){
-    if(sk.skillType==='passive'&&sk.passiveBonus){
-      const pb=sk.passiveBonus;
-      const bonus=getSkillLevelBonus(sk);
-      if(pb.atkPct)a+=Math.floor(a*pb.atkPct/100*bonus);
-      if(pb.defPct)d+=Math.floor(d*pb.defPct/100*bonus);
-      if(pb.hpPct)h+=Math.floor(h*pb.hpPct/100*bonus);
-      if(pb.dodge)dodge+=pb.dodge*bonus;
-      if(pb.critRate)cr+=pb.critRate*bonus;
-      if(pb.critDmg)cd+=Math.floor(pb.critDmg*bonus);
-      if(pb.atkSpd)sp=Math.max(20,sp-pb.atkSpd*bonus);
-      if(pb.skillDmg){} // 技能伤害加成在playerAttack中处理
-      if(pb.hpRegen)hpRegen+=Math.floor(pb.hpRegen*bonus);
-      if(pb.counterChance){} // 反击在enemyAttack中处理
-      if(pb.counterDmg){} // 反击伤害在enemyAttack中处理
-    }
-  }
 
   G.maxHp=h;G.curAtk=Math.max(1,a);G.curDef=d;G.curCritRate=Math.min(cr,80);G.curCritDmg=cd;G.curAtkSpd=Math.max(20,sp);
   G.curDodge=Math.min(dodge,50);G.curBlock=Math.min(block,40);G.curLifesteal=Math.min(lifesteal,50);
@@ -1679,14 +1573,16 @@ function playerAttack(useSkill){
   if(useSkill&&!sk){addLog('⏳ 技能冷却中...','sys');return;}
   let dmg,isCrit=false;
   if(sk){
-    const bonus=getSkillLevelBonus(sk);
-    dmg=Math.floor(G.curAtk*sk.mult*bonus);
-    if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef));
-    else dmg=Math.max(1,dmg-Math.floor(G.enemy.def*0.3));
-    if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult*bonus);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
+    dmg=Math.floor(G.curAtk*sk.mult);
+    if(sk.ignoreDef===1)dmg=Math.max(1,dmg); // 完全无视防御
+    else if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef)); // 部分无视防御
+    else{
+      let defReduction=0.3;
+      if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
+      dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
+    }
+    if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
     sk.lastUsed=now();
-    // 技能经验
-    gainSkillXp(sk);
     if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
     addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   }else{
@@ -1697,9 +1593,17 @@ function playerAttack(useSkill){
     else addLog(`⚔️ 普通攻击造成 ${dmg} 点伤害`,'hit');
     // double attack
     if(G.curDoubleAtk&&Math.random()*100<G.curDoubleAtk){
-      const d2=isCrit?Math.floor((Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5)))*G.curCritDmg/100):Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
-      G.enemy.hp-=d2;addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
-      if(G.enemy.hp<=0){onKill();return;}
+      // 连击单独检查敌人闪避
+      if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了连击！`,'sys');}
+      else{
+        const d2=isCrit?Math.floor((Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5)))*G.curCritDmg/100):Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
+        G.enemy.hp-=d2;addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
+        // 连击触发吸血
+        if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
+        // 连击触发敌人荆棘
+        if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！','die');}}
+        if(G.enemy&&G.enemy.hp<=0){onKill();return;}
+      }
     }
   }
   // lifesteal
@@ -1708,6 +1612,42 @@ function playerAttack(useSkill){
   // Enemy thorns (reflect damage back to player)
   if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！3秒后复活...','die');}}
   if(G.enemy&&G.enemy.hp<=0){onKill();return;}
+  enemyAttack();renderAll();
+}
+// 使用指定技能攻击（skill2专用），复用playerAttack核心逻辑
+function playerAttackWithSkill(sk){
+  if(!G.enemy||G.dead)return;
+  const e=G.enemy;
+  if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了你的攻击！`,'sys');enemyAttack();renderAll();return;}
+  let dmg=Math.floor(G.curAtk*sk.mult);
+  if(sk.ignoreDef===1)dmg=Math.max(1,dmg);
+  else if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef));
+  else{
+    let defReduction=0.3;
+    if(G.curArmorPierce&&Math.random()*100<G.curArmorPierce*0.5)defReduction=0.1;
+    dmg=Math.max(1,dmg-Math.floor(G.enemy.def*defReduction));
+  }
+  if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(G.enemy.def*0.3));}dmg=td;}
+  sk.lastUsed=now();
+  if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
+  addLog(`📖 ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
+  // lifesteal
+  if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);}}
+  G.enemy.hp-=dmg;
+  // Enemy thorns
+  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！3秒后复活...','die');}}
+  if(G.enemy&&G.enemy.hp<=0){onKill();return;}
+  // double attack
+  if(G.curDoubleAtk&&Math.random()*100<G.curDoubleAtk){
+    if(e._dodge&&Math.random()*100<e._dodge){addLog(`🌀 ${e.name} 闪避了连击！`,'sys');}
+    else{
+      const d2=Math.max(1,G.curAtk-Math.floor(G.enemy.def*0.5));
+      G.enemy.hp-=d2;addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
+      if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
+      if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！','die');}}
+      if(G.enemy&&G.enemy.hp<=0){onKill();return;}
+    }
+  }
   enemyAttack();renderAll();
 }
 function enemyAttack(){
@@ -1748,17 +1688,7 @@ function enemyAttack(){
 function onKill(){
   const e=G.enemy;addLog(`🎉 击杀 ${e.name}！获得 ${e.xp} 经验、${e.gold} 金币`,'die');
   G.killStreak++;
-  G.killAnyCount++;
-  if(e.type==='boss')G.killBossCount++;
-  else if(e.type==='elite')G.killEliteCount++;
-  else G.killNormalCount++;
-  // 按地图统计
-  if(!G.mapKills)G.mapKills={};
-  if(!G.mapKills[G.curMap])G.mapKills[G.curMap]={normal:0,elite:0,boss:0};
-  if(e.type==='boss')G.mapKills[G.curMap].boss++;
-  else if(e.type==='elite')G.mapKills[G.curMap].elite++;
-  else G.mapKills[G.curMap].normal++;
-  G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;
+  G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;G.killAnyCount++;
   gainXp(e.xp);gainGold(e.gold);
   if(G.curHpRegen)G.hp=Math.min(G.maxHp,G.hp+G.curHpRegen);
   if(G.curSiphon)G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*G.curSiphon/100));
@@ -1781,21 +1711,14 @@ function onKill(){
       else addLog('⚠️ 背包已满，装备丢失！','sys');
     }
   }
-  // 技能书掉落：人物≥10级后，全部职业技能书随机掉落，不管是否已学
-  // 普通1% / 精英5% / Boss10%
-  const sbDropRate = G.enemy.type==='boss'?0.10:G.enemy.type==='elite'?0.05:0.01;
-  if(G.level>=10&&Math.random()<sbDropRate){
-    const allSkills=[];
-    for(const[clsId,skills] of Object.entries(SKILLS)){
-      for(const s of skills){
-        allSkills.push({...s,classReq:clsId});
-      }
-    }
-    if(allSkills.length>0){
-      const sb=pick(allSkills);
-      const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:sb.unlockLv||0};
+  // 技能书掉落：仅怪物>10级，1.2%概率，进入背包
+  if(monLv>10&&Math.random()<0.012){
+    const clsSkills=SKILLS[G.classId];const bookSkills=clsSkills.filter(s=>s.bookOnly&&!G.skills.find(gs=>gs.id===s.id));
+    if(bookSkills.length>0){
+      const sb=pick(bookSkills);
+      const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:G.classId,reqLv:10};
       G.skillBooks.push(sbit);
-      addLog(`📖 掉落技能书：【${sb.name}】(${CLASS_NAMES[sb.classReq]})${sb.skillType==='passive'?'(被动)':''}已放入背包`,'drop');
+      addLog(`📖 掉落技能书：【${sb.name}】已放入背包`,'drop');
     }
   }
   // 材料掉落
@@ -1813,22 +1736,7 @@ function autoEquipCheck(it){
   if(!G.autoEquip)return;
   if(it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId)return;
   if(it.reqLv&&G.level<it.reqLv)return;
-  const cur=G.equipped[it.slot];if(!cur||it.power>cur.power){G.equipped[it.slot]=it;G.inventory.splice(G.inventory.indexOf(it),1);addLog(`🔄 自动装备：${it.name}`,'sys');computeStats();}
-}
-function gainSkillXp(sk){
-  if(!sk||!sk.id)return;
-  if(!G.skillXp)G.skillXp={};
-  G.skillXp[sk.id]=(G.skillXp[sk.id]||0)+SKILL_XP_PER_USE;
-  const lv=sk.level||0;
-  const needXp=skillXpForLevel(lv+1);
-  while(G.skillXp[sk.id]>=needXp){
-    G.skillXp[sk.id]-=needXp;
-    sk.level=(sk.level||0)+1;
-    const newNeed=skillXpForLevel(sk.level+1);
-    addLog(`⭐ ${sk.icon} ${sk.name} 升级！${getSkillRank(sk.level-1)}→${getSkillRank(sk.level)} Lv.${sk.level}`,'skill');
-    if(G.skillXp[sk.id]<newNeed)break;
-  }
-  computeStats();
+  const cur=G.equipped[it.slot];if(!cur||(it.power||0)>(cur.power||0)){G.equipped[it.slot]=it;G.inventory.splice(G.inventory.indexOf(it),1);addLog(`🔄 自动装备：${it.name}`,'sys');computeStats();}
 }
 function changeMap(mapId){
   const m=MAPS.find(x=>x.id===mapId);if(!m||m.lv>G.level)return;
@@ -1895,8 +1803,9 @@ function renderAll(){
   document.getElementById('cur-map-name').textContent=(MAPS.find(m=>m.id===G.curMap)||MAPS[0]).name;
 }
 function renderTopBar(){
+  const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
   document.getElementById('top-lv').textContent=G.level;
-  document.getElementById('top-class').textContent=G.className;
+  document.getElementById('top-class').textContent=G.className||clsNames[G.classId]+'学徒';
   document.getElementById('top-atk').textContent=fmt(G.curAtk);
   document.getElementById('top-def').textContent=fmt(G.curDef);
   document.getElementById('top-hp').textContent=fmt(G.hp)+'/'+fmt(G.maxHp);
@@ -1906,7 +1815,7 @@ function renderTopBar(){
   const need=xpForLevel(G.level);const pct=Math.min(100,Math.floor(G.xp/need*100));
   document.getElementById('xp-text').textContent=fmt(G.xp)+'/'+fmt(need);
   document.getElementById('xp-bar-inner').style.width=pct+'%';
-  document.getElementById('char-name').textContent=G.className+(G.switchCount>0?` #${G.switchCount+1}`:'');
+  document.getElementById('char-name').textContent=(G.className||clsNames[G.classId]+'学徒')+(G.switchCount>0?` #${G.switchCount+1}`:'');
   const icons={warrior:'⚔️',archer:'🏹',mage:'🧙'};
   document.getElementById('class-icon').textContent=G.classIcon||icons[G.classId]||'⚔️';
   const di=document.getElementById('death-indicator');if(di)di.style.display=G.dead?'inline':'none';
@@ -1990,12 +1899,8 @@ function renderEnemy(){
   const e=G.enemy;if(!e)return;
   const card=document.getElementById('enemy-card');card.className=e.type==='boss'?'boss':e.type==='elite'?'elite':'';
   // Show level badge
-  document.getElementById('en-name').textContent=e.name||'???';
-  if(e.type==='boss'||e.type==='elite'){
-    document.getElementById('en-lv-tag').textContent='Lv.'+(e.level||1);
-  }else{
-    document.getElementById('en-lv-tag').textContent='Lv.'+(e.level||1);
-  }
+  document.getElementById('en-name').textContent=e.name+(e.level!==undefined?` (Lv.${e.level})`:'');
+  document.getElementById('en-lv-tag').textContent=e.type==='boss'?'Lv.'+e.level:e.type==='elite'?'Lv.'+e.level:'';
   const typeTag=document.getElementById('en-type-tag');
   if(e.type==='boss'){typeTag.textContent='BOSS';typeTag.className='enemy-type-tag boss';}
   else if(e.type==='elite'){typeTag.textContent='精英';typeTag.className='enemy-type-tag elite';}
@@ -2006,60 +1911,20 @@ function renderEnemy(){
   // Show death state
   const actBtns=document.querySelector('.act-btns');
   if(actBtns){actBtns.querySelectorAll('button').forEach(b=>b.disabled=G.dead);}
-  // Enemy specials display — 可点击查看详情
+  // Enemy specials display
   let specialsHtml='';
   if(e.specials&&e.specials.length>0){
-    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal);display:flex;flex-wrap:wrap;gap:4px">';
-    for(const sp of e.specials){
-      specialsHtml+=`<span class="enemy-special-tag" data-sp-id="${sp.id}" style="background:rgba(16,185,129,0.15);border:1px solid var(--green);border-radius:12px;padding:1px 6px;cursor:pointer;white-space:nowrap">${sp.icon||''}${sp.name||''}</span>`;
-    }
+    specialsHtml='<div style="margin-top:4px;font-size:10px;color:var(--teal)">';
+    for(const sp of e.specials){specialsHtml+=`${sp.icon}${sp.name} `;}
     specialsHtml+='</div>';
   }
   // Skill display
-  if(e.skill){
-    specialsHtml+=`<div style="margin-top:4px;font-size:10px;display:flex;gap:4px">`;
-    specialsHtml+=`<span class="enemy-skill-tag" data-skill-name="${e.skill.name}" data-skill-icon="${e.skill.icon||''}" data-skill-desc="${e.skill.desc}" data-skill-cd="${e.skill.cdMs}" style="background:rgba(167,139,250,0.15);border:1px solid var(--purple);border-radius:12px;padding:1px 6px;cursor:pointer;white-space:nowrap">${e.skill.icon||''}技能：${e.skill.name||''}</span>`;
-    specialsHtml+=`</div>`;
-  }
+  if(e.skill){specialsHtml+=`<div style="font-size:10px;color:var(--purple);margin-top:2px">${e.skill.icon}技能：${e.skill.name}</div>`;}
   // Insert into enemy card
   const cardEl=document.getElementById('enemy-card');
   let infoEl=document.getElementById('enemy-specials');
   if(!infoEl){infoEl=document.createElement('div');infoEl.id='enemy-specials';cardEl.appendChild(infoEl);}
   infoEl.innerHTML=specialsHtml;
-  // 绑定怪物特殊属性点击事件
-  bindEnemySpecialClicks();
-}
-function bindEnemySpecialClicks(){
-  document.querySelectorAll('.enemy-special-tag').forEach(tag=>{
-    tag.removeEventListener('click',onEnemySpecialClick);
-    tag.addEventListener('click',onEnemySpecialClick);
-  });
-  document.querySelectorAll('.enemy-skill-tag').forEach(tag=>{
-    tag.removeEventListener('click',onEnemySkillClick);
-    tag.addEventListener('click',onEnemySkillClick);
-  });
-}
-function onEnemySpecialClick(e){
-  e.stopPropagation();
-  const spId=e.currentTarget.dataset.spId;
-  const sp=ENEMY_SPECIALS.find(s=>s.id===spId);
-  if(!sp)return;
-  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
-  box.innerHTML=`<h3>${sp.icon} ${sp.name}</h3>
-    <div style="font-size:13px;line-height:1.8;margin-bottom:8px"><p>${sp.desc}</p></div>
-    <button class="btn btn-sm" style="width:100%" onclick="document.getElementById('modal-overlay').classList.remove('show')">关闭</button>`;
-}
-function onEnemySkillClick(e){
-  e.stopPropagation();
-  const tag=e.currentTarget;
-  const name=tag.dataset.skillName;
-  const icon=tag.dataset.skillIcon;
-  const desc=tag.dataset.skillDesc;
-  const cd=tag.dataset.skillCd;
-  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
-  box.innerHTML=`<h3>${icon} ${name}</h3>
-    <div style="font-size:13px;line-height:1.8;margin-bottom:8px"><p>${desc}</p><p style="font-size:11px;color:var(--muted);margin-top:4px">冷却时间：${Math.round(cd/1000)}秒</p></div>
-    <button class="btn btn-sm" style="width:100%" onclick="document.getElementById('modal-overlay').classList.remove('show')">关闭</button>`;
 }
 function renderBag(){
   // 更新装备格子数
@@ -2075,7 +1940,6 @@ function renderBag(){
   renderBagEquip();
   renderBagMaterials();
   renderBagConsumables();
-  renderBagCraft();
   // 更新分解面板状态
   const acb=document.getElementById('auto-decompose');if(acb)acb.checked=G.autoDecompose;
   const dq=document.getElementById('decompose-quality');if(dq)dq.value=G.decomposeThreshold;
@@ -2105,34 +1969,16 @@ function renderBagMaterials(){
       const clsNames2={warrior:'战士',archer:'射手',mage:'法师'};
       const isMyClass=sb.classReq===G.classId;
       const alreadyHave=G.skills.find(s=>s.id===sb.skillId);
-      const lvEnough=G.level>=(sb.reqLv||0);
       div.className='skill-item';
-      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'} · 需Lv${sb.reqLv||0}</div></div>`;
+      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'}</div></div>`;
       const acts=document.createElement('div');acts.style.display='flex';acts.style.gap='3px';
-      if(isMyClass&&!alreadyHave&&lvEnough){
+      if(isMyClass&&!alreadyHave){
         const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';
-        lb.setAttribute('data-action','learn-skill-book');
-        lb.setAttribute('data-skill-id',sb.skillId);
-        acts.appendChild(lb);
-      }else if(isMyClass&&!alreadyHave&&!lvEnough){
-        const lb=document.createElement('button');lb.className='btn btn-xs';lb.textContent='Lv不足';
-        lb.disabled=true;lb.style.opacity='0.5';lb.style.fontSize='9px';
-        acts.appendChild(lb);
-      }else if(!isMyClass){
-        const lb=document.createElement('button');lb.className='btn btn-xs';lb.textContent='非本职业';
-        lb.disabled=true;lb.style.opacity='0.5';lb.style.fontSize='9px';
-        acts.appendChild(lb);
-      }else if(alreadyHave){
-        const lb=document.createElement('button');lb.className='btn btn-xs';lb.textContent='已学习';
-        lb.disabled=true;lb.style.opacity='0.5';lb.style.fontSize='9px';
+        lb.addEventListener('click',(function(idx){return function(){learnSkillBook(idx);};})(i));
         acts.appendChild(lb);
       }
-      const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';
-      const skillDef=SKILLS[sb.classReq]?.find(s=>s.id===sb.skillId);
-      const diamonds=skillDef?skillBookDiamond(skillDef):1;
-      eb.textContent='💎兑'+diamonds;
-      eb.setAttribute('data-action','exchange-skill-book');
-      eb.setAttribute('data-skill-id',sb.skillId);
+      const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';
+      eb.addEventListener('click',(function(idx){return function(){exchangeSkillBook(idx);};})(i));
       acts.appendChild(eb);
       div.appendChild(acts);el.appendChild(div);
     }
@@ -2147,49 +1993,34 @@ function renderBagMaterials(){
       div.className='shop-item-row';
       div.innerHTML=`<div class="shop-item-icon">${md.icon}</div><div class="shop-item-info"><div class="shop-item-name">${md.name}<span style="font-size:9px;color:var(--muted);margin-left:4px">×${count}</span></div><div class="shop-item-desc">${md.desc} · <span style="color:var(--purple)">${md.use.desc}</span></div></div>`;
       const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
-      ub.setAttribute('data-action','use-material');
-      ub.setAttribute('data-material-id',mid);
+      ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
       div.appendChild(ub);el.appendChild(div);
     }
     totalItems+=mats.length;
   }
+  // 材料合成装备（有材料时才显示）
+  if(totalItems>0){
+    el.innerHTML+=`<div style="font-size:11px;font-weight:bold;color:var(--orange);margin:8px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--border)">🔨 合成装备</div>`;
+    for(let i=0;i<MATERIAL_CRAFT.length;i++){
+      const rc=MATERIAL_CRAFT[i];
+      const div=document.createElement('div');
+      div.className='shop-item-row';
+      const costParts=[];
+      let canCraft=true;
+      for(const[mid,count] of Object.entries(rc.costs)){
+        const have=G.materials[mid]||0;
+        if(have<count)canCraft=false;
+        costParts.push(`${MATERIALS[mid].icon}${MATERIALS[mid].name}×${count}<span style="color:${have>=count?'var(--green)':'var(--red)'};font-size:9px">(${have})</span>`);
+      }
+      div.innerHTML=`<div class="shop-item-icon">${rc.icon}</div><div class="shop-item-info"><div class="shop-item-name">${rc.name}</div><div class="shop-item-desc">${costParts.join(' ')}</div></div>`;
+      const cb=document.createElement('button');cb.className='btn btn-orange btn-xs';cb.textContent='合成';
+      cb.disabled=!canCraft;
+      cb.addEventListener('click',(function(idx){return function(){craftEquip(idx);};})(i));
+      div.appendChild(cb);el.appendChild(div);
+    }
+  }
   if(totalItems===0)el.innerHTML='<span style="color:var(--muted);font-size:11px">暂无材料和技能书</span>';
   if(mc)mc.textContent=totalItems>0?(''+totalItems):'';
-}
-function renderBagCraft(){
-  const el=document.getElementById('craft-list');if(!el)return;el.innerHTML='';
-  let hasAny=false;
-  el.innerHTML+=`<div style="font-size:11px;font-weight:bold;color:var(--orange);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">🔨 材料合成装备</div>`;
-  // 显示材料库存概览
-  const mats=Object.entries(G.materials).filter(([k,v])=>v>0);
-  if(mats.length>0){
-    el.innerHTML+=`<div style="font-size:10px;color:var(--muted);margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px">`;
-    for(const[mid,count] of mats){
-      const md=MATERIALS[mid];
-      el.innerHTML+=`<span style="background:var(--card);padding:2px 6px;border-radius:4px;border:1px solid var(--border)">${md.icon} ${md.name} ×${count}</span>`;
-    }
-    el.innerHTML+=`</div>`;
-  }
-  for(let i=0;i<MATERIAL_CRAFT.length;i++){
-    const rc=MATERIAL_CRAFT[i];
-    const div=document.createElement('div');
-    div.className='shop-item-row';
-    const costParts=[];
-    let canCraft=true;
-    for(const[mid,count] of Object.entries(rc.costs)){
-      const have=G.materials[mid]||0;
-      if(have<count)canCraft=false;
-      costParts.push(`${MATERIALS[mid].icon}${MATERIALS[mid].name}×${count}<span style="color:${have>=count?'var(--green)':'var(--red)'};font-size:9px">(${have})</span>`);
-    }
-    div.innerHTML=`<div class="shop-item-icon">${rc.icon}</div><div class="shop-item-info"><div class="shop-item-name">${rc.name}</div><div class="shop-item-desc">${costParts.join(' ')}</div></div>`;
-    const cb=document.createElement('button');cb.className='btn btn-orange btn-xs';cb.textContent='合成';
-    cb.disabled=!canCraft;
-    cb.setAttribute('data-action','craft-equip');
-    cb.setAttribute('data-craft-index',i);
-    div.appendChild(cb);el.appendChild(div);
-    hasAny=true;
-  }
-  if(!hasAny)el.innerHTML+='<span style="color:var(--muted);font-size:11px">暂无合成配方</span>';
 }
 function renderBagConsumables(){
   const el=document.getElementById('consumable-list');if(!el)return;el.innerHTML='';
@@ -2223,7 +2054,7 @@ function doDecompose(threshold,nonClassOnly){
     const it=G.inventory[i];
     const matchQuality=it.quality<=threshold;
     const matchNonClass=nonClassOnly&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
-    if(nonClassOnly?matchNonClass:matchQuality){
+    if(matchNonClass||matchQuality){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
       decomposed++;
@@ -2250,36 +2081,19 @@ function toggleDecomposePanel(){
 }
 // ═══ 技能书系统 ═══
 function learnSkillBook(index){
-  const sb=G.skillBooks[index];if(!sb||sb.classReq!==G.classId){addLog('⚠️ 该技能书非本职业，无法学习','sys');return;}
+  const sb=G.skillBooks[index];if(!sb||sb.classReq!==G.classId)return;
   if(G.skills.find(s=>s.id===sb.skillId)){addLog('⚠️ 已学会该技能','sys');return;}
-  const skillDef=SKILLS[sb.classReq]?.find(s=>s.id===sb.skillId);
+  const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
   if(!skillDef)return;
-  if(G.level<(sb.reqLv||0)){addLog(`⚠️ 等级不足：学习【${sb.name}】需要Lv${sb.reqLv}，当前Lv${G.level}`,'sys');return;}
-  G.skills.push({...skillDef,lastUsed:0,level:0});G.skillBooks.splice(index,1);
-  G.skillXp[sb.skillId]=0;
-  addLog(`📖 学会技能：【${sb.name}】${skillDef.skillType==='passive'?'(被动)':''}！`,'sys');
-  showToast(`<span style="font-size:28px">${sb.icon}</span><br>学会技能<br><span style="font-size:16px;font-weight:bold;color:var(--purple)">${sb.name}</span>`);
-  computeStats();refreshSkillBtns();
+  G.skills.push({...skillDef,lastUsed:0});G.skillBooks.splice(index,1);
+  addLog(`📖 学会技能：【${sb.name}】！`,'sys');refreshSkillBtns();
   renderBag();renderSkills();renderAll();
-}
-function learnSkillBookById(skillId){
-  const idx=G.skillBooks.findIndex(sb=>sb.skillId===skillId);
-  if(idx===-1)return;
-  learnSkillBook(idx);
 }
 function exchangeSkillBook(index){
   const sb=G.skillBooks[index];if(!sb)return;
-  const skillDef=SKILLS[sb.classReq]?.find(s=>s.id===sb.skillId);
-  const diamonds=skillDef?skillBookDiamond(skillDef):1;
-  G.skillBooks.splice(index,1);G.diamond+=diamonds;
-  addLog(`💎 【${sb.name}】(${CLASS_NAMES[sb.classReq]||'未知'})兑换为${diamonds}钻石`,'sys');
-  showToast(`<span style="font-size:28px">${sb.icon}</span><br>技能书兑换<br><span style="color:var(--pink);font-size:20px;font-weight:bold">+${diamonds} 💎</span>`);
+  G.skillBooks.splice(index,1);G.diamond+=1;
+  addLog(`💎 【${sb.name}】兑换为1钻石`,'sys');
   renderBag();renderAll();
-}
-function exchangeSkillBookById(skillId){
-  const idx=G.skillBooks.findIndex(sb=>sb.skillId===skillId);
-  if(idx===-1)return;
-  exchangeSkillBook(idx);
 }
 // ═══ 材料使用 ═══
 function useMaterial(mid){
@@ -2291,9 +2105,9 @@ function useMaterial(mid){
   }
   if(count<md.use.count){addLog(`⚠️ 材料不足，需要${md.use.count}个${md.name}`,'sys');return;}
   G.materials[mid]-=md.use.count;
-  if(md.use.gold){G.gold+=md.use.gold;addLog(`💰 使用${md.use.count}个${md.name}兑换${md.use.gold}金币`,'sys');showToast(`<span style="font-size:28px">${md.icon}</span><br>使用${md.name}<br><span style="color:var(--gold);font-size:18px;font-weight:bold">+${md.use.gold} 💰</span>`);}
-  else if(md.use.diamond){G.diamond+=md.use.diamond;addLog(`💎 使用${md.use.count}个${md.name}兑换${md.use.diamond}钻石`,'sys');showToast(`<span style="font-size:28px">${md.icon}</span><br>使用${md.name}<br><span style="color:var(--pink);font-size:18px;font-weight:bold">+${md.use.diamond} 💎</span>`);}
-  else if(md.use.potion){G.consumables[md.use.potion]=(G.consumables[md.use.potion]||0)+1;addLog(`🧪 使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}`,'sys');showToast(`<span style="font-size:28px">${md.icon}</span><br>使用${md.name}<br><span style="font-size:16px;font-weight:bold">合成 ${md.use.potion==='hpPotion'?'🧪小血瓶':'💉大血瓶'} ×1</span>`);}
+  if(md.use.gold){G.gold+=md.use.gold;addLog(`💰 使用${md.use.count}个${md.name}兑换${md.use.gold}金币`,'sys');}
+  else if(md.use.diamond){G.diamond+=md.use.diamond;addLog(`💎 使用${md.use.count}个${md.name}兑换${md.use.diamond}钻石`,'sys');}
+  else if(md.use.potion){G.consumables[md.use.potion]=(G.consumables[md.use.potion]||0)+1;addLog(`🧪 使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}`,'sys');}
   else if(md.use.atkBoost){
     // 随机选择一件已装备的装备强化 +1~3 攻击力
     const eqSlots=Object.keys(G.equipped).filter(k=>G.equipped[k]);
@@ -2303,13 +2117,12 @@ function useMaterial(mid){
     G.equipped[slot].stats.atk+=boost;
     G.equipped[slot].power=itemPower(G.equipped[slot]);
     addLog(`⚒️ 使用${md.use.count}个${md.name}强化${G.equipped[slot].name}，攻击力+${boost}`,'sys');
-    showToast(`<span style="font-size:28px">⚒️</span><br>装备强化<br><span style="font-size:16px;font-weight:bold">${G.equipped[slot].name}</span><br><span style="color:var(--orange)">攻击力 +${boost}</span>`);
     computeStats();
   }
   else if(md.use.equipMinQ!==undefined){
     const q=rollWeightedQ(md.use.equipMinQ,8);const slot=pick(Object.keys(EQ_NAMES));
     const it=genEquip(slot,q,8,G.level);
-    if(G.inventory.length<G.maxInv){G.inventory.push(it);addLog(`🎁 使用${md.use.count}个${md.name}兑换获得：${it.name}`,'drop');showToast(`<span style="font-size:28px">${md.icon}</span><br>使用${md.name}<br><span style="color:${QCOLOR[it.quality]};font-size:16px;font-weight:bold">${it.name}</span>`);autoEquipCheck(it);}
+    if(G.inventory.length<G.maxInv){G.inventory.push(it);addLog(`🎁 使用${md.use.count}个${md.name}兑换获得：${it.name}`,'drop');autoEquipCheck(it);}
     else{addLog('⚠️ 背包已满','sys');G.materials[mid]+=md.use.count;return;}
   }
   computeStats();renderAll();renderBag();
@@ -2344,87 +2157,29 @@ function craftEquip(craftIndex){
   }
   addLog(logMsg,'drop');
   // 合成成功弹窗提示
-  showToast(`<span style="font-size:24px">🔨</span> 合成成功！<br><span style="color:${QCOLOR[it.quality]};font-size:16px;font-weight:bold">${it.name}</span><br><span style="font-size:11px;color:var(--muted)">${it.qName} · 战力${it.power}</span>`);
-  computeStats();renderAll();renderBag();
-}
-// ═══ 通用 Toast 提示 ═══
-function showToast(msg,duration){
   const toast = document.createElement('div');
   toast.className = 'craft-toast';
-  toast.innerHTML = msg;
+  toast.innerHTML = `<span style="font-size:24px">🔨</span> 合成成功！<br><span style="color:${QCOLOR[it.quality]};font-size:16px;font-weight:bold">${it.name}</span><br><span style="font-size:11px;color:var(--muted)">${it.qName} · 战力${it.power}</span>`;
   document.body.appendChild(toast);
   setTimeout(() => { toast.classList.add('show'); }, 10);
-  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, duration||2000);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 2500);
+  computeStats();renderAll();renderBag();
 }
 function renderSkills(){
   const el=document.getElementById('skill-list');el.innerHTML='';
-  // 分组：主动技能 + 被动技能
-  const activeSkills=G.skills.filter(s=>!s.skillType||s.skillType==='active');
-  const passiveSkills=G.skills.filter(s=>s.skillType==='passive');
-  if(activeSkills.length>0){
-    el.innerHTML+='<div style="font-size:11px;color:var(--muted);margin-bottom:4px">⚔️ 主动技能</div>';
-    for(const sk of activeSkills){
-      const lv=sk.level||0;const rank=getSkillRank(lv);const rankColor=getSkillRankColor(lv);
-      const xp=G.skillXp[sk.id]||0;const needXp=skillXpForLevel(lv+1);
-      const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
-      const div=document.createElement('div');div.className='skill-item';
-      const xpBar=`<div style="margin-top:4px;background:var(--border);border-radius:3px;height:4px;overflow:hidden"><div style="width:${Math.min(100,xp/needXp*100)}%;height:100%;background:${rankColor};border-radius:3px"></div></div>`;
-      div.innerHTML=`<div class="skill-icon">${sk.icon}</div><div class="skill-info"><div class="skill-name">${sk.name} <span style="color:${rankColor};font-size:10px;font-weight:bold;background:${rankColor}22;padding:1px 5px;border-radius:4px">${rank}</span> Lv.${lv}</div><div class="skill-desc">${sk.desc}</div>${xpBar}<div style="font-size:9px;color:var(--muted)">经验 ${fmt(xp)}/${fmt(needXp)}</div></div><div class="skill-cd">${ready?'就绪':(cdLeft/1000).toFixed(1)+'s'}</div>`;
-      el.appendChild(div);
-    }
-  }
-  if(passiveSkills.length>0){
-    el.innerHTML+='<div style="font-size:11px;color:var(--muted);margin:8px 0 4px">🛡️ 被动技能</div>';
-    for(const sk of passiveSkills){
-      const lv=sk.level||0;const rank=getSkillRank(lv);const rankColor=getSkillRankColor(lv);
-      const div=document.createElement('div');div.className='skill-item passive-skill';
-      div.innerHTML=`<div class="skill-icon">${sk.icon}</div><div class="skill-info"><div class="skill-name">${sk.name} <span style="color:${rankColor};font-size:10px;font-weight:bold;background:${rankColor}22;padding:1px 5px;border-radius:4px">${rank}</span> Lv.${lv}</div><div class="skill-desc">${sk.desc}</div></div><div class="skill-cd" style="color:var(--green);font-size:10px">被动</div>`;
-      el.appendChild(div);
-    }
+  for(const sk of G.skills){
+    const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
+    const div=document.createElement('div');div.className='skill-item';
+    div.innerHTML=`<div class="skill-icon">${sk.icon}</div><div class="skill-info"><div class="skill-name">${sk.name}${sk.bookOnly?' 📖':''}</div><div class="skill-desc">${sk.desc}</div></div><div class="skill-cd">${ready?'就绪':(cdLeft/1000).toFixed(1)+'s'}</div>`;
+    el.appendChild(div);
   }
   refreshSkillBtns();
 }
 function refreshSkillBtns(){
-  const extraEl=document.getElementById('extra-skill-btns');
-  if(!extraEl)return;
-  extraEl.innerHTML='';
-  const activeSkills=G.skills.filter(s=>!s.skillType||s.skillType==='active');
-  // 从第2个开始显示（第1个已固定在battle-skill-btns中）
-  for(let i=1;i<activeSkills.length;i++){
-    const sk=activeSkills[i];
-    const btn=document.createElement('button');
-    btn.className='btn btn-xs';
-    const colors=['btn-purple','btn-teal','btn-gold','btn-pink','btn-blue2','btn-red2','btn-green','btn-blue'];
-    btn.classList.add(colors[(i-1)%colors.length]);
-    const cdL=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;
-    btn.textContent=sk.icon+' '+sk.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');
-    btn.disabled=cdL>0||G.dead;
-    btn.addEventListener('click',(function(s){return function(){useSpecificSkill(s);};})(sk));
-    extraEl.appendChild(btn);
-  }
-  // 更新前两个固定按钮
+  const b2=document.getElementById('btn-skill2');
+  if(G.skill2){b2.style.display='';b2.textContent='📖 '+G.skill2.name;b2.disabled=!canUseSkill(G.skill2);}else b2.style.display='none';
   const s1=G.skills[0];const bs=document.getElementById('btn-skill');
-  if(s1){const cdL=s1.lastUsed?Math.max(0,s1.cdMs-(now()-s1.lastUsed)):0;bs.textContent='✨ '+s1.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');bs.disabled=cdL>0||G.dead;}
-}
-function useSpecificSkill(sk){
-  if(!canUseSkill(sk)||G.dead)return;
-  const e=G.enemy;if(!e)return;
-  let dmg=Math.floor(G.curAtk*sk.mult);
-  if(sk.ignoreDef)dmg=Math.floor(dmg*(1-sk.ignoreDef));
-  else dmg=Math.max(1,dmg-Math.floor(e.def*0.3));
-  if(sk.hits){let td=0;for(let i=0;i<sk.hits;i++){const sub=Math.floor(G.curAtk*sk.mult);td+=Math.max(1,sub-Math.floor(e.def*0.3));}dmg=td;}
-  e.hp-=dmg;
-  if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');sk.lastUsed=now();renderAll();return;}
-  if(sk.type==='dot'){
-    e.dotDmg=Math.floor(G.curAtk*0.2);e.dotUntil=now()+5000;
-    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 伤害+5秒中毒`,'skill');
-  }else{
-    addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
-  }
-  sk.lastUsed=now();
-  gainSkillXp(sk);
-  if(e.hp<=0)onKill();else enemyAttack();
-  renderAll();
+  if(s1){const cdL=s1.lastUsed?Math.max(0,s1.cdMs-(now()-s1.lastUsed)):0;bs.textContent='✨ '+s1.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');bs.disabled=cdL>0;}
 }
 function renderMaps(){
   const el=document.getElementById('map-list');
@@ -2435,8 +2190,7 @@ function renderMaps(){
     div.className='map-item'+(m.id===G.curMap?' active':'')+(locked?' locked':'');
     const allMonsters=[...m.monsters];if(m.elite)allMonsters.push(m.elite);if(m.boss)allMonsters.push(m.boss);
     const monList=allMonsters.map(x=>{const cls=x===m.boss?'map-boss':x===m.elite?'map-elite':'';return`<span class="${cls}">${x.icon}${x.name}</span>`;}).join('');
-    const mk = G.mapKills&&G.mapKills[m.id] ? G.mapKills[m.id] : {normal:0,elite:0,boss:0};
-    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''}</div><div class="map-desc" style="font-size:10px;color:var(--muted)">普通${mk.normal} · 精英${mk.elite} · BOSS${mk.boss}</div><div class="map-monsters">${monList}</div></div>`;
+    div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''} ⚡击杀${G.killStreak}</div><div class="map-monsters">${monList}</div></div>`;
     if(!locked)div.addEventListener('click',()=>changeMap(m.id));
     el.appendChild(div);
   }
@@ -2591,7 +2345,7 @@ function showItemModal(it,source,isEquipped){
     eqb.addEventListener('click',()=>{const old=G.equipped[it.slot];G.equipped[it.slot]=it;G.inventory.splice(source,1);if(old)G.inventory.push(old);addLog(`🛡️ 装备：${it.name}`,'sys');closeModal();computeStats();renderAll();checkQuests();});
     acts.appendChild(eqb);
     const selb=document.createElement('button');selb.className='btn btn-red btn-sm';selb.textContent='出售（💰'+fmt(Math.floor(it.power*2))+')';
-    selb.addEventListener('click',()=>{const goldGot=Math.floor(it.power*2);G.gold+=goldGot;G.inventory.splice(source,1);addLog(`💰 出售：${it.name}，获得${fmt(goldGot)}金币`,'sys');showToast(`<span style="font-size:24px">${eqIcon(it.slot,it.classReq)}</span><br>出售装备<br><span style="font-size:16px;font-weight:bold">${it.name}</span><br><span style="color:var(--gold)">+${fmt(goldGot)} 💰</span>`);closeModal();renderAll();checkQuests();});
+    selb.addEventListener('click',()=>{G.gold+=Math.floor(it.power*2);G.inventory.splice(source,1);addLog(`💰 出售：${it.name}，获得${fmt(Math.floor(it.power*2))}金币`,'sys');closeModal();renderAll();checkQuests();});
     acts.appendChild(selb);
   }
   box.appendChild(acts);
@@ -2751,19 +2505,7 @@ function showAdvModal(opts){
 }
 function refreshQuestUI(){
   const btn=document.getElementById('btn-refresh-quest');
-  if(!btn)return;
-  const elapsed=now()-G.questRefreshTime;
-  const cooldown=300000; // 5分钟
-  const left=Math.max(0,cooldown-elapsed);
-  if(left>0){
-    btn.disabled=true;
-    const m=Math.floor(left/60000);
-    const s=Math.floor((left%60000)/1000);
-    btn.textContent=`⏳ 刷新 (${m}:${String(s).padStart(2,'0')})`;
-  }else{
-    btn.disabled=false;
-    btn.textContent='🔄 刷新任务';
-  }
+  if(btn)btn.disabled=now()-G.questRefreshTime<1800000;
 }
 
 // ═══════════════════════════════════════════
@@ -2778,22 +2520,6 @@ function randomConsumableType(){
   if(r<=65)return 'atkScroll';
   if(r<=85)return 'defScroll';
   return 'hpScroll';
-}
-function confirmGacha(count){
-  const cost=count===10?45:5;
-  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
-  box.innerHTML=`<h3>${count===10?'🎰 十连抽':'🎲 单次抽取'}</h3>
-    <div style="font-size:13px;line-height:1.8;margin-bottom:12px">
-      <p>确定要花费 <span class="diamond" style="font-size:16px;font-weight:bold">💎 ${cost} 钻石</span> 进行${count===10?'十连':'单次'}抽取吗？</p>
-      <p style="font-size:11px;color:var(--muted);margin-top:4px">当前余额：💎 ${fmt(G.diamond)} 钻石</p>
-    </div>`;
-  const acts=document.createElement('div');acts.style.cssText='display:flex;gap:8px';
-  const yesBtn=document.createElement('button');yesBtn.className='btn btn-pink';yesBtn.textContent='✅ 确定抽取';yesBtn.style.flex='1';
-  yesBtn.addEventListener('click',()=>{closeModal();gachaPull(count);});
-  const noBtn=document.createElement('button');noBtn.className='btn';noBtn.textContent='❌ 取消';noBtn.style.flex='1';
-  noBtn.addEventListener('click',closeModal);
-  acts.appendChild(yesBtn);acts.appendChild(noBtn);
-  box.appendChild(acts);
 }
 function gachaPull(count){
   const cost=count===10?45:5;
@@ -2827,7 +2553,6 @@ function gachaPull(count){
     parts.push(CONSUMABLE_ICONS[c]+CONSUMABLE_NAMES[c]+'×'+num);
   }
   addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');
-  showToast(`<span style="font-size:28px">${count===10?'🎰':'🎲'}</span><br>${count}连抽！<br><span style="font-size:16px;font-weight:bold">${parts.join('、')}</span><br><span style="color:var(--muted)">-${cost} 💎</span>`,2500);
   renderAll();renderShop();
 }
 function useHpPotion(isAuto){
@@ -2862,7 +2587,6 @@ function useHpPotionSmall(isAuto){
   G._hpSmallHoT={until:n+5000,perTick,totalTicks:5,tickInterval:1000,lastTick:n};
   G._lastHpSmallUse=n;
   addLog('🧪 使用小血瓶！每秒恢复5%生命值，持续5秒'+(isAuto?'（自动）':''),'heal');
-  showToast('<span style="font-size:28px">🧪</span><br>使用小血瓶<br><span style="font-size:14px">每秒恢复5%HP，持续5秒</span>',1500);
   renderAll();
 }
 function useHpPotionLarge(isAuto){
@@ -2874,30 +2598,29 @@ function useHpPotionLarge(isAuto){
   G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*0.4));
   G._lastHpLargeUse=n;
   addLog('💉 使用大血瓶！瞬间恢复40%'+(isAuto?'（自动）':''),'heal');
-  showToast('<span style="font-size:28px">💉</span><br>使用大血瓶<br><span style="font-size:14px">瞬间恢复40%HP</span>',1500);
   renderAll();
 }
 function useAtkScroll(){
   if(!G.consumables.atkScroll)return addLog('⚠️ 没有攻击卷轴','sys');
+  if(G.buffs.atk&&G.buffs.atk.until>now())return addLog('⚠️ 攻击卷轴已在生效中','sys');
   G.consumables.atkScroll--;G.buffs.atk={val:Math.floor(G.curAtk*0.25),until:now()+180000};
   addLog('📜 使用攻击卷轴！攻击力+25%，持续3分钟','sys');
-  showToast('<span style="font-size:28px">📜</span><br>攻击卷轴生效<br><span style="color:var(--orange);font-size:16px;font-weight:bold">攻击力 +25%</span><br><span style="font-size:12px">持续3分钟</span>',2000);
   computeStats();renderAll();
 }
 function useDefScroll(){
   if(!G.consumables.defScroll)return addLog('⚠️ 没有防御卷轴','sys');
+  if(G.buffs.def&&G.buffs.def.until>now())return addLog('⚠️ 防御卷轴已在生效中','sys');
   G.consumables.defScroll--;G.buffs.def={val:Math.floor(G.curDef*0.30),until:now()+180000};
   addLog('🛡️ 使用防御卷轴！防御+30%，持续3分钟','sys');
-  showToast('<span style="font-size:28px">🛡️</span><br>防御卷轴生效<br><span style="color:var(--blue);font-size:16px;font-weight:bold">防御力 +30%</span><br><span style="font-size:12px">持续3分钟</span>',2000);
   computeStats();renderAll();
 }
 function useHpScroll(){
   if(!G.consumables.hpScroll)return addLog('⚠️ 没有生命卷轴','sys');
+  if(G.buffs.maxhp_cd&&G.buffs.maxhp_cd.until>now())return addLog('⚠️ 生命卷轴已在生效中','sys');
   G.consumables.hpScroll--;const bonus=Math.floor(G.maxHp*0.30);
   G.buffs.maxhp_cd={val:bonus,until:now()+180000};
   G.hp=Math.min(G.maxHp+bonus,G.hp+bonus);
   addLog('❤️ 使用生命卷轴！最大生命+30%（+'+bonus+'），持续3分钟','sys');
-  showToast('<span style="font-size:28px">❤️</span><br>生命卷轴生效<br><span style="color:var(--red);font-size:16px;font-weight:bold">最大HP +30%</span><br><span style="font-size:12px">持续3分钟</span>',2000);
   computeStats();renderAll();
 }
 function switchClass(newClassId){
@@ -2907,11 +2630,11 @@ function switchClass(newClassId){
   if(G.diamond<cost)return addLog(`⚠️ 钻石不足，需要${cost}💎`,'sys');
   if(cost>0)G.diamond-=cost;
   G.switchCount++;G.classSwitchCost=cost+10;
-  G.learnedSkills[G.classId]=G.skills.filter(s=>s.skillType==='passive'||s.unlockLv>0).map(s=>({...s}));
+  G.learnedSkills[G.classId]=G.skills.filter(s=>s.bookOnly).map(s=>({...s}));
   G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};
   const savedSkills=G.learnedSkills[newClassId]||[];
-  G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,level:0}];
-  for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0,level:0});}
+  G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0}];
+  for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0});}
   G.skill2=G.level>=10?SKILLS[G.classId].find(sk=>sk.unlockLv===10):null;
   addLog(`🔄 转职为：${G.className}！${cost===0?'首次免费！':'消耗'+cost+'💎'}`,'sys');
   if(savedSkills.length>0)addLog(`📖 恢复了${savedSkills.length}个已学技能`,'sys');
@@ -2969,12 +2692,12 @@ function renderShop(){
   const row1=document.createElement('div');row1.className='shop-item-row';
   row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 5 钻石</div></div>`;
   const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
-  b1.disabled=G.diamond<5;b1.addEventListener('click',()=>confirmGacha(1));
+  b1.disabled=G.diamond<5;b1.addEventListener('click',()=>gachaPull(1));
   row1.appendChild(b1);ds.appendChild(row1);
   const row10=document.createElement('div');row10.className='shop-item-row';
   row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 45 钻石</div></div>`;
   const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
-  b10.disabled=G.diamond<45;b10.addEventListener('click',()=>confirmGacha(10));
+  b10.disabled=G.diamond<45;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
   el.appendChild(ds);
   const cs=document.createElement('div');cs.className='shop-section';
@@ -3119,7 +2842,7 @@ function init(){
   if(!G.learnedSkills)G.learnedSkills={};
   if(!G.skillBooks)G.skillBooks=[];
   if(!G.materials)G.materials={};
-  if(!G.dead)G.dead=false;
+  if(G.dead===undefined||G.dead===null)G.dead=false;
   if(!G.deadUntil)G.deadUntil=0;
   computeStats();G.hp=Math.min(G.maxHp,G.hp);
   renderAll();renderShop();
@@ -3177,8 +2900,9 @@ async function loadGame(){
 
 // 从存档数据恢复游戏状态
 function restoreGameData(d){
+  const clsNames={warrior:'战士',archer:'射手',mage:'法师'};
   G.level = d.level; G.xp = d.xp; G.gold = d.gold; G.diamond = d.diamond;
-  G.classId = d.classId; G.classTier = d.classTier; G.className = d.className;
+  G.classId = d.classId; G.classTier = d.classTier; G.className = d.className || clsNames[G.classId]+'学徒';
   G.classSwitchCost = d.classSwitchCost; G.switchCount = d.switchCount;
   G.str = d.str; G.vit = d.vit; G.agi = d.agi; G.dex = d.dex; G.int = d.int;
   G.hp = d.hp; G.maxHp = d.maxHp;
@@ -3195,20 +2919,17 @@ function restoreGameData(d){
   G.autoHpSmall = !!d.autoHpSmall; G.autoHpLarge = !!d.autoHpLarge;
   G.learnedSkills = d.learnedSkills || {};
   G.killAnyCount = d.killAnyCount || 0;
-  G.killNormalCount = d.killNormalCount || 0;
-  G.killEliteCount = d.killEliteCount || 0;
-  G.killBossCount = d.killBossCount || 0;
-  G.mapKills = d.mapKills || {};
   G.quests = d.quests || [];
   G.skillBooks = d.skillBooks || [];
   G.materials = d.materials || {};
   G.bagExpansions = d.bagExpansions || 0;
   G.slotEnhance = d.slotEnhance || {};
+  G.classStatsAdv = d.classStatsAdv || {};
+  G.classIcon = d.classIcon || null;
   G.logs = d.logs || [];
-  G.skillXp = d.skillXp || {};
   
-  for(const it of G.inventory){if(it.quality==null)it.quality=0;}
-  for(const k in G.equipped){const it=G.equipped[k];if(it&&it.quality==null)it.quality=0;}
+  for(const it of G.inventory){if(it.quality==null)it.quality=0;if(it.power==null)it.power=itemPower(it);}
+  for(const k in G.equipped){const it=G.equipped[k];if(it){if(it.quality==null)it.quality=0;if(it.power==null)it.power=itemPower(it);}}
   G.dead = false; G.deadUntil = 0;
   
   G.skills = [];
@@ -3216,11 +2937,11 @@ function restoreGameData(d){
     const clsSkills = SKILLS[G.classId] || [];
     for(const sid of d.skillIds){
       const sk = clsSkills.find(s=>s.id===sid);
-      if(sk) G.skills.push({...sk, lastUsed: 0, level: d.skillLevels?.[sid] || 0});
+      if(sk) G.skills.push({...sk, lastUsed: 0});
     }
   }
   if(G.skills.length === 0 && SKILLS[G.classId]){
-    G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0, level: 0}];
+    G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0}];
   }
   if(d.skill2Id){
     G.skill2 = (SKILLS[G.classId] || []).find(s=>s.id===d.skill2Id) || null;
@@ -3239,6 +2960,9 @@ function restoreGameData(d){
     const ae=document.getElementById('auto-equip');if(ae)ae.checked=G.autoEquip;
     const ahs=document.getElementById('auto-hp-small');if(ahs)ahs.checked=G.autoHpSmall;
     const ahl=document.getElementById('auto-hp-large');if(ahl)ahl.checked=G.autoHpLarge;
+    const ad=document.getElementById('auto-decompose');if(ad)ad.checked=G.autoDecompose;
+    const dn=document.getElementById('decompose-nonclass');if(dn)dn.checked=G.decomposeNonClass;
+    const dq2=document.getElementById('decompose-quality');if(dq2)dq2.value=G.decomposeThreshold;
   }, 100);
   
   G.enemy = null;
@@ -3338,8 +3062,6 @@ function buildSaveData(now_){
     hp: G.hp, maxHp: G.maxHp,
     equipped: G.equipped, inventory: G.inventory, maxInv: G.maxInv,
     skillIds: G.skills.map(s=>s.id),
-    skillLevels: (()=>{const sl={};for(const s of G.skills)sl[s.id]=s.level||0;return sl;})(),
-    skillXp: G.skillXp || {},
     skill2Id: G.skill2 ? G.skill2.id : null,
     curMap: G.curMap,
     kills: G.kills,
@@ -3349,15 +3071,13 @@ function buildSaveData(now_){
     autoHpSmall: G.autoHpSmall, autoHpLarge: G.autoHpLarge,
     learnedSkills: G.learnedSkills,
     killAnyCount: G.killAnyCount,
-    killNormalCount: G.killNormalCount,
-    killEliteCount: G.killEliteCount,
-    killBossCount: G.killBossCount,
-    mapKills: G.mapKills,
     quests: G.quests,
     skillBooks: G.skillBooks,
     materials: G.materials,
     bagExpansions: G.bagExpansions,
     slotEnhance: G.slotEnhance,
+    classStatsAdv: G.classStatsAdv || {},
+    classIcon: G.classIcon || null,
     logs: G.logs.slice(0, 8),
   };
   const buffs = {};
@@ -3522,6 +3242,7 @@ function showResetConfirmModal(){
 // ═══════════════════════════════════════════
 document.getElementById('btn-attack').addEventListener('click',()=>playerAttack(false));
 document.getElementById('btn-skill').addEventListener('click',()=>playerAttack(true));
+document.getElementById('btn-skill2').addEventListener('click',()=>{if(G.skill2&&canUseSkill(G.skill2)&&G.enemy&&!G.dead){playerAttackWithSkill(G.skill2);}});
 document.getElementById('btn-change-map').addEventListener('click',()=>{
   // 在战斗页面显示地图选择弹窗
   const box=document.getElementById('modal-box');
@@ -3569,41 +3290,12 @@ document.getElementById('btn-bag-toggle').addEventListener('click',function(){
   renderBag();
 });
 const rqBtn=document.createElement('button');rqBtn.id='btn-refresh-quest';rqBtn.className='btn btn-green btn-xs';rqBtn.textContent='🔄 刷新任务';rqBtn.style.cssText='margin-top:6px;width:100%';
-rqBtn.addEventListener('click',()=>{if(now()-G.questRefreshTime>=300000)refreshQuests();else{const left=Math.ceil((300000-(now()-G.questRefreshTime))/60000);addLog('⏳ 每5分钟可刷新一次（剩余'+left+'分钟）','sys');}});
+rqBtn.addEventListener('click',()=>{if(now()-G.questRefreshTime>=1800000)refreshQuests();else{const left=Math.ceil((1800000-(now()-G.questRefreshTime))/60000);addLog('⏳ 每30分钟可刷新一次（剩余'+left+'分钟）','sys');}});
 const questPanel = document.getElementById('tab-page-quests');
 if(questPanel){
   const qb = questPanel.querySelector('.panel-bd');
   if(qb) qb.appendChild(rqBtn);
 }
-// ═══ 材料列表事件委托 ═══
-document.getElementById('material-list').addEventListener('click',function(e){
-  const btn=e.target.closest('button');if(!btn)return;
-  const action=btn.getAttribute('data-action');
-  if(!action)return;
-  if(action==='use-material'){
-    const mid=btn.getAttribute('data-material-id');
-    if(mid)useMaterial(mid);
-  }else if(action==='learn-skill-book'){
-    const skillId=btn.getAttribute('data-skill-id');
-    if(skillId)learnSkillBookById(skillId);
-  }else if(action==='exchange-skill-book'){
-    const skillId=btn.getAttribute('data-skill-id');
-    if(skillId)exchangeSkillBookById(skillId);
-  }else if(action==='craft-equip'){
-    const idx=parseInt(btn.getAttribute('data-craft-index'));
-    if(!isNaN(idx))craftEquip(idx);
-  }
-});
-// ═══ 合成列表事件委托 ═══
-document.getElementById('craft-list').addEventListener('click',function(e){
-  const btn=e.target.closest('button');if(!btn)return;
-  const action=btn.getAttribute('data-action');
-  if(!action)return;
-  if(action==='craft-equip'){
-    const idx=parseInt(btn.getAttribute('data-craft-index'));
-    if(!isNaN(idx))craftEquip(idx);
-  }
-});
 // ═══ 分解系统事件 ═══
 document.getElementById('btn-decompose').addEventListener('click',toggleDecomposePanel);
 document.getElementById('btn-decompose-confirm').addEventListener('click',()=>{
@@ -3628,6 +3320,7 @@ document.getElementById('decompose-nonclass').addEventListener('change',function
 });
 document.getElementById('decompose-quality').addEventListener('change',function(){
   G.decomposeThreshold=parseInt(this.value);
+  if(G.autoDecompose)addLog(`⚡ 自动分解品质阈值已更新：≤${QUALITY[G.decomposeThreshold]}`,'sys');
 });
 document.getElementById('btn-reset').addEventListener('click',resetGame);
 document.getElementById('btn-manual-save').addEventListener('click',manualSave);
