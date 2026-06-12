@@ -1618,18 +1618,40 @@ function getEnhancePower(slot){
   const elv=G.slotEnhance[slot]||0;if(elv<=0)return 0;
   const eb=ENHANCE_BONUS[slot];if(!eb)return 0;
   let p=0;
-  if(eb.atk)p+=eb.atk*elv*3;if(eb.def)p+=eb.def*elv*2;if(eb.hp)p+=eb.hp*elv*0.5;
-  if(eb.critRate)p+=eb.critRate*elv*5;if(eb.critDmg)p+=eb.critDmg*elv*0.5;
-  if(eb.atkSpd)p+=eb.atkSpd*elv*0.3;if(eb.block)p+=eb.block*elv*4;if(eb.dodge)p+=eb.dodge*elv*4;
+  if(eb.atk)p+=eb.atk*elv*5;if(eb.def)p+=eb.def*elv*3;if(eb.hp)p+=eb.hp*elv*0.8;
+  if(eb.critRate)p+=eb.critRate*elv*8;if(eb.critDmg)p+=eb.critDmg*elv*0.6;
+  if(eb.atkSpd)p+=eb.atkSpd*elv*0.5;if(eb.block)p+=eb.block*elv*6;if(eb.dodge)p+=eb.dodge*elv*6;
   return Math.floor(p);
 }
 
 function itemPower(it){
-  let p=0;const s=it.stats;
-  if(s.atk)p+=s.atk*3;if(s.def)p+=s.def*2;if(s.hp)p+=s.hp*0.5;
-  if(s.critRate)p+=s.critRate*5;if(s.critDmg)p+=(s.critDmg-150)*0.5;if(s.atkSpd)p+=s.atkSpd*0.3;
-  for(const sa of SPECIAL_ATTRS){if(s[sa.id])p+=s[sa.id]*4;}
-  return Math.floor(p);
+  let p=0;const s=it.stats;const q=it.quality||0;
+  // 基础属性加权（攻击最重要，防御/生命次之，百分比属性按等效值）
+  if(s.atk)p+=s.atk*5;
+  if(s.def)p+=s.def*3;
+  if(s.hp)p+=s.hp*0.8;
+  if(s.critRate)p+=s.critRate*8;          // 1%暴击 ≈ 8战力
+  if(s.critDmg)p+=Math.max(0,s.critDmg-150)*0.6; // 超出基础150%的部分
+  if(s.atkSpd)p+=s.atkSpd*0.5;            // 1点攻速 ≈ 0.5战力
+  if(s.block)p+=s.block*6;                // 1%格挡 ≈ 6战力
+  if(s.dodge)p+=s.dodge*6;                // 1%闪避 ≈ 6战力
+  // 特殊属性按实际效果加权
+  if(s.lifesteal)p+=s.lifesteal*8;        // 1%吸血 ≈ 8战力
+  if(s.thorns)p+=s.thorns*6;              // 1%荆棘 ≈ 6战力
+  if(s.magicFind)p+=s.magicFind*3;        // 1%寻宝 ≈ 3战力
+  if(s.expBonus)p+=s.expBonus*2;          // 1%经验 ≈ 2战力
+  if(s.goldBonus)p+=s.goldBonus*2;        // 1%金币 ≈ 2战力
+  if(s.hpRegen)p+=s.hpRegen*3;            // 1点恢复 ≈ 3战力
+  if(s.doubleAtk)p+=s.doubleAtk*10;       // 1%连击 ≈ 10战力（输出翻倍潜力）
+  if(s.armorPierce)p+=s.armorPierce*7;    // 1%破甲 ≈ 7战力
+  if(s.critBonus)p+=s.critBonus*7;        // 1%额外暴伤 ≈ 7战力
+  if(s.siphon)p+=s.siphon*5;              // 1%汲魂 ≈ 5战力
+  // 品质系数：高品质装备基础价值更高
+  const qMult=1+(q-0)*0.08;               // 白板1.0 → 超神级1.64
+  // 等级系数：高等级装备更稀有
+  const lvMult=1+((it.reqLv||1)-1)*0.005; // 100级+50%，300级+150%
+  p=Math.floor(p*qMult*lvMult);
+  return Math.max(1,p);
 }
 
 function genEquip(slot,minQ,maxQ,monsterLv){
@@ -2160,7 +2182,7 @@ function renderTopBar(){
   document.getElementById('free-pts-badge').textContent='';
 }
 function getTotalPower(){
-  let p=G.curAtk*5+G.curDef*3+G.maxHp*0.3+G.curCritRate*8+G.curDodge*6+G.curBlock*6+G.curLifesteal*8+G.curDoubleAtk*10;
+  let p=G.curAtk*5+G.curDef*3+G.maxHp*0.8+G.curCritRate*8+G.curDodge*6+G.curBlock*6+G.curLifesteal*8+G.curDoubleAtk*10;
   // 加上装备基础战力
   for(const k in G.equipped){const it=G.equipped[k];if(it)p+=(it.power||0);}
   return Math.floor(p);
