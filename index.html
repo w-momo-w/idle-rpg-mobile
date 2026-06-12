@@ -1751,8 +1751,7 @@ function gainXp(amt){
   let lvMult=1;
   if(eLv<pLv){lvMult=Math.max(0.1,1-(pLv-eLv)*0.15);}
   const bonus=1+G.curExpBonus/100;
-  G.xp+=Math.floor(amt*bonus*lvMult);
-  while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}
+  if(G.level<300){G.xp+=Math.floor(amt*bonus*lvMult);while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}}
 }
 function gainGold(amt){const bonus=1+G.curGoldBonus/100;const actualAmt=Math.floor(amt*bonus);G.gold+=actualAmt;
   // 更新收集金币类型任务的累计进度
@@ -2076,7 +2075,7 @@ function submitQuest(qIndex){
   // 发放奖励
   if(q.reward.gold)G.gold+=q.reward.gold;
   if(q.reward.diamond)G.diamond+=q.reward.diamond;
-  if(q.reward.xp){G.xp+=q.reward.xp;while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}}
+  if(q.reward.xp && G.level<300){G.xp+=q.reward.xp;while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}}
   if(q.reward.equipQ!==undefined){const slot=pick(Object.keys(EQ_NAMES));const it=genEquip(slot,q.reward.equipQ,Math.min(8,q.reward.equipQ+2),G.level);if(G.inventory.length<G.maxInv)G.inventory.push(it);else addLog('⚠️ 背包已满，装备奖励丢失','sys');}
   if(q.reward.potion){const key=q.reward.potion;G.consumables[key]=(G.consumables[key]||0)+q.reward.potionCount;}
   if(q.reward.material){const mk=q.reward.material;G.materials[mk]=(G.materials[mk]||0)+q.reward.materialCount;}
@@ -3191,7 +3190,7 @@ function showEquipSubmitModal(qIndex){
     // 发放奖励
     if(q.reward.gold)G.gold+=q.reward.gold;
     if(q.reward.diamond)G.diamond+=q.reward.diamond;
-    if(q.reward.xp){G.xp+=q.reward.xp;while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}}
+    if(q.reward.xp && G.level<300){G.xp+=q.reward.xp;while(G.xp>=xpForLevel(G.level)&&G.level<300){G.xp-=xpForLevel(G.level);levelUp();}}
     if(q.reward.equipQ!==undefined){const slot=pick(Object.keys(EQ_NAMES));const it=genEquip(slot,q.reward.equipQ,Math.min(8,q.reward.equipQ+2),G.level);if(G.inventory.length<G.maxInv)G.inventory.push(it);else addLog('⚠️ 背包已满，装备奖励丢失','sys');}
     if(q.reward.potion){const key=q.reward.potion;G.consumables[key]=(G.consumables[key]||0)+q.reward.potionCount;}
     if(q.reward.material){const mk=q.reward.material;G.materials[mk]=(G.materials[mk]||0)+q.reward.materialCount;}
@@ -3834,9 +3833,13 @@ function calculateOfflineRewards(offlineSec){
   const levelBefore = G.level;
   let equipKept = 0; // 实际保留的装备数量
   
-  // 经验、金币、技能经验按在线80%打折
-  totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100) * 0.8);
-  G.xp += totalXp;
+  // 经验、金币、技能经验按在线50%打折
+  if(G.level < 300){
+    totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100) * 0.5);
+    G.xp += totalXp;
+  } else {
+    totalXp = 0;
+  }
   // 离线升级：直接操作属性，避免触发转职弹窗
   while(G.xp >= xpForLevel(G.level) && G.level < 300){
     G.xp -= xpForLevel(G.level);
