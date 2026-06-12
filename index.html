@@ -736,16 +736,25 @@ body{
       <div id="center" class="panel">
         <div class="panel-hd"><span class="ph-icon">⚔️</span>战斗 — <span id="cur-map-name">新手村</span></div>
         <div class="panel-bd">
+          <!-- 存档按钮 -->
+          <div class="save-btns-bar">
+            <span id="save-indicator">💾 已保存</span>
+            <button class="btn btn-blue btn-xs" id="btn-manual-save">💾 保存</button>
+            <button class="btn btn-green btn-xs" id="btn-export-save">📥 导出</button>
+            <button class="btn btn-gold btn-xs" id="btn-import-save">📤 导入</button>
+            <button class="btn btn-red btn-xs" id="btn-reset">🗑️ 重置</button>
+          </div>
+          <!-- 敌人信息 -->
+          <div id="enemy-card">
+            <div id="enemy-name">🐺 <span id="en-name">野狼</span> <span id="en-lv-tag"></span> <span id="en-type-tag"></span></div>
+            <div class="enemy-hp-outer"><div class="enemy-hp-inner" id="en-hp-bar"></div></div>
+            <div class="enemy-info"><span>❤️ <span id="en-hp">40</span></span><span>⚔️ <span id="en-atk">4</span></span><span>🛡️ <span id="en-def">1</span></span></div>
+          </div>
           <!-- 战斗动画区 -->
           <div id="battle-anim" style="display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0;min-height:60px;position:relative">
             <div id="anim-player" style="text-align:center;font-size:40px;transition:transform .15s">🧑</div>
             <div id="anim-vs" style="font-size:20px;color:var(--muted)">⚡</div>
             <div id="anim-enemy" style="text-align:center;font-size:40px;transition:transform .15s">🐺</div>
-          </div>
-          <div id="enemy-card">
-            <div id="enemy-name">🐺 <span id="en-name">野狼</span> <span id="en-lv-tag"></span> <span id="en-type-tag"></span></div>
-            <div class="enemy-hp-outer"><div class="enemy-hp-inner" id="en-hp-bar"></div></div>
-            <div class="enemy-info"><span>❤️ <span id="en-hp">40</span></span><span>⚔️ <span id="en-atk">4</span></span><span>🛡️ <span id="en-def">1</span></span></div>
           </div>
           <div id="buff-bar"></div>
           <div class="act-btns" id="skill-btns">
@@ -761,20 +770,13 @@ body{
             <button class="btn btn-red2" id="btn-use-hp-scroll">❤️ 生命</button>
           </div>
           <div id="combat-log"></div>
-          <!-- 自动战斗设置 & 存档按钮 -->
+          <!-- 自动战斗设置 -->
           <div class="auto-battle-bar">
             <label class="auto-label"><input type="checkbox" id="auto-atk"> 自动攻击</label>
             <label class="auto-label"><input type="checkbox" id="auto-skill"> 自动技能</label>
             <label class="auto-label"><input type="checkbox" id="auto-hp-small"> 🧪自动小</label>
             <label class="auto-label"><input type="checkbox" id="auto-hp-large"> 💉自动大</label>
             <label class="auto-label"><input type="checkbox" id="auto-equip"> 自动穿装</label>
-          </div>
-          <div class="save-btns-bar">
-            <span id="save-indicator">💾 已保存</span>
-            <button class="btn btn-blue btn-xs" id="btn-manual-save">💾 保存</button>
-            <button class="btn btn-green btn-xs" id="btn-export-save">📥 导出</button>
-            <button class="btn btn-gold btn-xs" id="btn-import-save">📤 导入</button>
-            <button class="btn btn-red btn-xs" id="btn-reset">🗑️ 重置</button>
           </div>
         </div>
       </div>
