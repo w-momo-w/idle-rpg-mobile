@@ -1583,10 +1583,10 @@ function computeStats(){
   if(G.classStatsAdv){const ba=G.classStatsAdv;if(ba.atk)a+=ba.atk;if(ba.def)d+=ba.def;if(ba.hp)h+=ba.hp;if(ba.critRate)cr+=ba.critRate;}
 
   G.maxHp=h;G.curAtk=Math.max(1,a);G.curDef=d;G.curCritRate=Math.min(cr,80);G.curCritDmg=cd;G.curAtkSpd=Math.max(20,sp);
-  G.curDodge=Math.min(dodge,50);G.curBlock=Math.min(block,40);G.curLifesteal=Math.min(lifesteal,50);
-  G.curThorns=Math.min(thorns,50);G.curMagicFind=Math.min(magicFind,80);G.curExpBonus=Math.min(expBonus,200);
-  G.curGoldBonus=Math.min(goldBonus,200);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,40);
-  G.curArmorPierce=Math.min(armorPierce,50);G.curSiphon=Math.min(siphon,30);
+  G.curDodge=Math.min(dodge,35);G.curBlock=Math.min(block,30);G.curLifesteal=Math.min(lifesteal,30);
+  G.curThorns=Math.min(thorns,30);G.curMagicFind=Math.min(magicFind,80);G.curExpBonus=Math.min(expBonus,200);
+  G.curGoldBonus=Math.min(goldBonus,200);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,25);
+  G.curArmorPierce=Math.min(armorPierce,40);G.curSiphon=Math.min(siphon,25);
   // store raw stats for display
   G.rawST=ST||0;G.rawVT=VT||0;G.rawAG=AG||0;G.rawDX=DX||0;G.rawIN=IN||0;
 
