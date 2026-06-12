@@ -2116,15 +2116,20 @@ function renderTopBar(){
   document.getElementById('xp-text').textContent=fmt(G.xp)+'/'+fmt(need);
   document.getElementById('xp-bar-inner').style.width=pct+'%';
   document.getElementById('char-name').textContent=(G.className||clsNames[G.classId]+'学徒')+(G.switchCount>0?` #${G.switchCount+1}`:'');
-  // 转职按钮：到达进阶等级但未选择时显示
+  // 转职按钮：到达进阶等级但该阶未选择时显示
   const advBtn=document.getElementById('btn-advance');
   if(advBtn){
-    const advLv=G.classTier===0?50:(G.classTier===1?150:0);
-    if(advLv>0&&G.level>=advLv&&!G.classAdvId){
-      advBtn.style.display='inline-block';
-    }else{
-      advBtn.style.display='none';
+    let show=false;
+    // 一转：classTier===0 且 >=50级 且未选
+    if(G.classTier===0&&G.level>=50&&!G.classAdvId)show=true;
+    // 二转：classTier===1 且 >=150级（classAdvId可能还是50级进阶的id，仍可触发150级弹窗）
+    if(G.classTier===1&&G.level>=150){
+      const adv150=CLASS_ADV.find(a=>a.lv===150);
+      const opts150=adv150?adv150[G.classId]:null;
+      // 如果150级选项存在且classAdvId不是150级的（说明还没选二转）
+      if(opts150&&!opts150.some(o=>o.id===G.classAdvId))show=true;
     }
+    advBtn.style.display=show?'inline-block':'none';
   }
   const icons={warrior:'⚔️',archer:'🏹',mage:'🧙'};
   document.getElementById('class-icon').textContent=G.classIcon||icons[G.classId]||'⚔️';
