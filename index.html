@@ -2607,7 +2607,7 @@ function renderLog(){
     const p=document.createElement('p');p.className=l.cls||'';p.innerHTML=`<span style="color:var(--muted);margin-right:4px;font-size:10px">${l.time}</span>${l.msg}`;el.appendChild(p);
   }
 }
-function showItemModal(it,source,isEquipped){
+function showItemModal(it,source,isEquipped,activeTab){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   const eqIt=!isEquipped?G.equipped[it.slot]:null;
   const clsNames2={warrior:'战士',archer:'射手',mage:'法师',all:'通用'};
@@ -2724,8 +2724,8 @@ function showItemModal(it,source,isEquipped){
       const canRef=G.gold>=rGold&&(G.materials[rm.material]||0)>=rMat;
       const rangeStr=range?` <span style="font-size:9px;color:var(--muted)">(${range.min}-${range.max})</span>`:'';
       refineHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
-        <span style="flex:1;font-size:12px;font-weight:bold">${lbl}${rangeStr}</span>
-        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${curVal}</span>
+        <span style="flex:1;font-size:12px;font-weight:bold">${lbl}</span>
+        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${curVal}${rangeStr}</span>
         <button class="btn btn-purple btn-sm refine-attr-btn" data-key="${rk}" ${canRef?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">🔄 💰${rGold}+${md.icon}${rMat}</button>
       </div>`;
     }
@@ -2736,8 +2736,8 @@ function showItemModal(it,source,isEquipped){
       const rangeStr=sr?` <span style="font-size:9px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:'';
       const canRecast=(G.materials.recastStone||0)>=1;
       recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
-        <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}${rangeStr}</span>
-        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}</span>
+        <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}</span>
+        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}${rangeStr}</span>
         <button class="btn btn-pink btn-sm recast-attr-btn" data-key="${sp.id}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ ♻️${1}个</button>
       </div>`;
     }
@@ -2745,15 +2745,16 @@ function showItemModal(it,source,isEquipped){
     const hasRefine=refineAttrs.length>0;
     const hasRecast=it.specials&&it.specials.length>0;
     // 动态构建Tab栏
+    if(!activeTab)activeTab='info';
     const tabBlock=document.createElement('div');
     let tabsHtml=`<div class="tabs" style="margin-top:8px">
-      <button class="tab-btn active" data-equiptab="info">📋 详情</button>`;
-    if(hasRefine)tabsHtml+=`<button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>`;
-    if(hasRecast)tabsHtml+=`<button class="tab-btn" data-equiptab="recast">♻️ 重铸</button>`;
+      <button class="tab-btn${activeTab==='info'?' active':''}" data-equiptab="info">📋 详情</button>`;
+    if(hasRefine)tabsHtml+=`<button class="tab-btn${activeTab==='refine'?' active':''}" data-equiptab="refine">🔄 洗炼</button>`;
+    if(hasRecast)tabsHtml+=`<button class="tab-btn${activeTab==='recast'?' active':''}" data-equiptab="recast">♻️ 重铸</button>`;
     tabsHtml+=`</div>
-    <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>`;
-    if(hasRefine)tabsHtml+=`<div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>`;
-    if(hasRecast)tabsHtml+=`<div class="bag-tab-content" id="equip-tab-recast">${recastHtml}</div>`;
+    <div class="bag-tab-content${activeTab==='info'?' active':''}" id="equip-tab-info">${infoHtml}</div>`;
+    if(hasRefine)tabsHtml+=`<div class="bag-tab-content${activeTab==='refine'?' active':''}" id="equip-tab-refine">${refineHtml}</div>`;
+    if(hasRecast)tabsHtml+=`<div class="bag-tab-content${activeTab==='recast'?' active':''}" id="equip-tab-recast">${recastHtml}</div>`;
     tabBlock.innerHTML=tabsHtml;
     box.appendChild(tabBlock);
     // Tab切换（通用处理）
@@ -2843,73 +2844,84 @@ function doRefineAttr(slot,key){
   if((G.materials[rm.material]||0)<matCost){addLog('⚠️ '+md.name+'不足(需要'+matCost+')','sys');return;}
   const oldVal=it.stats[key];
   const range=it.statRanges&&it.statRanges[key];
-  let newVal;
-  if(range){
-    const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
-    if(isIntStat){newVal=randi(range.min,range.max);}
-    else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}
-  }else{
-    const m=QMULT[q];
-    if(key==='atk'){
-      if(slot==='mainHand')newVal=randi(2,6)*m;
-      else if(slot==='bracer')newVal=randi(1,4)*m;
-      else if(slot==='necklace')newVal=randi(1,3)*m;
-      else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
-      else if(slot==='pendant')newVal=randi(1,5)*m;
-      else newVal=0;
-      newVal=Math.floor(newVal);
-    }else if(key==='def'){
-      if(slot==='offHand')newVal=randi(1,4)*m;
-      else if(slot==='armor')newVal=randi(2,5)*m;
-      else if(slot==='helmet')newVal=randi(1,3)*m;
-      else if(slot==='pants')newVal=randi(2,4)*m;
-      else if(slot==='pendant')newVal=randi(1,3)*m;
-      else newVal=0;
-      newVal=Math.floor(newVal);
-    }else if(key==='hp'){
-      if(slot==='armor')newVal=randi(5,20)*m;
-      else if(slot==='helmet')newVal=randi(5,15)*m;
-      else if(slot==='pants')newVal=randi(5,15)*m;
-      else if(slot==='pendant')newVal=randi(5,20)*m;
-      else newVal=0;
-      newVal=Math.floor(newVal);
-    }else if(key==='critRate'){
-      if(slot==='mainHand')newVal=randf(0,1)*m;
-      else if(slot==='bracer')newVal=randf(0,2)*m;
-      else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
-      else newVal=0;
-      newVal=Math.round(newVal*10)/10;
-    }else if(key==='critDmg'){
-      if(slot==='necklace')newVal=randi(5,20)*m;
-      else newVal=0;
-      newVal=Math.floor(newVal);
-    }else if(key==='atkSpd'){
-      if(slot==='boots')newVal=randi(2,8)*m;
-      else newVal=0;
-      newVal=Math.floor(newVal);
+  // 获取当前活动tab
+  const activeTabBtn=document.querySelector('#modal-box [data-equiptab].active');
+  const activeTab=activeTabBtn?activeTabBtn.dataset.equiptab:'info';
+  function execute(){
+    let newVal;
+    if(range){
+      const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
+      if(isIntStat){newVal=randi(range.min,range.max);}
+      else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}
     }else{
-      const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
-      else newVal=0;
+      const m=QMULT[q];
+      if(key==='atk'){
+        if(slot==='mainHand')newVal=randi(2,6)*m;
+        else if(slot==='bracer')newVal=randi(1,4)*m;
+        else if(slot==='necklace')newVal=randi(1,3)*m;
+        else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
+        else if(slot==='pendant')newVal=randi(1,5)*m;
+        else newVal=0;
+        newVal=Math.floor(newVal);
+      }else if(key==='def'){
+        if(slot==='offHand')newVal=randi(1,4)*m;
+        else if(slot==='armor')newVal=randi(2,5)*m;
+        else if(slot==='helmet')newVal=randi(1,3)*m;
+        else if(slot==='pants')newVal=randi(2,4)*m;
+        else if(slot==='pendant')newVal=randi(1,3)*m;
+        else newVal=0;
+        newVal=Math.floor(newVal);
+      }else if(key==='hp'){
+        if(slot==='armor')newVal=randi(5,20)*m;
+        else if(slot==='helmet')newVal=randi(5,15)*m;
+        else if(slot==='pants')newVal=randi(5,15)*m;
+        else if(slot==='pendant')newVal=randi(5,20)*m;
+        else newVal=0;
+        newVal=Math.floor(newVal);
+      }else if(key==='critRate'){
+        if(slot==='mainHand')newVal=randf(0,1)*m;
+        else if(slot==='bracer')newVal=randf(0,2)*m;
+        else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
+        else newVal=0;
+        newVal=Math.round(newVal*10)/10;
+      }else if(key==='critDmg'){
+        if(slot==='necklace')newVal=randi(5,20)*m;
+        else newVal=0;
+        newVal=Math.floor(newVal);
+      }else if(key==='atkSpd'){
+        if(slot==='boots')newVal=randi(2,8)*m;
+        else newVal=0;
+        newVal=Math.floor(newVal);
+      }else{
+        const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+        if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+        else newVal=0;
+      }
     }
+    G.gold-=goldCost;G.materials[rm.material]-=matCost;
+    if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
+      addLog(`🔄 洗炼完成，${key} 属性不变（${oldVal}），消耗💰${goldCost}+${md.icon}${matCost}`,'sys');
+    }else{
+      const isSpecial=SPECIAL_ATTRS.find(x=>x.id===key);
+      const dispOld=isSpecial?isSpecial.fmt(oldVal):oldVal;
+      const dispNew=isSpecial?isSpecial.fmt(newVal):newVal;
+      addLog(`🔄 洗炼：${key} ${dispOld} → ${dispNew}（消耗💰${goldCost}+${md.icon}${matCost}）`,'sys');
+    }
+    it.stats[key]=newVal;
+    if(it.specials){
+      const spEntry=it.specials.find(sp=>sp.id===key);
+      if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
+    }
+    it.power=itemPower(it);
+    computeStats();renderAll();
+    closeModal();showItemModal(it,slot,true,activeTab);
   }
-  G.gold-=goldCost;G.materials[rm.material]-=matCost;
-  if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
-    addLog(`🔄 洗炼完成，${key} 属性不变（${oldVal}），消耗💰${goldCost}+${md.icon}${matCost}`,'sys');
-  }else{
-    const isSpecial=SPECIAL_ATTRS.find(x=>x.id===key);
-    const dispOld=isSpecial?isSpecial.fmt(oldVal):oldVal;
-    const dispNew=isSpecial?isSpecial.fmt(newVal):newVal;
-    addLog(`🔄 洗炼：${key} ${dispOld} → ${dispNew}（消耗💰${goldCost}+${md.icon}${matCost}）`,'sys');
+  // 检查是否已达最大值
+  if(range&&oldVal>=range.max){
+    confirmAction('已达到最大值','该属性当前值('+oldVal+')已达到范围最大值('+range.max+')，是否继续洗练？',execute);
+    return;
   }
-  it.stats[key]=newVal;
-  if(it.specials){
-    const spEntry=it.specials.find(sp=>sp.id===key);
-    if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
-  }
-  it.power=itemPower(it);
-  computeStats();renderAll();
-  closeModal();showItemModal(it,slot,true);
+  execute();
 }
 // 重铸：针对装备特殊属性词条，消耗重铸石，在范围内随机重roll
 function doRecastAttr(slot,key){
@@ -2918,36 +2930,47 @@ function doRecastAttr(slot,key){
   if((G.materials.recastStone||0)<1){addLog('⚠️ 重铸石不足(需要1个)','sys');return;}
   const oldVal=it.stats[key];
   const range=it.statRanges&&it.statRanges[key];
-  let newVal;
-  if(range){
-    const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-    if(sa){
-      const isInt=sa.step>=1;
-      if(isInt){newVal=randi(range.min/sa.step,range.max/sa.step)*sa.step;}
-      else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10))/10)/10;}
-    }else{
-      newVal=randi(range.min,range.max);
-    }
-  }else{
-    const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-    if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
-    else newVal=oldVal;
-  }
-  G.materials.recastStone-=1;
   const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-  const dispOld=sa?sa.fmt(oldVal):oldVal;
-  const dispNew=sa?sa.fmt(newVal):newVal;
-  if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
-    addLog(`♻️ 重铸完成，${sa?sa.name:key} 属性不变（${dispOld}），消耗♻️重铸石×1`,'sys');
-  }else{
-    addLog(`♻️ 重铸：${sa?sa.name:key} ${dispOld} → ${dispNew}（消耗♻️重铸石×1）`,'sys');
+  // 获取当前活动tab
+  const activeTabBtn=document.querySelector('#modal-box [data-equiptab].active');
+  const activeTab=activeTabBtn?activeTabBtn.dataset.equiptab:'info';
+  function execute(){
+    let newVal;
+    if(range){
+      if(sa){
+        const isInt=sa.step>=1;
+        if(isInt){newVal=randi(range.min/sa.step,range.max/sa.step)*sa.step;}
+        else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10))/10)/10;}
+      }else{
+        newVal=randi(range.min,range.max);
+      }
+    }else{
+      if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+      else newVal=oldVal;
+    }
+    G.materials.recastStone-=1;
+    const dispOld=sa?sa.fmt(oldVal):oldVal;
+    const dispNew=sa?sa.fmt(newVal):newVal;
+    if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
+      addLog(`♻️ 重铸完成，${sa?sa.name:key} 属性不变（${dispOld}），消耗♻️重铸石×1`,'sys');
+    }else{
+      addLog(`♻️ 重铸：${sa?sa.name:key} ${dispOld} → ${dispNew}（消耗♻️重铸石×1）`,'sys');
+    }
+    it.stats[key]=newVal;
+    const spEntry=it.specials.find(sp=>sp.id===key);
+    if(spEntry){spEntry.val=newVal;spEntry.text=(sa||spEntry).fmt(newVal);}
+    it.power=itemPower(it);
+    computeStats();renderAll();
+    closeModal();showItemModal(it,slot,true,activeTab);
   }
-  it.stats[key]=newVal;
-  const spEntry=it.specials.find(sp=>sp.id===key);
-  if(spEntry){spEntry.val=newVal;spEntry.text=(sa||spEntry).fmt(newVal);}
-  it.power=itemPower(it);
-  computeStats();renderAll();
-  closeModal();showItemModal(it,slot,true);
+  // 检查是否已达最大值
+  if(range&&oldVal>=range.max){
+    const dispVal=sa?sa.fmt(oldVal):oldVal;
+    const dispMax=sa?sa.fmt(range.max):range.max;
+    confirmAction('已达到最大值','该属性当前值('+dispVal+')已达到范围最大值('+dispMax+')，是否继续重铸？',execute);
+    return;
+  }
+  execute();
 }
 function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
