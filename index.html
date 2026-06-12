@@ -3620,11 +3620,12 @@ function showDiamondShop(){
   const goldExInput=document.getElementById('gold-exchange-amount');
   goldExBtn.addEventListener('click',()=>{
     const amount=parseInt(goldExInput.value)||0;
-    if(amount<=0){addLog('⚠️ 请输入有效数量','sys');return;}
+    if(amount<=0){showToast('⚠️ 输入无效','请输入有效的兑换数量','error');return;}
     const cost=amount*10000;
-    if(G.gold<cost){addLog('⚠️ 金币不足（需要'+fmt(cost)+'）','sys');return;}
+    if(G.gold<cost){showToast('⚠️ 金币不足','需要 '+fmt(cost)+' 金币','error');return;}
     G.gold-=cost;G.diamond+=amount;
     addLog(`💰 兑换成功！消耗 ${fmt(cost)} 金币 → 💎${amount} 钻石（余额：${fmt(G.diamond)}）`,'sys');
+    showToast('💰 兑换成功！',`消耗 ${fmt(cost)} 金币 → 💎${amount} 钻石`,'success');
     closeModal();renderAll();showDiamondShop(); // 重新打开刷新界面
   });
   // 充值逻辑
