@@ -2451,29 +2451,53 @@ function renderBagMaterials(){
   // 技能书部分
   if(G.skillBooks.length>0){
     el.innerHTML+=`<div style="font-size:11px;font-weight:bold;color:var(--purple);margin-bottom:4px;padding-bottom:2px;border-bottom:1px solid var(--border)">📖 技能书 (${G.skillBooks.length}本)</div>`;
+    // 按 skillId 分组合并显示
+    const groups={};const order=[];
     for(let i=0;i<G.skillBooks.length;i++){
-      const sb=G.skillBooks[i];const div=document.createElement('div');
-      const clsNames2={warrior:'战士',archer:'射手',mage:'法师'};
+      const sb=G.skillBooks[i];const key=sb.skillId;
+      if(!groups[key]){groups[key]={sb,count:0,indices:[]};order.push(key);}
+      groups[key].count++;groups[key].indices.push(i);
+    }
+    const clsNames2={warrior:'战士',archer:'射手',mage:'法师'};
+    for(const key of order){
+      const g=groups[key];const sb=g.sb;const div=document.createElement('div');
       const isMyClass=sb.classReq===G.classId;
       const alreadyHave=G.skills.find(s=>s.id===sb.skillId);
       const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
       const reqLv=skillDef?skillDef.unlockLv||0:0;
       const canLearn=isMyClass&&!alreadyHave&&G.level>=reqLv;
       const lvNote=isMyClass&&!alreadyHave&&G.level<reqLv?` <span style="color:var(--red);font-size:9px">(需Lv.${reqLv})</span>`:'';
+      const countTag=g.count>1?` <span style="color:var(--muted);font-size:9px">×${g.count}</span>`:'';
       div.className='skill-item';
-      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}${lvNote}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'} · <span style="color:var(--orange)">Lv.${reqLv}</span></div></div>`;
+      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${countTag}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}${lvNote}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'} · <span style="color:var(--orange)">Lv.${reqLv}</span></div></div>`;
       const acts=document.createElement('div');acts.style.display='flex';acts.style.gap='3px';
       if(canLearn){
         const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';
-        lb.addEventListener('click',(function(idx){return function(){learnSkillBook(idx);};})(i));
+        const idx=g.indices[0];
+        lb.addEventListener('click',(function(i){return function(){learnSkillBook(i);};})(idx));
         acts.appendChild(lb);
       }
-      const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';
-      eb.addEventListener('click',(function(idx){return function(){exchangeSkillBook(idx);};})(i));
-      acts.appendChild(eb);
+      if(g.count>1&&!canLearn){
+        // 不可学习且多本：显示批量兑换数量
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑换×${g.count}`;
+        eb.addEventListener('click',(function(indices){return function(){batchExchangeSkillBooks(indices);};})([...g.indices]));
+        acts.appendChild(eb);
+      }else if(g.count>1&&canLearn){
+        // 可学习且多本：学习按钮已显示，兑换按钮显示剩余数量
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑×${g.count-1}`;
+        // 兑换除第一本外的其余本
+        const restIndices=g.indices.slice(1);
+        eb.addEventListener('click',(function(indices){return function(){batchExchangeSkillBooks(indices);};})(restIndices));
+        acts.appendChild(eb);
+      }else{
+        // 单本
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';
+        eb.addEventListener('click',(function(i){return function(){exchangeSkillBook(i);};})(g.indices[0]));
+        acts.appendChild(eb);
+      }
       div.appendChild(acts);el.appendChild(div);
     }
-    totalItems+=G.skillBooks.length;
+    totalItems+=order.length;
   }
   // 材料部分
   const mats=Object.entries(G.materials).filter(([k,v])=>v>0);
@@ -2610,15 +2634,27 @@ function learnSkillBook(index){
 }
 function exchangeSkillBook(index){
   const sb=G.skillBooks[index];if(!sb)return;
+  showExchangeModal([index],sb.name,sb.icon,1);
+}
+function batchExchangeSkillBooks(indices){
+  if(!indices||indices.length===0)return;
+  const sb=G.skillBooks[indices[0]];if(!sb)return;
+  showExchangeModal(indices,sb.name,sb.icon,indices.length);
+}
+function showExchangeModal(indices,name,icon,count){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
   ov.classList.add('show');
-  box.innerHTML=`<h3>💎 兑换技能书</h3><p style="font-size:12px;margin:8px 0">确定将 <b>${sb.icon} ${sb.name}</b> 兑换为 <b style="color:var(--purple)">💎1钻石</b> 吗？</p>
+  const diamondText=count>1?`💎${count}钻石`:'💎1钻石';
+  box.innerHTML=`<h3>💎 兑换技能书</h3><p style="font-size:12px;margin:8px 0">确定将 <b>${icon} ${name}${count>1?' ×'+count:''}</b> 兑换为 <b style="color:var(--purple)">${diamondText}</b> 吗？</p>
     <div style="display:flex;gap:8px"><button class="btn btn-pink" style="flex:1" id="btn-exch-yes">✅ 兑换</button><button class="btn btn-sm" style="flex:1" id="btn-exch-no">❌ 取消</button></div>`;
   document.getElementById('btn-exch-no').addEventListener('click',closeModal);
   document.getElementById('btn-exch-yes').addEventListener('click',()=>{
     closeModal();
-    G.skillBooks.splice(index,1);G.diamond+=1;
-    addLog(`💎 【${sb.name}】兑换为1钻石`,'sys');
+    // 从后往前删，避免索引错位
+    const sorted=[...indices].sort((a,b)=>b-a);
+    for(const idx of sorted)G.skillBooks.splice(idx,1);
+    G.diamond+=count;
+    addLog(`💎 【${name}】${count>1?count+'本':''}兑换为${count}钻石`,'sys');
     renderBag();renderAll();
   });
 }
