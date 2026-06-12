@@ -2544,8 +2544,9 @@ function doEnhance(slot){
   const tier=Math.floor(elv/10);
   const goldCost=200+elv*150+tier*500;
   const oreCost=3+elv*2+tier*3;
-  // 成功率：每10级递减，每级-0.8%，基础100%
-  const successRate=Math.max(3,100-(elv+1)*0.8);
+  // 成功率：每10级一个循环，+1=100%, +2=90%, ... +10=10%, +11重新从100%开始
+  const inTier=(elv%10)+1; // 当前在1-10中的位置
+  const successRate=Math.max(5,100-(inTier-1)*10);
   if(G.gold<goldCost){addLog('⚠️ 金币不足','sys');return;}
   if((G.materials.ironOre||0)<oreCost){addLog('⚠️ 铁矿石不足','sys');return;}
   G.gold-=goldCost;G.materials.ironOre-=oreCost;
@@ -2570,7 +2571,8 @@ function showEnhanceSelectModal(){
     if(elv>=300)continue;
     const tier=Math.floor(elv/10);
     const goldCost=200+elv*150+tier*500;const oreCost=3+elv*2+tier*3;
-    const successRate=Math.max(3,100-(elv+1)*0.8);
+    const inTier=(elv%10)+1;
+    const successRate=Math.max(5,100-(inTier-1)*10);
     const hasOre=(G.materials.ironOre||0)>=oreCost;const hasGold=G.gold>=goldCost;
     const canEnhance=hasOre&&hasGold;
     html+=`<div class="shop-item-row" style="cursor:pointer;${!canEnhance?'opacity:0.5':''}">
