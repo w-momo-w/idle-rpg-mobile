@@ -1731,7 +1731,13 @@ function playerAttack(useSkill){
         addLog(`⭐ ${sk.name} 升级为 <span style="color:${SKILL_GRADE_COLOR[sk.grade]}">${sk.grade}级</span>！`,'skill');
       }
     }
-    if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
+    if(sk.type==='buff'){
+      const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+      // 根据技能id设置对应buff，效果随等级提高
+      applySkillBuff(sk,gradeMult);
+      addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+      computeStats();renderAll();return;
+    }
     addLog(`✨ ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   }else{
     isCrit=Math.random()*100<G.curCritRate;
@@ -1779,7 +1785,7 @@ function playerAttackWithSkill(sk){
   sk.lastUsed=now();
   // 技能经验（使用一次+1~3，缓慢升级）
   if(sk.gradeIdx<4){
-    sk.xp=(sk.xp||0)+randi(1,3);
+    sk.xp=(sk.xp||0)+randi(0,1);
     const nextXp=skillXpForGrade(sk.gradeIdx+1);
     if(sk.xp>=nextXp){
       sk.xp-=nextXp;
@@ -1788,7 +1794,12 @@ function playerAttackWithSkill(sk){
       addLog(`⭐ ${sk.name} 升级为 <span style="color:${SKILL_GRADE_COLOR[sk.grade]}">${sk.grade}级</span>！`,'skill');
     }
   }
-  if(sk.type==='buff'){addLog(`✨ ${sk.icon} 使用 ${sk.name}！`,'skill');renderAll();return;}
+  if(sk.type==='buff'){
+    const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+    applySkillBuff(sk,gradeMult);
+    addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+    computeStats();renderAll();return;
+  }
   addLog(`📖 ${sk.icon} ${sk.name}！造成 ${dmg} 点伤害`,'skill');
   // lifesteal
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);}}
@@ -3135,6 +3146,58 @@ function showDiamondShop(){
       addLog(`💎 充值成功！获得 ${item.diamond} 钻石（余额：${fmt(G.diamond)}）`,'sys');
       renderAll();
     });
+  }
+}
+// ═══ Buff技能效果 ═══
+function applySkillBuff(sk,gradeMult){
+  const dur=10000; // 持续10秒
+  const n=now();
+  switch(sk.id){
+    case 'berserk': G.buffs.atk={val:Math.floor(G.curAtk*0.30*gradeMult),until:n+dur}; break;
+    case 'shield_wall': G.buffs.def={val:Math.floor(G.curDef*0.50*gradeMult),until:n+dur}; break;
+    case 'blood_rage': G.buffs.atk={val:Math.floor(G.curAtk*0.40*gradeMult),until:n+dur}; break;
+    case 'frenzy': G.buffs.atkSpd={val:Math.floor(30*gradeMult),until:n+dur}; break;
+    case 'holy_shield': G.buffs.def={val:Math.floor(G.curDef*0.40*gradeMult),until:n+dur}; break;
+    case 'divine_heal': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.03*gradeMult),until:n+dur}; break;
+    case 'headshot': G.buffs.critRate={val:Math.floor(25*gradeMult),until:n+dur}; break;
+    case 'long_shot': G.buffs.atk={val:Math.floor(G.curAtk*0.30*gradeMult),until:n+dur}; break;
+    case 'shadow_step': G.buffs.dodge={val:Math.floor(25*gradeMult),until:n+dur}; break;
+    case 'poison_blade': G.buffs.dot={dmg:Math.floor(G.curAtk*0.15*gradeMult),until:n+dur,icon:'☠️'}; break;
+    case 'fire_mastery': G.buffs.atk={val:Math.floor(G.curAtk*0.30*gradeMult),until:n+dur}; break;
+    case 'ice_mastery': G.buffs.def={val:Math.floor(G.curDef*0.30*gradeMult),until:n+dur}; break;
+    case 'soul_drain': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.03*gradeMult),until:n+dur}; break;
+    case 'dark_pact': G.buffs.atk={val:Math.floor(G.curAtk*0.40*gradeMult),until:n+dur}; break;
+    case 'war_rage': G.buffs.atk={val:Math.floor(G.curAtk*0.50*gradeMult),until:n+dur}; break;
+    case 'death_grip': G.buffs.lifesteal={val:Math.floor(20*gradeMult),until:n+dur}; break;
+    case 'arrow_rain': G.buffs.atkSpd={val:Math.floor(35*gradeMult),until:n+dur}; break;
+    case 'lethal_blade': G.buffs.critDmg={val:Math.floor(80*gradeMult),until:n+dur}; break;
+    case 'arcane_brilliance': G.buffs.atk={val:Math.floor(G.curAtk*0.40*gradeMult),until:n+dur}; break;
+    case 'undead_army': G.buffs.doubleAtk={val:Math.floor(30*gradeMult),until:n+dur}; break;
+    case 'iron_skin': G.buffs.def={val:Math.floor(G.curDef*0.15*gradeMult),until:n+dur}; break;
+    case 'blood_thirst': G.buffs.lifesteal={val:Math.floor(5*gradeMult),until:n+dur}; break;
+    case 'war_cry': G.buffs.atk={val:Math.floor(G.curAtk*0.15*gradeMult),until:n+dur}; break;
+    case 'unyielding': G.buffs.def={val:Math.floor(G.curDef*0.30*gradeMult),until:n+dur}; break;
+    case 'counter_strike': G.buffs.thorns={val:Math.floor(15*gradeMult),until:n+dur}; break;
+    case 'second_wind': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.02*gradeMult),until:n+dur}; break;
+    case 'titan_strength': G.buffs.atk={val:Math.floor(G.curAtk*0.20*gradeMult),until:n+dur}; break;
+    case 'immortal': G.buffs.revive={val:1,until:n+300000}; break;
+    case 'agility': G.buffs.dodge={val:Math.floor(8*gradeMult),until:n+dur}; break;
+    case 'poison_master': G.buffs.atk={val:Math.floor(G.curAtk*0.15*gradeMult),until:n+dur}; break;
+    case 'critical_focus': G.buffs.critDmg={val:Math.floor(40*gradeMult),until:n+dur}; break;
+    case 'shadow_veil': G.buffs.dodge={val:Math.floor(20*gradeMult),until:n+dur}; break;
+    case 'hunter_mark': G.buffs.atk={val:Math.floor(G.curAtk*0.25*gradeMult),until:n+dur}; break;
+    case 'rapid_fire': G.buffs.atkSpd={val:Math.floor(20*gradeMult),until:n+dur}; break;
+    case 'true_shot': G.buffs.armorPierce={val:Math.floor(15*gradeMult),until:n+dur}; break;
+    case 'death_mark': G.buffs.critDmg={val:Math.floor(100*gradeMult),until:n+dur}; break;
+    case 'mana_shield': G.buffs.def={val:Math.floor(G.curDef*0.12*gradeMult),until:n+dur}; break;
+    case 'arcane_intellect': G.buffs.atk={val:Math.floor(G.curAtk*0.15*gradeMult),until:n+dur}; break;
+    case 'frost_armor': G.buffs.def={val:Math.floor(G.curDef*0.30*gradeMult),until:n+dur}; break;
+    case 'spell_vamp': G.buffs.lifesteal={val:Math.floor(10*gradeMult),until:n+dur}; break;
+    case 'elemental_fury': G.buffs.atk={val:Math.floor(G.curAtk*0.20*gradeMult),until:n+dur}; break;
+    case 'arcane_power': G.buffs.atk={val:Math.floor(G.curAtk*0.30*gradeMult),until:n+dur}; break;
+    case 'mana_burn': G.buffs.atk={val:Math.floor(G.curAtk*0.18*gradeMult),until:n+dur}; break;
+    case 'time_warp': G.buffs.cdReduce={val:Math.floor(20*gradeMult),until:n+dur}; break;
+    default: addLog(`⚠️ 未知buff技能：${sk.name}`,'sys');
   }
 }
 function renderBuffBar(){
