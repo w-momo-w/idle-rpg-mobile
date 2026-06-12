@@ -3214,15 +3214,22 @@ function calculateOfflineRewards(offlineSec){
   for(let i=0;i<Math.min(equipCount,50);i++){
     const slot = pick(Object.keys(EQ_NAMES));
     const it = genEquip(slot, 0, Math.min(8, Math.floor(G.level/20)+2), monLv);
-    if(G.inventory.length < G.maxInv){
+    // 检查自动分解
+    const nonClass=G.decomposeNonClass&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
+    if(nonClass||(G.autoDecompose&&it.quality<=G.decomposeThreshold)){
+      const goldGot = decomposeItem(it);
+      G.gold += goldGot;
+      totalGold += goldGot;
+      // 自动分解的装备不展示在列表
+    }else if(G.inventory.length < G.maxInv){
       G.inventory.push(it);
       autoEquipCheck(it);
+      if(equipDrops.length < 10) equipDrops.push(it);
     }else{
       const goldGot = decomposeItem(it);
       G.gold += goldGot;
       totalGold += goldGot;
     }
-    if(equipDrops.length < 20) equipDrops.push(it);
   }
   
   // 材料掉落
