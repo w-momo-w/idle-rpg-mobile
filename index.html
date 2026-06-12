@@ -1784,6 +1784,20 @@ function genMonster(){
 
   const enemy={name:mName,icon:mIcon,type,level:monLv,hp,maxHp:hp,atk,def,xp,gold,dropQ,originalName:template.name,specials:[],skill:null,skillLastUsed:0,dotDmg:0,dotUntil:0};
 
+  // 50级后普通怪物随机获得1个特殊属性（减益效果除外）
+  if(type==='normal'&&monLv>=50&&Math.random()<0.5){
+    const normalPool=ENEMY_SPECIALS.filter(s=>!s.dmgReduce&&!s.critReduce&&!s.atkSpdReduce);
+    if(normalPool.length>0){
+      const sp=pick(normalPool);
+      enemy.specials.push({...sp});
+      if(sp.apply)sp.apply(enemy);
+      if(sp.isRegen)enemy._regen=sp.regenPct;
+      if(sp.dodge)enemy._dodge=sp.dodge;
+      if(sp.thorns)enemy._thorns=sp.thorns;
+      if(sp.lifesteal)enemy._lifesteal=sp.lifesteal;
+    }
+  }
+
   // Elite/Boss get special attributes
   if(type==='elite'){
     // 精英获得2个特殊属性
