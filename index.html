@@ -1336,7 +1336,7 @@ const ENEMY_SKILLS=[
 
 const QUEST_TEMPLATES=[
   {type:'kill',gen:function(G){
-    const m=MAPS.find(x=>x.lv<=G.level)||MAPS[0];
+    const m=MAPS.find(x=>x.id===G.curMap)||MAPS[0];
     const allMon=[...m.monsters];if(m.elite)allMon.push(m.elite);if(m.boss)allMon.push(m.boss);
     const mo=pick(allMon);const tgt=randi(2,5)+Math.floor(G.level/10);
     return{type:'kill',text:`在${m.name}击杀${tgt}只${mo.name}`,reward:genQuestReward(G,{gold:randi(40,120)*Math.floor(G.level/5+1),xp:Math.floor(randi(20,80)*Math.floor(G.level/10+1))}),mapId:m.id,monster:mo.name,target:tgt,progress:0,_startCount:(G.kills[mo.name]||0),submitted:false}}},
@@ -1929,6 +1929,9 @@ function autoEquipCheck(it){
 function changeMap(mapId){
   const m=MAPS.find(x=>x.id===mapId);if(!m||m.lv>G.level)return;
   G.curMap=mapId;G.enemy=genMonster();G.killStreak=0;addLog(`🗺️ 进入：${m.name}`,'sys');
+  // 切换地图时刷新任务（不计CD）
+  G.quests=[];for(let i=0;i<3;i++){const t=pick(QUEST_TEMPLATES);G.quests.push(t.gen(G));}
+  addLog('📋 任务已更新','sys');
   closeModal();
   renderAll();
 }
