@@ -1084,6 +1084,7 @@ const MATERIALS={
   herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.028,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
   ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.024,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
   dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.006,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
+  recastStone:{id:'recastStone',name:'重铸石',icon:'♻️',desc:'重铸装备特殊属性词条',dropRate:0,dropSources:[],use:{count:1,desc:'在装备详情中重铸特殊属性'}},
 };
 
 // Material synthesis: combine materials to craft specific-slot equipment
@@ -1353,25 +1354,37 @@ const QUEST_TEMPLATES=[
     const tgt=randi(80,250)*Math.floor(G.level/3+1);
     return{type:'collect_gold',text:`收集${tgt}金币`,reward:genQuestReward(G,{gold:randi(50,150)*Math.floor(G.level/5+1),xp:Math.floor(randi(15,60)*Math.floor(G.level/10+1))}),target:tgt,progress:0,_goldCollected:0,submitted:false}}},
   {type:'collect_material',gen:function(G){
-    const mid=randi(0,2)===0?'crystalShard':randi(0,1)===0?'beastHide':'herb';
-    const md=MATERIALS[mid];const tgt=randi(2,5);
+    const mats=['beastHide','herb','crystalShard','ironOre'];if(G.level>=50)mats.push('dragonScale');
+    const mid=pick(mats);
+    const md=MATERIALS[mid];const tgt=mid==='dragonScale'?randi(1,2):randi(2,5);
     return{type:'collect_material',text:`收集${tgt}个${md.icon}${md.name}`,reward:genQuestReward(G,{gold:randi(80,250)*Math.floor(G.level/5+1)}),target:tgt,materialId:mid,progress:0,_startMatCount:(G.materials[mid]||0),submitted:false}}},
   {type:'kill_any',gen:function(G){
     const tgt=randi(5,15)+Math.floor(G.level/5);
     return{type:'kill_any',text:`击杀任意怪物${tgt}只`,reward:genQuestReward(G,{gold:randi(50,180)*Math.floor(G.level/5+1),xp:Math.floor(randi(20,70)*Math.floor(G.level/10+1))}),target:tgt,progress:0,_startCount:(G.killAnyCount||0),submitted:false}}},
+  {type:'use_consumable',gen:function(G){
+    const items=[{id:'hpPotion',name:'小血瓶',icon:'🧪'},{id:'hpLarge',name:'大血瓶',icon:'💉'},{id:'atkScroll',name:'攻击卷轴',icon:'📜'},{id:'defScroll',name:'防御卷轴',icon:'🛡️'},{id:'hpScroll',name:'生命卷轴',icon:'❤️'}];
+    const item=pick(items);const tgt=randi(1,3)+Math.floor(G.level/30);
+    return{type:'use_consumable',text:`使用${tgt}个${item.icon}${item.name}`,reward:genQuestReward(G,{gold:randi(60,200)*Math.floor(G.level/5+1),xp:Math.floor(randi(25,100)*Math.floor(G.level/10+1))}),target:tgt,itemId:item.id,progress:0,submitted:false}}},
+  {type:'enhance_count',gen:function(G){
+    const tgt=randi(1,3)+Math.floor(G.level/30);
+    return{type:'enhance_count',text:`强化装备${tgt}次（成功或失败都算）`,reward:genQuestReward(G,{gold:randi(100,350)*Math.floor(G.level/5+1),xp:Math.floor(randi(30,120)*Math.floor(G.level/10+1))}),target:tgt,progress:0,_startCount:(G.enhanceTotal||0),submitted:false}}},
 ];
 
 function genQuestReward(G,base){
   const rew={...base};
   // ~55%概率随机给1~4颗钻石（独立于其他奖励）
   if(Math.random()<0.55){rew.diamond=randi(1,4);}
-  const r=Math.random();
-  // 30%概率给装备
-  if(r<0.30){rew.equipQ=Math.min(randi(0,Math.floor(G.level/20)),7);}
-  // 30%概率给药水
-  else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
-  // 25%概率给材料
-  else if(r<0.85){const mids=Object.keys(MATERIALS);rew.material=pick(mids);rew.materialCount=randi(2,6);}
+  // 5%概率给1~2个重铸石
+  if(Math.random()<0.05){rew.material='recastStone';rew.materialCount=randi(1,2);}
+  else{
+    const r=Math.random();
+    // 30%概率给装备
+    if(r<0.30){rew.equipQ=Math.min(randi(0,Math.floor(G.level/20)),7);}
+    // 30%概率给药水
+    else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
+    // 25%概率给材料（排除重铸石）
+    else if(r<0.85){const mids=Object.keys(MATERIALS).filter(k=>k!=='recastStone');rew.material=pick(mids);rew.materialCount=randi(2,6);}
+  }
   // 其余只给基础奖励
   return rew;
 }
@@ -1430,7 +1443,7 @@ let G={
   equipped:{},inventory:[],maxInv:50,
   skills:[],skill2:null,
   curMap:'village',enemy:null,killStreak:0,
-  quests:[],questRefreshTime:0,killAnyCount:0,
+  quests:[],questRefreshTime:0,killAnyCount:0,enhanceTotal:0,_consumableUseHistory:{},
   autoAtk:false,autoSkill:false,autoEquip:false,
   kills:{},
   logs:[],maxLogs:50,
@@ -1984,6 +1997,8 @@ function checkQuests(){
     else if(q.type==='kill_any'){q.progress=Math.min(Math.max(0,(G.killAnyCount||0)-(q._startCount||0)),q.target);}
     else if(q.type==='collect_gold'){q.progress=Math.min(q._goldCollected||0,q.target);}
     else if(q.type==='collect_material'){q.progress=Math.min(Math.max(0,(G.materials[q.materialId]||0)-(q._startMatCount||0)),q.target);}
+    else if(q.type==='use_consumable'){q.progress=Math.min(G._consumableUseHistory?.[q.itemId]||0,q.target);}
+    else if(q.type==='enhance_count'){q.progress=Math.min(Math.max(0,(G.enhanceTotal||0)-(q._startCount||0)),q.target);}
   }
 }
 
@@ -2592,7 +2607,7 @@ function renderQuests(){
     if(q.reward.equipQ!==undefined)rw.push('🎁'+QUALITY[q.reward.equipQ]+'+装备');
     if(q.reward.potion){const pn={hpPotion:'🧪小血瓶',hpLarge:'💉大血瓶',atkScroll:'📜攻击卷轴',defScroll:'🛡️防御卷轴',hpScroll:'❤️生命卷轴'};rw.push(pn[q.reward.potion]+'×'+q.reward.potionCount);}
     if(q.reward.material){const md=MATERIALS[q.reward.material];rw.push(md.icon+md.name+'×'+q.reward.materialCount);}
-    div.innerHTML=`<div class="quest-title">${q.type==='kill'?'🗡️':q.type==='kill_any'?'⚔️':q.type==='collect_gold'?'💰':q.type==='collect_material'?'📦':'🎒'} ${q.text}</div><div class="quest-progress">进度：<span style="font-weight:bold;color:${canSubmit?'var(--green)':'var(--purple)'}">${q.progress}/${q.target}</span> (${pct}%)${canSubmit?' ✅ 可提交':''}</div><div class="quest-reward">奖励：${rw.join(' ')}</div>`;
+    div.innerHTML=`<div class="quest-title">${q.type==='kill'?'🗡️':q.type==='kill_any'?'⚔️':q.type==='collect_gold'?'💰':q.type==='collect_material'?'📦':q.type==='use_consumable'?'🧪':q.type==='enhance_count'?'⚒️':'🎒'} ${q.text}</div><div class="quest-progress">进度：<span style="font-weight:bold;color:${canSubmit?'var(--green)':'var(--purple)'}">${q.progress}/${q.target}</span> (${pct}%)${canSubmit?' ✅ 可提交':''}</div><div class="quest-reward">奖励：${rw.join(' ')}</div>`;
     if(canSubmit){
       const sbtn=document.createElement('button');
       sbtn.className='btn btn-green btn-xs';
@@ -2683,7 +2698,7 @@ function showItemModal(it,source,isEquipped){
     const attrLbls2={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率',critDmg:'暴击伤害',atkSpd:'攻速',block:'格挡',dodge:'闪避'};
     const attrOrder=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
     const refineAttrs=[];
-    for(const k of attrOrder){if(it.stats[k]!=null)refineAttrs.push(k);}
+    for(const k of attrOrder){if(it.stats[k])refineAttrs.push(k);}
     if(it.specials){for(const sp of it.specials)refineAttrs.push(sp.id);}
     // 构建详情Tab内容
     let infoHtml='';
@@ -2729,14 +2744,34 @@ function showItemModal(it,source,isEquipped){
       </div>`;
     }
     if(refineAttrs.length===0)refineHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有可洗炼的属性</div>';
+    // 构建重铸Tab内容（逐条特殊属性）
+    const recastAttrs=[];
+    if(it.specials){for(const sp of it.specials)recastAttrs.push(sp.id);}
+    let recastHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">消耗♻️重铸石随机重roll特殊属性数值（当前：'+(G.materials.recastStone||0)+'个）</div>';
+    for(const rk of recastAttrs){
+      const sa=SPECIAL_ATTRS.find(x=>x.id===rk);
+      if(!sa)continue;
+      const curVal=sa.fmt(it.stats[rk]);
+      const range=it.statRanges&&it.statRanges[rk];
+      const rangeStr=range?` <span style="font-size:9px;color:var(--muted)">(${range.min}-${range.max})</span>`:'';
+      const canRecast=(G.materials.recastStone||0)>0;
+      recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
+        <span style="flex:1;font-size:12px;font-weight:bold">${sa.name}${rangeStr}</span>
+        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${curVal}</span>
+        <button class="btn btn-orange btn-sm recast-attr-btn" data-key="${rk}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ 重铸</button>
+      </div>`;
+    }
+    if(recastAttrs.length===0)recastHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有可重铸的特殊属性</div>';
     // 插入Tab栏到modal-box
     const tabBlock=document.createElement('div');
     tabBlock.innerHTML=`<div class="tabs" style="margin-top:8px">
       <button class="tab-btn active" data-equiptab="info">📋 详情</button>
       <button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>
+      <button class="tab-btn" data-equiptab="recast">♻️ 重铸</button>
     </div>
     <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>
-    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>`;
+    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>
+    <div class="bag-tab-content" id="equip-tab-recast">${recastHtml}</div>`;
     box.appendChild(tabBlock);
     // Tab切换
     box.querySelectorAll('[data-equiptab]').forEach(btn=>{
@@ -2746,11 +2781,16 @@ function showItemModal(it,source,isEquipped){
         const tn=this.dataset.equiptab;
         document.getElementById('equip-tab-info').classList.toggle('active',tn==='info');
         document.getElementById('equip-tab-refine').classList.toggle('active',tn==='refine');
+        document.getElementById('equip-tab-recast').classList.toggle('active',tn==='recast');
       });
     });
     // 逐条洗炼按钮事件
     box.querySelectorAll('.refine-attr-btn').forEach(btn=>{
       btn.addEventListener('click',function(){doRefineAttr(source,this.dataset.key);});
+    });
+    // 逐条重铸按钮事件
+    box.querySelectorAll('.recast-attr-btn').forEach(btn=>{
+      btn.addEventListener('click',function(){doRecastAttr(source,this.dataset.key);});
     });
     // 卸下按钮
     const ub=document.createElement('button');ub.className='btn btn-red btn-sm';ub.textContent='卸下装备';
@@ -2801,6 +2841,7 @@ function doEnhance(slot){
   if(G.gold<goldCost){addLog('⚠️ 金币不足','sys');return;}
   if((G.materials.ironOre||0)<oreCost){addLog('⚠️ 铁矿石不足','sys');return;}
   G.gold-=goldCost;G.materials.ironOre-=oreCost;
+  G.enhanceTotal=(G.enhanceTotal||0)+1; // 追踪强化次数（含成败）
   if(Math.random()*100<successRate){
     G.slotEnhance[slot]=(G.slotEnhance[slot]||0)+1;
     const ep=getEnhancePower(slot);
@@ -2887,6 +2928,41 @@ function doRefineAttr(slot,key){
     if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
   }
   it.power=itemPower(it);
+  computeStats();renderAll();
+  closeModal();showItemModal(it,slot,true);
+}
+function doRecastAttr(slot,key){
+  const it=G.equipped[slot];if(!it)return;
+  const q=it.quality;
+  // 消耗重铸石
+  if((G.materials.recastStone||0)<1){addLog('⚠️ 重铸石不足，可在商城钻石区购买','sys');return;}
+  const oldVal=it.stats[key];
+  const range=it.statRanges&&it.statRanges[key];
+  const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+  if(!sa){addLog('⚠️ 该属性不可重铸','sys');return;}
+  // 检查是否已达最大值
+  const isMax=range&&oldVal>=range.max;
+  if(isMax){
+    confirmAction('重铸确认',`⚡ ${sa.name} 已达到最大值 ${sa.fmt(oldVal)}，是否继续重铸？`,()=>{
+      doRecastAttrInner(slot,key,it,sa,range);
+    });
+    return;
+  }
+  doRecastAttrInner(slot,key,it,sa,range);
+}
+function doRecastAttrInner(slot,key,it,sa,range){
+  G.materials.recastStone--;
+  let newVal;
+  if(range){
+    newVal=randi(range.min,range.max);
+  }else{
+    newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;
+  }
+  it.stats[key]=newVal;
+  const spEntry=it.specials?it.specials.find(sp=>sp.id===key):null;
+  if(spEntry){spEntry.val=newVal;spEntry.text=sa.fmt(newVal);}
+  it.power=itemPower(it);
+  addLog(`♻️ 重铸：${sa.name} → ${sa.fmt(newVal)}（消耗♻️重铸石×1）`,'sys');
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true);
 }
@@ -3108,13 +3184,13 @@ function useHpPotion(isAuto){
   // 手动使用也共享冷却：手动用了，自动10秒内也不会再用
   // 优先使用大血瓶
   if(G.consumables.hpLarge&&(!isAuto||(G.autoHpLarge&&n-G._lastHpLargeUse>=10000))){
-    G.consumables.hpLarge--;
+    G.consumables.hpLarge--;G._consumableUseHistory.hpLarge=(G._consumableUseHistory.hpLarge||0)+1;
     G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*0.4));
     G._lastHpLargeUse=n; // 手动和自动共享冷却
     addLog('💉 使用大血瓶！瞬间恢复40%'+(isAuto?'（自动）':''),'heal');
   }
   else if(G.consumables.hpPotion&&(!isAuto||(G.autoHpSmall&&n-G._lastHpSmallUse>=10000))){
-    G.consumables.hpPotion--;
+    G.consumables.hpPotion--;G._consumableUseHistory.hpPotion=(G._consumableUseHistory.hpPotion||0)+1;
     const perTick=Math.floor(G.maxHp*0.05);
     G._hpSmallHoT={until:n+5000,perTick,totalTicks:5,tickInterval:1000,lastTick:n};
     G._lastHpSmallUse=n; // 手动和自动共享冷却
@@ -3128,7 +3204,7 @@ function useHpPotionSmall(isAuto){
   if(G.hp>=G.maxHp)return addLog('⚠️ 生命值已满','sys');
   const n=now();const cdLeft=G._lastHpSmallUse?10000-(n-G._lastHpSmallUse):0;
   if(cdLeft>0)return addLog('⏳ 小血瓶冷却中('+Math.ceil(cdLeft/1000)+'s)','sys');
-  G.consumables.hpPotion--;
+  G.consumables.hpPotion--;G._consumableUseHistory.hpPotion=(G._consumableUseHistory.hpPotion||0)+1;
   const perTick=Math.floor(G.maxHp*0.05);
   G._hpSmallHoT={until:n+5000,perTick,totalTicks:5,tickInterval:1000,lastTick:n};
   G._lastHpSmallUse=n;
@@ -3140,7 +3216,7 @@ function useHpPotionLarge(isAuto){
   if(G.hp>=G.maxHp)return addLog('⚠️ 生命值已满','sys');
   const n=now();const cdLeft=G._lastHpLargeUse?10000-(n-G._lastHpLargeUse):0;
   if(cdLeft>0)return addLog('⏳ 大血瓶冷却中('+Math.ceil(cdLeft/1000)+'s)','sys');
-  G.consumables.hpLarge--;
+  G.consumables.hpLarge--;G._consumableUseHistory.hpLarge=(G._consumableUseHistory.hpLarge||0)+1;
   G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*0.4));
   G._lastHpLargeUse=n;
   addLog('💉 使用大血瓶！瞬间恢复40%'+(isAuto?'（自动）':''),'heal');
@@ -3150,7 +3226,7 @@ function useAtkScroll(){
   if(!G.consumables.atkScroll)return addLog('⚠️ 没有攻击卷轴','sys');
   if(G.buffs.atk&&G.buffs.atk.until>now())return addLog('⚠️ 攻击卷轴已在生效中','sys');
   confirmAction('使用攻击卷轴','📜 攻击卷轴：3分钟内攻击力+25%，确定使用吗？',()=>{
-    G.consumables.atkScroll--;G.buffs.atk={val:Math.floor(G.curAtk*0.25),until:now()+180000};
+    G.consumables.atkScroll--;G._consumableUseHistory.atkScroll=(G._consumableUseHistory.atkScroll||0)+1;G.buffs.atk={val:Math.floor(G.curAtk*0.25),until:now()+180000};
     addLog('📜 使用攻击卷轴！攻击力+25%，持续3分钟','sys');
     computeStats();renderAll();
   });
@@ -3159,7 +3235,7 @@ function useDefScroll(){
   if(!G.consumables.defScroll)return addLog('⚠️ 没有防御卷轴','sys');
   if(G.buffs.def&&G.buffs.def.until>now())return addLog('⚠️ 防御卷轴已在生效中','sys');
   confirmAction('使用防御卷轴','🛡️ 防御卷轴：3分钟内防御+30%，确定使用吗？',()=>{
-    G.consumables.defScroll--;G.buffs.def={val:Math.floor(G.curDef*0.30),until:now()+180000};
+    G.consumables.defScroll--;G._consumableUseHistory.defScroll=(G._consumableUseHistory.defScroll||0)+1;G.buffs.def={val:Math.floor(G.curDef*0.30),until:now()+180000};
     addLog('🛡️ 使用防御卷轴！防御+30%，持续3分钟','sys');
     computeStats();renderAll();
   });
@@ -3168,7 +3244,7 @@ function useHpScroll(){
   if(!G.consumables.hpScroll)return addLog('⚠️ 没有生命卷轴','sys');
   if(G.buffs.maxhp_cd&&G.buffs.maxhp_cd.until>now())return addLog('⚠️ 生命卷轴已在生效中','sys');
   confirmAction('使用生命卷轴','❤️ 生命卷轴：3分钟内最大生命+30%，确定使用吗？',()=>{
-    G.consumables.hpScroll--;const bonus=Math.floor(G.maxHp*0.30);
+    G.consumables.hpScroll--;G._consumableUseHistory.hpScroll=(G._consumableUseHistory.hpScroll||0)+1;const bonus=Math.floor(G.maxHp*0.30);
     G.buffs.maxhp_cd={val:bonus,until:now()+180000};
     G.hp=Math.min(G.maxHp+bonus,G.hp+bonus);
     addLog('❤️ 使用生命卷轴！最大生命+30%（+'+bonus+'），持续3分钟','sys');
@@ -3276,6 +3352,12 @@ function renderShop(){
   const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
   b10.disabled=G.diamond<90;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
+  // 重铸石购买
+  const rowRecast=document.createElement('div');rowRecast.className='shop-item-row';
+  rowRecast.innerHTML=`<div class="shop-item-icon">♻️</div><div class="shop-item-info"><div class="shop-item-name">重铸石</div><div class="shop-item-desc">重铸装备特殊属性（当前：${G.materials.recastStone||0}个）</div><div class="shop-item-price diamond">💎 20 钻石</div></div>`;
+  const bRecast=document.createElement('button');bRecast.className='btn btn-purple btn-xs';bRecast.textContent='购买';
+  bRecast.disabled=G.diamond<20;bRecast.addEventListener('click',()=>{G.diamond-=20;G.materials.recastStone=(G.materials.recastStone||0)+1;addLog('♻️ 购买重铸石×1（余额💎'+G.diamond+'，重铸石'+G.materials.recastStone+'个）','sys');renderAll();renderShop();});
+  rowRecast.appendChild(bRecast);ds.appendChild(rowRecast);
   el.appendChild(ds);
   const cs=document.createElement('div');cs.className='shop-section';
   cs.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">🎒 消耗品</h4>`;
@@ -3798,6 +3880,8 @@ function restoreGameData(d){
   G.autoHpSmall = !!d.autoHpSmall; G.autoHpLarge = !!d.autoHpLarge;
   G.learnedSkills = d.learnedSkills || {};
   G.killAnyCount = d.killAnyCount || 0;
+  G.enhanceTotal = d.enhanceTotal || 0;
+  G._consumableUseHistory = d._consumableUseHistory || {};
   G.quests = d.quests || [];
   G.questRefreshTime = d.questRefreshTime || 0;
   G.skillBooks = d.skillBooks || [];
@@ -3965,6 +4049,8 @@ function buildSaveData(now_){
     autoHpSmall: G.autoHpSmall, autoHpLarge: G.autoHpLarge,
     learnedSkills: G.learnedSkills,
     killAnyCount: G.killAnyCount,
+    enhanceTotal: G.enhanceTotal,
+    _consumableUseHistory: G._consumableUseHistory,
     quests: G.quests,
     questRefreshTime: G.questRefreshTime,
     skillBooks: G.skillBooks,
