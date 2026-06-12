@@ -1509,13 +1509,12 @@ function genMonster(){
   const minLv = Math.max(1, G.level - 3);
   const upperLv = Math.min(maxLv, G.level + 3);
   const monLv = randi(minLv, upperLv);
-  // Scale by monster type, NO killStreak scaling
+  // Scale by monster type, 10级后额外+20%
   const typeMult=type==='boss'?5:type==='elite'?2.5:1;
-  const mName=type==='boss'?template.name:(type==='elite'?'精英·'+template.name:template.name);
-  const mIcon=template.icon;
-  const hp=Math.floor(template.hp*typeMult);
-  const atk=Math.floor(template.atk*typeMult);
-  const def=Math.floor(template.def*typeMult);
+  const diffMult=G.level>=10?1.2:1;
+  const hp=Math.floor(template.hp*typeMult*diffMult);
+  const atk=Math.floor(template.atk*typeMult*diffMult);
+  const def=Math.floor(template.def*typeMult*diffMult);
   const xp=Math.floor(template.xp*typeMult);const gold=Math.floor(template.gold*typeMult);
   const dropQ=[template.dropQ[0],Math.min(8,template.dropQ[1]+(type==='boss'?1:0))];
 
@@ -1639,7 +1638,7 @@ function playerAttack(useSkill){
         // 连击触发吸血
         if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
         // 连击触发敌人荆棘
-        if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！','die');}}
+        if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！','die');}}
         if(G.enemy&&G.enemy.hp<=0){onKill();return;}
       }
     }
@@ -1648,7 +1647,7 @@ function playerAttack(useSkill){
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);} }
   G.enemy.hp-=dmg;
   // Enemy thorns (reflect damage back to player)
-  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！3秒后复活...','die');}}
+  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！5秒后复活...','die');}}
   if(G.enemy&&G.enemy.hp<=0){onKill();return;}
   enemyAttack();renderAll();
 }
@@ -1684,7 +1683,7 @@ function playerAttackWithSkill(sk){
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);}}
   G.enemy.hp-=dmg;
   // Enemy thorns
-  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！3秒后复活...','die');}}
+  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！5秒后复活...','die');}}
   if(G.enemy&&G.enemy.hp<=0){onKill();return;}
   // double attack
   if(G.curDoubleAtk&&Math.random()*100<G.curDoubleAtk){
@@ -1693,7 +1692,7 @@ function playerAttackWithSkill(sk){
       const d2=Math.floor(dmg*0.6); // 连击伤害=主伤害的60%
       G.enemy.hp-=d2;addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');
       if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
-      if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 被荆棘反弹致死！','die');}}
+      if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！','die');}}
       if(G.enemy&&G.enemy.hp<=0){onKill();return;}
     }
   }
@@ -1732,8 +1731,8 @@ function enemyAttack(){
   if(G.curThorns&&G.enemy){const tDmg=Math.floor(dmg*G.curThorns/100);G.enemy.hp-=tDmg;if(G.enemy.hp<=0){addLog(`🛡️ 荆棘反弹！击杀 ${e.name}`,'die');onKill();return;}addLog(`⚡ 荆棘反弹 ${tDmg} 点伤害`,'skill');}
 
   if(G.hp<=0){
-    G.hp=0;G.dead=true;G.deadUntil=now()+3000;
-    addLog('💀 你被击败了！3秒后复活...','die');
+    G.hp=0;G.dead=true;G.deadUntil=now()+5000;
+    addLog('💀 你被击败了！5秒后复活...','die');
   }
 }
 function onKill(){
@@ -1794,7 +1793,10 @@ function onKill(){
       addLog(`📦 掉落材料：${mdef.icon}${mdef.name}×${dropAmt} (共${G.materials[mid]})`,'drop');
     }
   }
-  G.enemy=genMonster();checkQuests();renderAll();
+  // 怪物死亡后3秒刷新
+  G._nextMonsterTime=now()+3000;
+  G.enemy=null;
+  checkQuests();renderAll();
 }
 function autoEquipCheck(it){
   if(!G.autoEquip)return;
@@ -3081,7 +3083,8 @@ function gameTick(){
     renderTopBar();renderEnemy();renderLog();refreshQuestUI();renderBuffBar();refreshConsumableBtns();
     return; // dead — no auto actions
   }
-  if(!G.enemy)G.enemy=genMonster();
+  // 怪物死亡后3秒刷新
+  if(!G.enemy&&(!G._nextMonsterTime||now()>=G._nextMonsterTime)){G.enemy=genMonster();G._nextMonsterTime=0;}
   // 小血瓶HoT处理
   if(G._hpSmallHoT&&now()<G._hpSmallHoT.until){
     const n=now();
@@ -3120,7 +3123,7 @@ function gameTick(){
   // DOT damage from enemy
   if(G.buffs.dot&&now()<G.buffs.dot.until){
     G.hp-=G.buffs.dot.dmg;
-    if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+3000;addLog('💀 毒发身亡！3秒后复活...','die');}
+    if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 毒发身亡！5秒后复活...','die');}
   }
   // Slow debuff consumption
   if(G._slowUntil&&now()<G._slowUntil){G._slowed=true;}else{G._slowed=false;}
@@ -3162,7 +3165,7 @@ function init(){
     addLog('📋 完成任务获取💎钻石，商店抽取装备','sys');
     addLog('🔄 攒够💎可切换职业体验不同玩法','sys');
   }
-  if(!G.enemy)G.enemy=genMonster();
+  if(!G.enemy)G.enemy=genMonster();G._nextMonsterTime=0;
   if(!G.logs)G.logs=[];
   if(!G.buffs)G.buffs={};
   if(!G.learnedSkills)G.learnedSkills={};
