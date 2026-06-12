@@ -1378,7 +1378,7 @@ function genQuestReward(G,base){
   // 30%概率给药水
   else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
   // 25%概率给材料
-  else if(r<0.85){const mids=Object.keys(MATERIALS);rew.material=pick(mids);rew.materialCount=randi(2,6);}
+  else if(r<0.85){const mids=Object.keys(MATERIALS).filter(k=>k!=='recastStone');rew.material=pick(mids);rew.materialCount=randi(2,6);}
   // 其余只给基础奖励
   // 极低概率（5%）给重铸石
   if(Math.random()<0.05){rew.recastStone=randi(1,2);}
