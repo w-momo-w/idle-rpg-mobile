@@ -2455,6 +2455,7 @@ function renderBagMaterials(){
       const sb=G.skillBooks[i];const div=document.createElement('div');
       const clsNames2={warrior:'战士',archer:'射手',mage:'法师'};
       const isMyClass=sb.classReq===G.classId;
+      const alreadyHave=G.skills.find(s=>s.id===sb.skillId);
       const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
       const reqLv=skillDef?skillDef.unlockLv||0:0;
       const canLearn=isMyClass&&!alreadyHave&&G.level>=reqLv;
