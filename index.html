@@ -1479,7 +1479,7 @@ function computeStats(){
   let ST=cb.str+G.str, VT=cb.vit+G.vit, AG=cb.agi+G.agi, DX=cb.dex+G.dex, IN=cb.int+G.int;
   // Str→ATK, Vit→HP(法师/射手额外加成), Agi→ATK_SPD+Dodge, Dex→CritRate, Int→ATK(mage only)
   const vitHpMult = G.classId==='warrior'?15:G.classId==='archer'?18:20;
-  let a=ST*2, d=VT*1.2, h=VT*vitHpMult, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
+  let a=ST*2, d=VT*1.2, h=VT*vitHpMult, cr=DX*0.5+5, cd=150, sp=Math.max(20, 100 - Math.pow(AG, 0.7) * 2.5);
   if(G.classId==='mage')a+=IN*3;
   let dodge=AG*0.3, block=0, lifesteal=0, thorns=0, magicFind=0, expBonus=0, goldBonus=0, hpRegen=0, doubleAtk=0, armorPierce=0, siphon=0;
 
@@ -1488,7 +1488,7 @@ function computeStats(){
     const it=G.equipped[k];if(!it)continue;
     if(it.stats.atk)a+=it.stats.atk;if(it.stats.def)d+=it.stats.def;
     if(it.stats.hp)h+=it.stats.hp;if(it.stats.critRate)cr+=it.stats.critRate;
-    if(it.stats.critDmg)cd+=it.stats.critDmg;if(it.stats.atkSpd)sp=Math.max(30,sp-it.stats.atkSpd);
+    if(it.stats.critDmg)cd+=it.stats.critDmg;if(it.stats.atkSpd)sp=Math.max(20,sp-it.stats.atkSpd);
     if(it.stats.lifesteal)lifesteal+=it.stats.lifesteal;
     if(it.stats.thorns)thorns+=it.stats.thorns;
     if(it.stats.magicFind)magicFind+=it.stats.magicFind;
@@ -1549,7 +1549,7 @@ function computeStats(){
     else if(id==='dodge')G.curDodge+=b.val||0;else if(id==='block')G.curBlock+=b.val||0;
     else if(id==='lifesteal')G.curLifesteal+=b.val||0;else if(id==='thorns')G.curThorns+=b.val||0;
     else if(id==='armorPierce')G.curArmorPierce+=b.val||0;else if(id==='doubleAtk')G.curDoubleAtk+=b.val||0;
-    else if(id==='hpRegen')G.curHpRegen=b.val||0;else if(id==='cdReduce')G.curAtkSpd+=b.val||0;
+    else if(id==='hpRegen')G.curHpRegen=b.val||0;else if(id==='cdReduce')G.curAtkSpd-=b.val||0;
   }
   if(G.hp>G.maxHp)G.hp=G.maxHp;
 }
@@ -1714,7 +1714,6 @@ function levelUp(){
   // Auto-allocate 5 stat points based on class
   const growth=CLASS_GROWTH[G.classId];
   G.str+=growth.str;G.vit+=growth.vit;G.agi+=growth.agi;G.dex+=growth.dex;G.int+=growth.int;
-  G.hp=G.maxHp;
   if(G.level===10){
     const sk2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);
     if(sk2){
@@ -1728,7 +1727,7 @@ function levelUp(){
   if(G.level===50&&!G.classTier){G.classTier=1;addLog('🌟 达到50级！已解锁一转资格','sys');}
   else if(G.level===150&&G.classTier===1){G.classTier=2;addLog('🌟 达到150级！已解锁二转资格','sys');}
   addLog(`🎉 升级！达到 Lv.${G.level}，属性自动分配`,'sys');
-  computeStats();renderAll();
+  computeStats();G.hp=G.maxHp;renderAll();
 }
 function doAdvance(opt){
   G.classStatsAdv=G.classStatsAdv||{};
@@ -3697,12 +3696,11 @@ function calculateOfflineRewards(offlineSec){
     G.level++;
     const growth=CLASS_GROWTH[G.classId];
     G.str+=growth.str;G.vit+=growth.vit;G.agi+=growth.agi;G.dex+=growth.dex;G.int+=growth.int;
-    G.hp=G.maxHp;
     if(G.level===10&&!G.skill2){const sk2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);if(sk2){G.skill2={...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0};if(!G.skills.find(s=>s.id===sk2.id))G.skills.push({...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});}}
     if(G.level===50&&!G.classTier)G.classTier=1;
     else if(G.level===150&&G.classTier===1)G.classTier=2;
   }
-  computeStats();
+  computeStats();G.hp=G.maxHp;
   const levelAfter = G.level;
   
   totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100));
