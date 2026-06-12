@@ -793,6 +793,7 @@ body{
               <button class="tab-btn active" data-bagtab="equip">⚔️ 装备 <span class="bag-count-badge" id="bag-equip-count"></span></button>
               <button class="tab-btn" data-bagtab="material">📦 材料 <span class="bag-count-badge" id="bag-material-count"></span></button>
               <button class="tab-btn" data-bagtab="consumable">🧪 消耗品 <span class="bag-count-badge" id="bag-consumable-count"></span></button>
+              <button class="tab-btn" data-bagtab="craft">🔨 合成</button>
             </div>
             <div id="decompose-panel">
               <span>分解品质 ≤</span>
@@ -807,6 +808,7 @@ body{
             <div class="bag-tab-content active" id="bag-tab-equip"><div class="inv-grid" id="inv-grid"></div></div>
             <div class="bag-tab-content" id="bag-tab-material"><div id="material-list"></div></div>
             <div class="bag-tab-content" id="bag-tab-consumable"><div id="consumable-list"></div></div>
+            <div class="bag-tab-content" id="bag-tab-craft"><div id="craft-list"></div></div>
           </div>
         </div>
       </div>
@@ -2014,6 +2016,7 @@ function renderBag(){
   const acb=document.getElementById('auto-decompose');if(acb)acb.checked=G.autoDecompose;
   const dq=document.getElementById('decompose-quality');if(dq)dq.value=G.decomposeThreshold;
   const dnc=document.getElementById('decompose-nonclass');if(dnc)dnc.checked=G.decomposeNonClass;
+  renderBagCraft();
 }
 function renderBagEquip(){
   const el=document.getElementById('inv-grid');if(!el)return;el.innerHTML='';
@@ -2077,35 +2080,38 @@ function renderBagMaterials(){
     }
     totalItems+=mats.length;
   }
-  // 材料合成装备（有材料时才显示）
-  if(totalItems>0){
-    el.innerHTML+=`<div style="font-size:11px;font-weight:bold;color:var(--orange);margin:8px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--border)">🔨 合成装备</div>`;
-    for(let i=0;i<MATERIAL_CRAFT.length;i++){
-      const rc=MATERIAL_CRAFT[i];
-      const div=document.createElement('div');
-      div.className='shop-item-row';
-      const costParts=[];
-      let canCraft=true;
-      for(const[mid,count] of Object.entries(rc.costs)){
-        const have=G.materials[mid]||0;
-        if(have<count)canCraft=false;
-        costParts.push(`${MATERIALS[mid].icon}${MATERIALS[mid].name}×${count}<span style="color:${have>=count?'var(--green)':'var(--red)'};font-size:9px">(${have})</span>`);
-      }
-      div.innerHTML=`<div class="shop-item-icon">${rc.icon}</div><div class="shop-item-info"><div class="shop-item-name">${rc.name}</div><div class="shop-item-desc">${costParts.join(' ')}</div></div>`;
-      const cb=document.createElement('button');cb.className='btn btn-orange btn-xs';cb.textContent='合成';
-      cb.disabled=!canCraft;
-      cb.addEventListener('click',(function(idx){return function(){craftEquip(idx);};})(i));
-      div.appendChild(cb);el.appendChild(div);
-    }
-  }
-  if(totalItems===0)el.innerHTML='<span style="color:var(--muted);font-size:11px">暂无材料和技能书</span>';
+  // 材料合成装备（移到独立tab，这里移除）
   if(mc)mc.textContent=totalItems>0?(''+totalItems):'';
+  if(mc)mc.textContent=totalItems>0?(''+totalItems):'';
+}
+function renderBagCraft(){
+  const el=document.getElementById('craft-list');if(!el)return;el.innerHTML='';
+  let hasAny=false;
+  for(let i=0;i<MATERIAL_CRAFT.length;i++){
+    const rc=MATERIAL_CRAFT[i];
+    const costParts=[];
+    let canCraft=true;
+    for(const[mid,count] of Object.entries(rc.costs)){
+      const have=G.materials[mid]||0;
+      if(have<count)canCraft=false;
+      costParts.push(`${MATERIALS[mid].icon}${MATERIALS[mid].name}×${count}<span style="color:${have>=count?'var(--green)':'var(--red)'};font-size:9px">(${have})</span>`);
+    }
+    hasAny=true;
+    const div=document.createElement('div');
+    div.className='shop-item-row';
+    div.innerHTML=`<div class="shop-item-icon">${rc.icon}</div><div class="shop-item-info"><div class="shop-item-name">${rc.name}</div><div class="shop-item-desc">${costParts.join(' ')}</div></div>`;
+    const cb=document.createElement('button');cb.className='btn btn-orange btn-xs';cb.textContent='合成';
+    cb.disabled=!canCraft;
+    cb.addEventListener('click',(function(idx){return function(){craftEquip(idx);};})(i));
+    div.appendChild(cb);el.appendChild(div);
+  }
+  if(!hasAny)el.innerHTML='<span style="color:var(--muted);font-size:11px">暂无合成配方</span>';
 }
 function renderBagConsumables(){
   const el=document.getElementById('consumable-list');if(!el)return;el.innerHTML='';
   const cc=document.getElementById('bag-consumable-count');
-  const items=[{icon:'🧪',name:'小血瓶',key:'hpPotion',count:G.consumables.hpPotion||0,desc:'每秒恢复5%HP，持续5秒',use:function(){useHpPotion(false);renderBagConsumables();}},
-    {icon:'💉',name:'大血瓶',key:'hpLarge',count:G.consumables.hpLarge||0,desc:'瞬间恢复40%生命值',use:function(){if(!G.consumables.hpLarge)return;G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*0.4));G.consumables.hpLarge--;addLog('💉 使用大血瓶！瞬间恢复40%','heal');renderAll();renderBagConsumables();}},
+  const items=[    {icon:'🧪',name:'小血瓶',key:'hpPotion',count:G.consumables.hpPotion||0,desc:'每秒恢复5%HP，持续5秒',use:function(){useHpPotionSmall(false);renderBagConsumables();}},
+    {icon:'💉',name:'大血瓶',key:'hpLarge',count:G.consumables.hpLarge||0,desc:'瞬间恢复40%生命值',use:function(){useHpPotionLarge(false);renderBagConsumables();}},
     {icon:'📜',name:'攻击卷轴',key:'atkScroll',count:G.consumables.atkScroll||0,desc:'3分钟内攻击力+25%',use:function(){useAtkScroll();renderBagConsumables();}},
     {icon:'🛡️',name:'防御卷轴',key:'defScroll',count:G.consumables.defScroll||0,desc:'3分钟内防御+30%',use:function(){useDefScroll();renderBagConsumables();}},
     {icon:'❤️',name:'生命卷轴',key:'hpScroll',count:G.consumables.hpScroll||0,desc:'3分钟内最大生命+30%',use:function(){useHpScroll();renderBagConsumables();}}];
@@ -3651,6 +3657,7 @@ document.querySelectorAll('#bag-subtabs .tab-btn').forEach(b=>{
     const target=document.getElementById('bag-tab-'+b.dataset.bagtab);
     if(target)target.classList.add('active');
     if(b.dataset.bagtab==='consumable')renderBagConsumables();
+    if(b.dataset.bagtab==='craft')renderBagCraft();
   });
 });
 // 背包折叠/展开
