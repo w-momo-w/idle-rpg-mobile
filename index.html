@@ -3001,6 +3001,7 @@ function doRefineAttr(slot,key){
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true,'refine');
 }
+function doRecastAttr(slot,key){
   const it=G.equipped[slot];if(!it)return;
   const q=it.quality;
   // 消耗重铸石
@@ -3035,6 +3036,7 @@ function doRecastAttrInner(slot,key,it,sa,range){
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true,'recast');
 }
+function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，上限+300，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
   const slotNames={mainHand:'主手武器',offHand:'副武器',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰',cloak:'披风'};
@@ -3669,6 +3671,15 @@ function gameTick(){
   if(Object.keys(G.buffs).length>0)computeStats();
 }
 async function init(){
+  // 立即初始化关键状态，避免异步等待期间点击无效
+  if(!G.enemy)G.enemy=genMonster();
+  if(!G.logs)G.logs=[];
+  if(!G.materials)G.materials={};
+  if(!G.skillBooks)G.skillBooks=[];
+  if(!G.buffs)G.buffs={};
+  if(!G.learnedSkills)G.learnedSkills={};
+  G._nextMonsterTime=0;
+  
   // 初始化存档系统（等待OPFS就绪）
   await initSaveSystem();
   
