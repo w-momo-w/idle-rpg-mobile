@@ -1699,7 +1699,7 @@ function genMonster(){
   const lvDiff=monLv-m.lv;
   const lvScale=Math.max(0.3, 1+lvDiff*0.06);
   const rewardScale=Math.max(0.5, 1+lvDiff*0.04);
-  const STAT_BOOST=1.2;
+  const STAT_BOOST=type==='boss'?1.56:type==='elite'?1.56:1.2;
   const mName=type==='boss'?template.name:(type==='elite'?'精英·'+template.name:template.name);
   const mIcon=template.icon;
   const hp=Math.floor(template.hp*typeMult*diffMult*lvScale*STAT_BOOST);
