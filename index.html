@@ -1002,6 +1002,7 @@ const EQ_ICONS={
   ring1:{warrior:'💍',archer:'💍',mage:'💍',all:'💍'},
   ring2:{warrior:'💍',archer:'💍',mage:'💍',all:'💍'},
   pendant:{warrior:'🔮',archer:'🔮',mage:'🔮',all:'🔮'},
+  cloak:{warrior:'🧣',archer:'🧣',mage:'🧣',all:'🧣'},
 };
 const EQ_NAMES={
   mainHand:{warrior:['短剑','长剑','战斧','弯刀','大剑','巨锤','长枪','太刀','重斧','斩马刀'],archer:['短弓','长弓','复合弓','弩','猎弓','精灵弓','暗影弓','滑轮弓','连弩'],mage:['魔杖','法杖','水晶杖','暗影杖','圣光杖','龙语法杖','元素杖','星辉杖'],all:['短剑','长剑','战斧','弯刀','大剑','巨锤','长枪','太刀']},
@@ -1015,6 +1016,7 @@ const EQ_NAMES={
   ring1:{warrior:['力量戒','金戒','钻石戒','勇气戒','战神戒'],archer:['敏捷戒','银戒','精准戒','疾风戒','鹰眼戒'],mage:['魔力戒','智慧戒','元素戒','暗影戒','星辰戒'],all:['铜戒','银戒','金戒','钻石戒']},
   ring2:{warrior:['铁环','秘银环','力量之环','勇气环','战神环'],archer:['轻环','疾风环','暗影环','鹰眼环','精准环'],mage:['魔力环','智慧之环','元素环','暗影环','星辰环'],all:['铁环','秘银环','魔力环','生命之环']},
   pendant:{warrior:['战士护符','龙晶','战斗宝珠','勇气符','战神符'],archer:['猎手护符','鹰眼符','疾风宝珠','精准符','暗影符'],mage:['魔法护符','元素符','圣光宝珠','奥术符','星辰符'],all:['木符','玉符','水晶','龙晶']},
+  cloak:{warrior:['布披风','锁链披风','铁护肩','龙鳞披风','战神披风'],archer:['轻披风','暗影披风','猎手披风','疾风披风','丛林披风'],mage:['布披风','魔法披风','暗影披风','元素披风','星辰披风'],all:['布披风','皮披风','锁链披风','铁披风']},
 };
 const Q_PREFIX=['破损的','普通的','精良的','优质的','卓越的','史诗的','传说的','神话的','超神的'];
 const REFINE_COST=[500,1000,2000,3500,5500,8000,12000,18000,25000]; // 洗炼费用按品质递增
@@ -1031,6 +1033,7 @@ const REFINE_MATERIALS={
   ring1:{material:'crystalShard',baseCount:2},
   ring2:{material:'crystalShard',baseCount:2},
   pendant:{material:'dragonScale',baseCount:2},
+  cloak:{material:'beastHide',baseCount:2},
 };
 
 const SETS=[
@@ -1059,6 +1062,7 @@ const ENHANCE_BONUS={
   ring1:{atk:1,critRate:0.2},
   ring2:{atk:1,critRate:0.2},
   pendant:{atk:0.8,hp:2.5,def:0.5},
+  cloak:{hp:3,dodge:0.3},
 };
 
 // Special attributes pool (青铜品质以上随机获得)
@@ -1099,6 +1103,7 @@ const MATERIAL_CRAFT=[
   {name:'项链',icon:'📿',desc:'合成一条项链',costs:{crystalShard:7,dragonScale:3},slot:'necklace',minQ:1,maxQ:5},
   {name:'戒指',icon:'💍',desc:'合成一枚戒指',costs:{crystalShard:6,dragonScale:3},slot:'ring1',minQ:1,maxQ:5},
   {name:'护符',icon:'🔮',desc:'合成一个护符',costs:{crystalShard:7,beastHide:5},slot:'pendant',minQ:1,maxQ:4},
+  {name:'披风',icon:'🧣',desc:'合成一件披风',costs:{beastHide:8,dragonScale:2},slot:'cloak',minQ:1,maxQ:4},
 ];
 
 // Skill data
@@ -1374,16 +1379,16 @@ function genQuestReward(G,base){
   const rew={...base};
   // ~55%概率随机给1~4颗钻石（独立于其他奖励）
   if(Math.random()<0.55){rew.diamond=randi(1,4);}
-  // 5%概率给1~2个重铸石
+  // 1%概率给1~2个重铸石
   if(Math.random()<0.01){rew.material='recastStone';rew.materialCount=randi(1,2);}
   else{
     const r=Math.random();
-    // 30%概率给装备
-    if(r<0.30){rew.equipQ=Math.min(randi(1, Math.floor(G.level/10)+1), 7);}
+    // 10%概率给装备
+    if(r<0.10){rew.equipQ=Math.min(randi(1, Math.floor(G.level/10)+1), 7);}
     // 30%概率给药水
-    else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
+    else if(r<0.40){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
     // 25%概率给材料（排除重铸石）
-    else if(r<0.85){const mids=Object.keys(MATERIALS).filter(k=>k!=='recastStone');rew.material=pick(mids);rew.materialCount=randi(2,6);}
+    else if(r<0.65){const mids=Object.keys(MATERIALS).filter(k=>k!=='recastStone');rew.material=pick(mids);rew.materialCount=randi(2,6);}
   }
   // 其余只给基础奖励
   return rew;
@@ -1604,6 +1609,7 @@ function genEquip(slot,minQ,maxQ,monsterLv){
   else if(slot==='necklace'){s.critDmg=randi(5,20)*m;statRanges.critDmg={min:Math.floor(5*m),max:Math.floor(20*m)};s.atk=randi(1,3)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(3*m)};}
   else if(slot==='ring1'||slot==='ring2'){s.atk=randi(1,4)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(4*m)};s.critRate=randf(0.5,2)*m;statRanges.critRate={min:Math.round(0.5*m*10)/10,max:Math.round(2*m*10)/10};}
   else if(slot==='pendant'){s.atk=randi(1,5)*m;statRanges.atk={min:Math.floor(1*m),max:Math.floor(5*m)};s.hp=randi(5,20)*m;statRanges.hp={min:Math.floor(5*m),max:Math.floor(20*m)};s.def=randi(1,3)*m;statRanges.def={min:Math.floor(1*m),max:Math.floor(3*m)};}
+  else if(slot==='cloak'){s.hp=randi(3,12)*m;statRanges.hp={min:Math.floor(3*m),max:Math.floor(12*m)};s.dodge=randf(1,4)*m;statRanges.dodge={min:Math.round(1*m*10)/10,max:Math.round(4*m*10)/10};}
   // round all basic stats
   for(const k in s){if(typeof s[k]==='number')s[k]=Math.round(s[k]*10)/10;}
   s.atk=Math.floor(s.atk||0);s.def=Math.floor(s.def||0);s.hp=Math.floor(s.hp||0);
@@ -2115,8 +2121,8 @@ function renderStats(){
 }
 function renderEquipment(){
   const el=document.getElementById('eq-grid');el.innerHTML='';
-  const slots=['mainHand','offHand','armor','helmet','bracer','pants','boots','necklace','ring1','ring2','pendant'];
-  const slotNames={mainHand:'主武器',offHand:'副武器',armor:'衣服',helmet:'头盔',bracer:'护腕',pants:'裤子',boots:'鞋子',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰'};
+  const slots=['mainHand','offHand','armor','helmet','bracer','pants','boots','necklace','ring1','ring2','pendant','cloak'];
+  const slotNames={mainHand:'主武器',offHand:'副武器',armor:'衣服',helmet:'头盔',bracer:'护腕',pants:'裤子',boots:'鞋子',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰',cloak:'披风'};
   for(const s of slots){
     const it=G.equipped[s];const div=document.createElement('div');
     div.className='eq-slot'+(it?' qbg'+it.quality:' empty');
@@ -2969,7 +2975,7 @@ function doRecastAttrInner(slot,key,it,sa,range){
 function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，上限+300，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
-  const slotNames={mainHand:'主手武器',offHand:'副武器',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰'};
+  const slotNames={mainHand:'主手武器',offHand:'副武器',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰',cloak:'披风'};
   let hasItems=false;
   for(const slot in G.equipped){
     const it=G.equipped[slot];if(!it)continue;hasItems=true;
