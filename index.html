@@ -1467,6 +1467,14 @@ const randi=(min,max)=>{if(min>max)[min,max]=[max,min];return Math.floor(Math.ra
 const randf=(min,max)=>Math.random()*(max-min)+min;
 const pick=a=>a[randi(0,a.length-1)];
 const fmt=v=>{if(v>=1e8)return(v/1e8).toFixed(1)+'亿';if(v>=1e4)return(v/1e4).toFixed(1)+'万';return v.toLocaleString()};
+// 属性溢出显示：raw=计算值, cur=生效值, max=上限。溢出时显示 "raw→cur(max)" 格式
+function fmtStat(raw,cur,max,unit,suffix){
+  const u=unit||'';const s=suffix||'';
+  if(raw>max){
+    return `<span style="color:var(--muted);text-decoration:line-through">${typeof raw==='number'&&raw%1!==0?raw.toFixed(1):raw}${u}</span> <span style="color:var(--red);font-size:9px">→${typeof cur==='number'&&cur%1!==0?cur.toFixed(1):cur}${u}${s}</span>`;
+  }
+  return (typeof cur==='number'&&cur%1!==0?cur.toFixed(1):cur)+u+s;
+}
 const now=()=>Date.now();
 // 装备品质安全读取（处理旧存档无quality字段的情况）
 function getQuality(item){return item!=null&&item.quality!=null?item.quality:0;}
@@ -1492,6 +1500,7 @@ let G={
   str:0,vit:0,agi:0,dex:0,int:0, // allocated points
   hp:100,maxHp:100,curAtk:5,curDef:2,curCritRate:5,curCritDmg:150,curAtkSpd:100,
   curDodge:0,curBlock:0,curLifesteal:0,curThorns:0,curMagicFind:0,curExpBonus:0,curGoldBonus:0,curHpRegen:0,curDoubleAtk:0,curArmorPierce:0,curSiphon:0,
+  rawDodge:0,rawBlock:0,rawLifesteal:0,rawThorns:0,rawMagicFind:0,rawExpBonus:0,rawGoldBonus:0,rawHpRegen:0,rawDoubleAtk:0,rawArmorPierce:0,rawSiphon:0,
   equipped:{},inventory:[],maxInv:50,
   skills:[],skill2:null,
   curMap:'village',enemy:null,killStreak:0,
@@ -1583,10 +1592,17 @@ function computeStats(){
   if(G.classStatsAdv){const ba=G.classStatsAdv;if(ba.atk)a+=ba.atk;if(ba.def)d+=ba.def;if(ba.hp)h+=ba.hp;if(ba.critRate)cr+=ba.critRate;}
 
   G.maxHp=h;G.curAtk=Math.max(1,a);G.curDef=d;G.curCritRate=Math.min(cr,80);G.curCritDmg=cd;G.curAtkSpd=Math.max(20,sp);
-  G.curDodge=Math.min(dodge,35);G.curBlock=Math.min(block,30);G.curLifesteal=Math.min(lifesteal,30);
-  G.curThorns=Math.min(thorns,30);G.curMagicFind=Math.min(magicFind,80);G.curExpBonus=Math.min(expBonus,200);
-  G.curGoldBonus=Math.min(goldBonus,200);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,25);
-  G.curArmorPierce=Math.min(armorPierce,40);G.curSiphon=Math.min(siphon,25);
+  // 存储原始值（含超出上限部分），用于页面显示
+  G.rawDodge=dodge;G.rawBlock=block;G.rawLifesteal=lifesteal;
+  G.rawThorns=thorns;G.rawMagicFind=magicFind;G.rawExpBonus=expBonus;
+  G.rawGoldBonus=goldBonus;G.rawHpRegen=hpRegen;G.rawDoubleAtk=doubleAtk;
+  G.rawArmorPierce=armorPierce;G.rawSiphon=siphon;
+
+  // 硬上限裁剪（提高后的值）
+  G.curDodge=Math.min(dodge,50);G.curBlock=Math.min(block,45);G.curLifesteal=Math.min(lifesteal,50);
+  G.curThorns=Math.min(thorns,45);G.curMagicFind=Math.min(magicFind,100);G.curExpBonus=Math.min(expBonus,300);
+  G.curGoldBonus=Math.min(goldBonus,300);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,40);
+  G.curArmorPierce=Math.min(armorPierce,60);G.curSiphon=Math.min(siphon,40);
   // store raw stats for display
   G.rawST=ST||0;G.rawVT=VT||0;G.rawAG=AG||0;G.rawDX=DX||0;G.rawIN=IN||0;
 
@@ -1594,11 +1610,19 @@ function computeStats(){
   for(const id in G.buffs){const b=G.buffs[id];if(b.until<n){delete G.buffs[id];continue;}
     if(id==='atk')G.curAtk+=b.val||0;else if(id==='def')G.curDef+=b.val||0;else if(id==='maxhp_cd')G.maxHp+=b.val||0;
     else if(id==='critRate')G.curCritRate+=b.val||0;else if(id==='critDmg')G.curCritDmg+=b.val||0;else if(id==='atkSpd')G.curAtkSpd-=b.val||0;
-    else if(id==='dodge')G.curDodge+=b.val||0;else if(id==='block')G.curBlock+=b.val||0;
-    else if(id==='lifesteal')G.curLifesteal+=b.val||0;else if(id==='thorns')G.curThorns+=b.val||0;
-    else if(id==='armorPierce')G.curArmorPierce+=b.val||0;else if(id==='doubleAtk')G.curDoubleAtk+=b.val||0;
+    else if(id==='dodge'){G.curDodge+=b.val||0;G.rawDodge+=b.val||0;}
+    else if(id==='block'){G.curBlock+=b.val||0;G.rawBlock+=b.val||0;}
+    else if(id==='lifesteal'){G.curLifesteal+=b.val||0;G.rawLifesteal+=b.val||0;}
+    else if(id==='thorns'){G.curThorns+=b.val||0;G.rawThorns+=b.val||0;}
+    else if(id==='armorPierce'){G.curArmorPierce+=b.val||0;G.rawArmorPierce+=b.val||0;}
+    else if(id==='doubleAtk'){G.curDoubleAtk+=b.val||0;G.rawDoubleAtk+=b.val||0;}
     else if(id==='hpRegen')G.curHpRegen=b.val||0;else if(id==='cdReduce')G.curAtkSpd-=b.val||0;
   }
+  // buff叠加后重新裁剪硬上限
+  G.curDodge=Math.min(G.curDodge,50);G.curBlock=Math.min(G.curBlock,45);
+  G.curLifesteal=Math.min(G.curLifesteal,50);G.curThorns=Math.min(G.curThorns,45);
+  G.curDoubleAtk=Math.min(G.curDoubleAtk,40);G.curArmorPierce=Math.min(G.curArmorPierce,60);
+  G.curSiphon=Math.min(G.curSiphon,40);
   if(G.hp>G.maxHp)G.hp=G.maxHp;
 }
 function playerDie(msg){
@@ -2233,10 +2257,10 @@ function renderStats(){
     <div style="border-top:1px solid var(--teal);margin-top:6px;padding-top:4px;font-size:10px">
       <div style="color:var(--teal);font-weight:bold;margin-bottom:3px;font-size:11px">✨ 装备特殊属性</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px 12px">
-        <span>🩸吸血 ${G.curLifesteal}%</span><span>🌵荆棘 ${G.curThorns}%</span><span>💎寻宝 ${G.curMagicFind}%</span>
-        <span>📖经验 ${G.curExpBonus}%</span><span>💰金币 ${G.curGoldBonus}%</span><span>💚恢复 ${G.curHpRegen}/2秒</span>
-        <span>👊连击 ${G.curDoubleAtk}%</span><span>🗡️破甲 ${G.curArmorPierce}%</span><span>💀汲魂 ${G.curSiphon}%</span>
-        <span>🌀闪避 ${G.curDodge.toFixed(1)}%</span><span>🛡️格挡 ${G.curBlock}%</span><span>💥致命 ${G.curCritDmg-150}%</span>
+        <span>🩸吸血 ${fmtStat(G.rawLifesteal,G.curLifesteal,50,'%')}</span><span>🌵荆棘 ${fmtStat(G.rawThorns,G.curThorns,45,'%')}</span><span>💎寻宝 ${fmtStat(G.rawMagicFind,G.curMagicFind,100,'%')}</span>
+        <span>📖经验 ${fmtStat(G.rawExpBonus,G.curExpBonus,300,'%')}</span><span>💰金币 ${fmtStat(G.rawGoldBonus,G.curGoldBonus,300,'%')}</span><span>💚恢复 ${G.curHpRegen}/2秒</span>
+        <span>👊连击 ${fmtStat(G.rawDoubleAtk,G.curDoubleAtk,40,'%')}</span><span>🗡️破甲 ${fmtStat(G.rawArmorPierce,G.curArmorPierce,60,'%')}</span><span>💀汲魂 ${fmtStat(G.rawSiphon,G.curSiphon,40,'%')}</span>
+        <span>🌀闪避 ${fmtStat(G.rawDodge,G.curDodge,50,'%')}</span><span>🛡️格挡 ${fmtStat(G.rawBlock,G.curBlock,45,'%')}</span><span>💥致命 ${G.curCritDmg-150}%</span>
       </div>
     </div>`;
   // 套装属性单独显示
