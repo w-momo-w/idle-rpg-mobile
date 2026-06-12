@@ -1070,11 +1070,11 @@ const SPECIAL_ATTRS=[
 
 // Material system
 const MATERIALS={
-  beastHide:{id:'beastHide',name:'兽皮',icon:'🦴',desc:'野兽的皮毛，可兑换金币',dropRate:0.18,dropSources:['normal','elite'],use:{gold:3,count:5,desc:'5兽皮→3金币'}},
-  crystalShard:{id:'crystalShard',name:'魔晶碎片',icon:'💠',desc:'蕴含魔力的碎片，可出售获得金币',dropRate:0.10,dropSources:['elite','boss'],use:{gold:8,count:1,desc:'1碎片→8金币'}},
-  herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.14,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
-  ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.12,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
-  dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.03,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
+  beastHide:{id:'beastHide',name:'兽皮',icon:'🦴',desc:'野兽的皮毛，可兑换金币',dropRate:0.036,dropSources:['normal','elite'],use:{gold:3,count:5,desc:'5兽皮→3金币'}},
+  crystalShard:{id:'crystalShard',name:'魔晶碎片',icon:'💠',desc:'蕴含魔力的碎片，可出售获得金币',dropRate:0.02,dropSources:['elite','boss'],use:{gold:8,count:1,desc:'1碎片→8金币'}},
+  herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.028,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
+  ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.024,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
+  dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.006,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
 };
 
 // Material synthesis: combine materials to craft specific-slot equipment
@@ -1744,10 +1744,10 @@ function onKill(){
   if(G.curSiphon)G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*G.curSiphon/100));
   // 装备掉落 — 按怪物类型区分基础概率（已下调）
   const monLv=G.enemy.level||1;
-  const typeBase=G.enemy.type==='boss'?0.35:G.enemy.type==='elite'?0.20:0.06;
-  const lvBonus=Math.min(G.level/200,0.10);
-  const mfBonus=G.enemy.type==='boss'?G.curMagicFind/100:(G.enemy.type==='elite'?G.curMagicFind/100:G.curMagicFind/200);
-  const dropRate=Math.min(typeBase+lvBonus+mfBonus,0.65);
+  const typeBase=G.enemy.type==='boss'?0.12:G.enemy.type==='elite'?0.07:0.02;
+  const lvBonus=Math.min(G.level/600,0.03);
+  const mfBonus=G.enemy.type==='boss'?G.curMagicFind/300:(G.enemy.type==='elite'?G.curMagicFind/300:G.curMagicFind/600);
+  const dropRate=Math.min(typeBase+lvBonus+mfBonus,0.35);
   if(Math.random()<dropRate){
     const slot=pick(Object.keys(EQ_NAMES));
     const it=genEquip(slot,e.dropQ[0],e.dropQ[1],monLv);
