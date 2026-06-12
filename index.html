@@ -572,7 +572,7 @@ body{
 /* ═══ 弹窗 ═══ */
 #modal-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);z-index:999;
+  background:rgba(0,0,0,.6);z-index:9999;
   align-items:flex-end;justify-content:center;
 }
 #modal-overlay.show{display:flex}
@@ -2468,31 +2468,28 @@ function renderBagMaterials(){
       const canLearn=isMyClass&&!alreadyHave&&G.level>=reqLv;
       const lvNote=isMyClass&&!alreadyHave&&G.level<reqLv?` <span style="color:var(--red);font-size:9px">(需Lv.${reqLv})</span>`:'';
       const countTag=g.count>1?` <span style="color:var(--muted);font-size:9px">×${g.count}</span>`:'';
-      div.className='skill-item';
+      div.className='skill-item skill-book-row';
+      div.style.cursor='default';
       div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${countTag}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}${lvNote}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'} · <span style="color:var(--orange)">Lv.${reqLv}</span></div></div>`;
-      const acts=document.createElement('div');acts.style.display='flex';acts.style.gap='3px';
+      const acts=document.createElement('div');acts.className='skillbook-actions';acts.style.cssText='display:flex;gap:3px;flex-shrink:0;align-items:center;pointer-events:auto;';
       if(canLearn){
-        const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';
+        const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';lb.type='button';
         const idx=g.indices[0];
-        lb.addEventListener('click',(function(i){return function(){learnSkillBook(i);};})(idx));
+        lb.addEventListener('click',function(e){e.stopPropagation();learnSkillBook(idx);});
         acts.appendChild(lb);
       }
       if(g.count>1&&!canLearn){
-        // 不可学习且多本：显示批量兑换数量
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑换×${g.count}`;
-        eb.addEventListener('click',(function(indices){return function(){batchExchangeSkillBooks(indices);};})([...g.indices]));
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑换×${g.count}`;eb.type='button';
+        eb.addEventListener('click',function(e){e.stopPropagation();batchExchangeSkillBooks([...g.indices]);});
         acts.appendChild(eb);
       }else if(g.count>1&&canLearn){
-        // 可学习且多本：学习按钮已显示，兑换按钮显示剩余数量
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑×${g.count-1}`;
-        // 兑换除第一本外的其余本
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑×${g.count-1}`;eb.type='button';
         const restIndices=g.indices.slice(1);
-        eb.addEventListener('click',(function(indices){return function(){batchExchangeSkillBooks(indices);};})(restIndices));
+        eb.addEventListener('click',function(e){e.stopPropagation();batchExchangeSkillBooks(restIndices);});
         acts.appendChild(eb);
       }else{
-        // 单本
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';
-        eb.addEventListener('click',(function(i){return function(){exchangeSkillBook(i);};})(g.indices[0]));
+        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';eb.type='button';
+        eb.addEventListener('click',function(e){e.stopPropagation();exchangeSkillBook(g.indices[0]);});
         acts.appendChild(eb);
       }
       div.appendChild(acts);el.appendChild(div);
