@@ -2128,7 +2128,7 @@ function onKill(){
       }
       if(allBooks.length>0){
         const sb=pick(allBooks);
-        const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:10};
+        const sbit={type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:sb.unlockLv||0};
         G.skillBooks.push(sbit);
         addLog(`📖 掉落技能书：【${sb.name}】已放入背包`,'drop');
       }
@@ -4277,7 +4277,7 @@ function calculateOfflineRewards(offlineSec){
       }
       for(let i=0;i<Math.min(offlineBookCount,20);i++){
         const sb=pick(allBooks);
-        G.skillBooks.push({type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:10});
+        G.skillBooks.push({type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:sb.unlockLv||0});
       }
     }
   }
