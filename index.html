@@ -2235,7 +2235,7 @@ function renderBagMaterials(){
     totalItems+=G.skillBooks.length;
   }
   // 材料部分
-  const mats=Object.entries(G.materials).filter(([k,v])=>v>0);
+  const mats=Object.entries(G.materials).filter(([k,v])=>v>0&&k!=='recastStone');
   if(mats.length>0){
     el.innerHTML+=`<div style="font-size:11px;font-weight:bold;color:var(--teal);margin:6px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--border)">📦 材料</div>`;
     for(const[mid,count] of mats){
@@ -2678,7 +2678,6 @@ function showItemModal(it,source,isEquipped){
     const attrOrder=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
     const refineAttrs=[];
     for(const k of attrOrder){if(it.stats[k]!=null)refineAttrs.push(k);}
-    if(it.specials){for(const sp of it.specials)refineAttrs.push(sp.id);}
     // 构建详情Tab内容
     let infoHtml='';
     const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
@@ -2698,20 +2697,15 @@ function showItemModal(it,source,isEquipped){
       if(eb.dodge)nextParts.push('闪避+'+(eb.dodge*(slotElv+1)).toFixed(1)+'%');
       infoHtml+=`<div style="font-size:10px;color:var(--orange);margin-top:4px">强化+${slotElv} → +${slotElv+1}：${nextParts.join(' · ')}</div>`;
     }
-    // 构建洗炼Tab内容（逐条属性）
+    // 构建洗炼Tab内容（逐条基本属性）
     const rm=REFINE_MATERIALS[source]||{material:'ironOre',baseCount:1};
     const md=MATERIALS[rm.material];
-    let refineHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条洗炼属性词条，数值在范围内随机重roll</div>';
+    let refineHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条洗炼基础属性，数值在范围内随机重roll</div>';
     for(const rk of refineAttrs){
-      const isSp=SPECIAL_ATTRS.find(x=>x.id===rk);
-      let lbl,curVal,range;
-      if(isSp){lbl=isSp.name;curVal=isSp.fmt(it.stats[rk]);range=it.statRanges&&it.statRanges[rk];}
-      else{
-        lbl=attrLbls2[rk]||rk;
-        const isPct=['critRate','dodge'].includes(rk);
-        curVal=(isPct?Math.round(it.stats[rk]*10)/10:it.stats[rk])+(isPct?'%':'');
-        range=it.statRanges&&it.statRanges[rk];
-      }
+      const lbl=attrLbls2[rk]||rk;
+      const isPct=['critRate','dodge'].includes(rk);
+      const curVal=(isPct?Math.round(it.stats[rk]*10)/10:it.stats[rk])+(isPct?'%':'');
+      const range=it.statRanges&&it.statRanges[rk];
       const rGold=Math.floor((REFINE_COST[it.quality]||500)/3);
       const rMat=rm.baseCount+it.quality;
       const canRef=G.gold>=rGold&&(G.materials[rm.material]||0)>=rMat;
@@ -2722,43 +2716,42 @@ function showItemModal(it,source,isEquipped){
         <button class="btn btn-purple btn-sm refine-attr-btn" data-key="${rk}" ${canRef?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">🔄 💰${rGold}+${md.icon}${rMat}</button>
       </div>`;
     }
-    if(refineAttrs.length===0)refineHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有可洗炼的属性</div>';
     // 构建重铸Tab内容（只显示特殊属性词条）
     let recastHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条重铸特殊属性词条，数值在范围内随机重roll，消耗♻️重铸石×1/次</div>';
-    if(it.specials&&it.specials.length>0){
-      for(const sp of it.specials){
-        const sr=it.statRanges&&it.statRanges[sp.id];
-        const rangeStr=sr?` <span style="font-size:9px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:'';
-        const canRecast=(G.materials.recastStone||0)>=1;
-        recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
-          <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}${rangeStr}</span>
-          <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}</span>
-          <button class="btn btn-pink btn-sm recast-attr-btn" data-key="${sp.id}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ ♻️${1}个</button>
-        </div>`;
-      }
-    }else{
-      recastHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有特殊属性可重铸</div>';
+    for(const sp of it.specials||[]){
+      const sr=it.statRanges&&it.statRanges[sp.id];
+      const rangeStr=sr?` <span style="font-size:9px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:'';
+      const canRecast=(G.materials.recastStone||0)>=1;
+      recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
+        <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}${rangeStr}</span>
+        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}</span>
+        <button class="btn btn-pink btn-sm recast-attr-btn" data-key="${sp.id}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ ♻️${1}个</button>
+      </div>`;
     }
-    // 插入Tab栏到modal-box
+    // 检查哪些Tab需要显示
+    const hasRefine=refineAttrs.length>0;
+    const hasRecast=it.specials&&it.specials.length>0;
+    // 动态构建Tab栏
     const tabBlock=document.createElement('div');
-    tabBlock.innerHTML=`<div class="tabs" style="margin-top:8px">
-      <button class="tab-btn active" data-equiptab="info">📋 详情</button>
-      <button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>
-      <button class="tab-btn" data-equiptab="recast">♻️ 重铸</button>
-    </div>
-    <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>
-    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>
-    <div class="bag-tab-content" id="equip-tab-recast">${recastHtml}</div>`;
+    let tabsHtml=`<div class="tabs" style="margin-top:8px">
+      <button class="tab-btn active" data-equiptab="info">📋 详情</button>`;
+    if(hasRefine)tabsHtml+=`<button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>`;
+    if(hasRecast)tabsHtml+=`<button class="tab-btn" data-equiptab="recast">♻️ 重铸</button>`;
+    tabsHtml+=`</div>
+    <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>`;
+    if(hasRefine)tabsHtml+=`<div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>`;
+    if(hasRecast)tabsHtml+=`<div class="bag-tab-content" id="equip-tab-recast">${recastHtml}</div>`;
+    tabBlock.innerHTML=tabsHtml;
     box.appendChild(tabBlock);
-    // Tab切换
+    // Tab切换（通用处理）
     box.querySelectorAll('[data-equiptab]').forEach(btn=>{
       btn.addEventListener('click',function(){
         box.querySelectorAll('[data-equiptab]').forEach(b=>b.classList.remove('active'));
         this.classList.add('active');
         const tn=this.dataset.equiptab;
-        document.getElementById('equip-tab-info').classList.toggle('active',tn==='info');
-        document.getElementById('equip-tab-refine').classList.toggle('active',tn==='refine');
-        document.getElementById('equip-tab-recast').classList.toggle('active',tn==='recast');
+        box.querySelectorAll('.bag-tab-content').forEach(el=>el.classList.remove('active'));
+        const target=document.getElementById('equip-tab-'+tn);
+        if(target)target.classList.add('active');
       });
     });
     // 逐条洗炼按钮事件
@@ -3125,15 +3118,23 @@ function gachaPull(count){
     G.diamond-=cost;
   const equips=[];
   const consObtained=[];
+  let recastCount=0;
   for(let i=0;i<count;i++){
-    if(randi(1,100)<=30){
+    const roll=randi(1,100);
+    if(roll<=40){
+      // 40% 消耗品
       const ct=randomConsumableType();
       consObtained.push(ct);
       G.consumables[ct]=(G.consumables[ct]||0)+1;
-    }else{
+    }else if(roll<=95){
+      // 55% 装备 (41-95)
       const q=rollGachaQuality();
       const slot=pick(Object.keys(EQ_NAMES));
       equips.push(genEquip(slot,q,q,G.level));
+    }else{
+      // 5% 重铸石 (96-100)
+      recastCount++;
+      G.materials.recastStone=(G.materials.recastStone||0)+1;
     }
   }
   if(count===10&&equips.length>0){equips[randi(0,equips.length-1)]=genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level);}
@@ -3148,6 +3149,7 @@ function gachaPull(count){
   for(const[c,num]of Object.entries(consMap)){
     parts.push(CONSUMABLE_ICONS[c]+CONSUMABLE_NAMES[c]+'×'+num);
   }
+  if(recastCount>0)parts.push('♻️重铸石×'+recastCount);
   addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');
   renderAll();renderShop();
   });
@@ -3317,12 +3319,12 @@ function renderShop(){
   const probs=gachaProb();
   ds.innerHTML+=`<div class="gacha-rate">概率：${probs.map(p=>QUALITY[p.q]+p.pct+'%').join(' | ')}</div>`;
   const row1=document.createElement('div');row1.className='shop-item-row';
-  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 10 钻石</div></div>`;
+  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备/消耗品/重铸石（40%消耗品/55%装备/5%重铸石）</div><div class="shop-item-price diamond">💎 10 钻石</div></div>`;
   const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
   b1.disabled=G.diamond<10;b1.addEventListener('click',()=>gachaPull(1));
   row1.appendChild(b1);ds.appendChild(row1);
   const row10=document.createElement('div');row10.className='shop-item-row';
-  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 90 钻石</div></div>`;
+  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品/重铸石</div><div class="shop-item-price diamond">💎 90 钻石</div></div>`;
   const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
   b10.disabled=G.diamond<90;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
