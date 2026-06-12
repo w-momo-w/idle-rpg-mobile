@@ -1636,12 +1636,14 @@ function computeStats(){
   if(G.hp>G.maxHp)G.hp=G.maxHp;
 }
 function playerDie(msg){
-  // 不死之身：有revive buff时自动复活
+  // 不死之身：有revive buff时自动复活（原地复活，不刷新怪物，无等待）
   if(G.buffs.revive&&G.buffs.revive.until>now()){
     const healPct=G.buffs.revive.healPct||0.5;
     delete G.buffs.revive;
     G.hp=Math.floor(G.maxHp*healPct);G.dead=false;G.deadUntil=0;
+    G._monsterSpawnTime=0; // 不死之身不刷新怪物，直接继续战斗
     addLog(`👼 不死之身·原地复活！恢复${Math.round(healPct*100)}%生命值`,'sys');
+    showToast('👼 不死之身触发！',`原地复活，恢复${Math.round(healPct*100)}%生命值`,'sys');
     return false;
   }
   G.hp=0;G.dead=true;G.deadUntil=now()+5000;
@@ -2763,7 +2765,7 @@ function showToast(title,msg,type){
   toastEl.innerHTML=`<div style="font-size:18px;margin-bottom:4px">${title}</div><div style="font-size:13px;color:var(--muted)">${msg}</div>`;
   toastEl.classList.add('show');
   clearTimeout(toastEl._timer);
-  toastEl._timer=setTimeout(()=>{toastEl.classList.remove('show');},1500);
+  toastEl._timer=setTimeout(()=>{toastEl.classList.remove('show');},500);
 }
 function craftEquip(craftIndex){
   const recipe=MATERIAL_CRAFT[craftIndex];
