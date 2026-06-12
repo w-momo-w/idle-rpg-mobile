@@ -3794,9 +3794,10 @@ function calculateOfflineRewards(offlineSec){
   if(killCount > 100000) killCount = 100000;
   
   // 批量结算收益
-  let totalXp = 0, totalGold = 0;
+  let totalXp = 0, totalGold = 0, totalSkillXp = 0;
   const equipDrops = [];
   const matDrops = {};
+  const skillUpgrades = []; // 记录离线期间技能升级
   const levelBefore = G.level;
   let equipKept = 0; // 实际保留的装备数量
   
@@ -3812,6 +3813,25 @@ function calculateOfflineRewards(offlineSec){
   }
   computeStats();G.hp=G.maxHp;
   const levelAfter = G.level;
+  
+  // 离线技能经验（在线每次使用+0~1，离线按击杀数×50%效率计算）
+  const offlineSkillUses = Math.floor(killCount * 0.5); // 假设每只怪物用一次技能，效率50%
+  for(const sk of G.skills){
+    if(sk.gradeIdx >= 4) continue;
+    let gained = 0;
+    for(let u = 0; u < offlineSkillUses; u++){
+      sk.xp = (sk.xp || 0) + 1; // 离线每次固定+1（在线是0~1随机，取上限的一半补偿）
+      gained++;
+      const nextXp = skillXpForGrade(sk.gradeIdx + 1);
+      if(sk.xp >= nextXp && sk.gradeIdx < 4){
+        sk.xp -= nextXp;
+        sk.gradeIdx++;
+        sk.grade = SKILL_GRADES[sk.gradeIdx];
+        skillUpgrades.push({name:sk.name,icon:sk.icon,grade:sk.grade});
+      }
+    }
+    totalSkillXp += gained;
+  }
   
   totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100));
   G.gold += totalGold;
@@ -3875,11 +3895,12 @@ function calculateOfflineRewards(offlineSec){
   
   return {
     offlineSec, killCount,
-    totalXp, totalGold,
+    totalXp, totalGold, totalSkillXp,
     levelBefore, levelAfter,
     equipDrops: equipDrops.slice(0, 10),
     equipTotal: equipKept,
     matDrops,
+    skillUpgrades,
   };
 }
 
@@ -3898,6 +3919,12 @@ function showOfflineModal(rewards){
   html += `<div style="display:flex;justify-content:space-between;font-size:12px"><span>⚔️ 击杀怪物</span><b>${fmt(rewards.killCount)} 只</b></div>`;
   html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>✨ 获得经验</span><b style="color:var(--teal)">+${fmt(rewards.totalXp)}</b></div>`;
   html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>💰 获得金币</span><b style="color:var(--gold)">+${fmt(rewards.totalGold)}</b></div>`;
+  if(rewards.totalSkillXp > 0){
+    html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>📖 技能经验</span><b style="color:var(--purple)">+${fmt(rewards.totalSkillXp)}</b></div>`;
+  }
+  if(rewards.skillUpgrades && rewards.skillUpgrades.length > 0){
+    html += `<div style="font-size:11px;color:var(--green);margin-top:4px">⭐ 技能升级：${rewards.skillUpgrades.map(s=>s.icon+s.name+'→'+s.grade+'级').join(' ')}</div>`;
+  }
   if(rewards.levelAfter > rewards.levelBefore){
     html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>⬆️ 等级提升</span><b style="color:var(--green)">Lv.${rewards.levelBefore} → Lv.${rewards.levelAfter}</b></div>`;
   }
