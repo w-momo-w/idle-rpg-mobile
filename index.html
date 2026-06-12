@@ -2410,8 +2410,9 @@ function doDecompose(threshold,nonClassOnly){
     const it=G.inventory[i];
     const matchQuality=it.quality<=threshold;
     const matchNonClass=nonClassOnly&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
-    // 非本职业：只看职业不匹配；品质：只看品质阈值
-    const shouldDecompose = nonClassOnly ? matchNonClass : matchQuality;
+    // 勾选非本职业时：同时检查品质和职业
+    // 只勾选品质时：只检查品质
+    const shouldDecompose = nonClassOnly ? (matchQuality||matchNonClass) : matchQuality;
     if(shouldDecompose){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
@@ -4425,7 +4426,7 @@ function autoDecomposeExisting(){
     const it=G.inventory[i];
     const matchQuality=it.quality<=G.decomposeThreshold;
     const matchNonClass=G.decomposeNonClass&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
-    const shouldDecompose=G.decomposeNonClass?matchNonClass:matchQuality;
+    const shouldDecompose=matchQuality||matchNonClass;
     if(shouldDecompose){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
