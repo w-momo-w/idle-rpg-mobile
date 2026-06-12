@@ -2167,10 +2167,14 @@ function renderStats(){
       <span style="font-weight:bold">🧠 智力：${G.rawIN||0}</span><span style="color:var(--muted);font-size:10px"> (+${G.int}成长)</span>${G.classId==='mage'?` &rarr; <span style="color:var(--red)">攻击+${(G.rawIN||0)*3}</span>`:''}
     </div>
     <div class="pts-bar" style="margin-bottom:6px">⚡ 每级自动分配：力${growth.str} 体${growth.vit} 敏${growth.agi} 巧${growth.dex} 智${growth.int}</div>
-    <div style="border-top:1px solid var(--border);padding-top:4px;font-size:10px;color:var(--muted)">
-      <span>闪避 ${G.curDodge.toFixed(1)}%</span> · <span>格挡 ${G.curBlock}%</span> · <span>吸血 ${G.curLifesteal}%</span><br>
-      <span>寻宝 ${G.curMagicFind}%</span> · <span>经验 ${G.curExpBonus}%</span> · <span>金币 ${G.curGoldBonus}%</span><br>
-      <span>连击 ${G.curDoubleAtk}%</span> · <span>荆棘 ${G.curThorns}%</span> · <span>破甲 ${G.curArmorPierce}%</span>
+    <div style="border-top:1px solid var(--teal);margin-top:6px;padding-top:4px;font-size:10px">
+      <div style="color:var(--teal);font-weight:bold;margin-bottom:3px;font-size:11px">✨ 装备特殊属性</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px 12px">
+        <span>🩸吸血 ${G.curLifesteal}%</span><span>🌵荆棘 ${G.curThorns}%</span><span>💎寻宝 ${G.curMagicFind}%</span>
+        <span>📖经验 ${G.curExpBonus}%</span><span>💰金币 ${G.curGoldBonus}%</span><span>💚恢复 ${G.curHpRegen}/秒</span>
+        <span>👊连击 ${G.curDoubleAtk}%</span><span>🗡️破甲 ${G.curArmorPierce}%</span><span>💀汲魂 ${G.curSiphon}%</span>
+        <span>🌀闪避 ${G.curDodge.toFixed(1)}%</span><span>🛡️格挡 ${G.curBlock}%</span>
+      </div>
     </div>`;
   // 套装属性单独显示
   if(G._activeSetBonuses&&G._activeSetBonuses.length>0){
