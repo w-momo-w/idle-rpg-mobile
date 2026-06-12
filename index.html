@@ -2256,8 +2256,10 @@ function renderEquipment(){
     const elv=G.slotEnhance[s]||0;
     const enhBadge=it&&elv>0?`<span class="eq-enhance-badge">⚒️+${elv}</span>`:'';
     const enhTag=it&&elv>0?` <span style="color:var(--orange);font-size:10px;font-weight:bold">+${elv}</span>`:'';
-    const showPower=(it?it.power:0)+getEnhancePower(s);
-    div.innerHTML=`${enhBadge}<div class="eq-label">${eqIcon(s,it?.classReq||'all')} ${slotNames[s]}${classTag}</div><div class="eq-name ${it?QCLASS[it.quality]:''}">${it?it.name:'空'}${enhTag}</div>${it?`<div class="eq-sub">${it.qName} · 战力${showPower}</div>${specialsText}`:''}`;
+    const enhPower=getEnhancePower(s);
+    const showPower=(it?it.power:0)+enhPower;
+    const enhPowerText=enhPower>0?` <span style="color:var(--orange);font-size:9px">(+${enhPower}强化)</span>`:'';
+    div.innerHTML=`${enhBadge}<div class="eq-label">${eqIcon(s,it?.classReq||'all')} ${slotNames[s]}${classTag}</div><div class="eq-name ${it?QCLASS[it.quality]:''}">${it?it.name:'空'}${enhTag}</div>${it?`<div class="eq-sub">${it.qName} · 战力${it.power}${enhPowerText}</div>${specialsText}`:''}`;
     if(it){
       div.addEventListener('click',()=>showItemModal(it,s,true));
       const ub=document.createElement('button');ub.className='eq-unequip';ub.textContent='卸下';
