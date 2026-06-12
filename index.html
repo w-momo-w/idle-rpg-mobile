@@ -756,16 +756,17 @@ body{
           <div id="buff-bar"></div>
           <div class="act-btns" id="skill-btns">
             <button class="btn btn-red btn-lg" id="btn-attack">⚔️ 攻击</button>
-            <button class="btn btn-blue btn-lg" id="btn-skill">✨ 技能</button>
-            <button class="btn btn-purple" id="btn-skill2">📖 技能2</button>
           </div>
-          <div class="act-btns act-btns-sm">
+          <div class="act-btns act-btns-sm" id="consumable-btns">
             <button class="btn btn-green" id="btn-use-hp-small">🧪 小血瓶</button>
             <button class="btn btn-blue" id="btn-use-hp-large">💉 大血瓶</button>
+          </div>
+          <div class="act-btns act-btns-sm" id="scroll-btns">
             <button class="btn btn-pink" id="btn-use-atk-scroll">📜 攻击</button>
             <button class="btn btn-blue2" id="btn-use-def-scroll">🛡️ 防御</button>
             <button class="btn btn-red2" id="btn-use-hp-scroll">❤️ 生命</button>
-            <button class="btn btn-pink" id="btn-use-scroll">📜 卷轴</button>
+          </div>
+          <div class="act-btns act-btns-sm">
             <button class="btn btn-gold" id="btn-change-map">🗺️ 切换地图</button>
           </div>
           <div id="combat-log"></div>
@@ -3280,8 +3281,7 @@ function showResetConfirmModal(){
 //  EVENTS
 // ═══════════════════════════════════════════
 document.getElementById('btn-attack').addEventListener('click',()=>playerAttack(false));
-document.getElementById('btn-skill').addEventListener('click',()=>playerAttack(true));
-// skill2 由 refreshSkillBtns 动态管理
+// 技能按钮由 refreshSkillBtns 动态管理
 document.getElementById('btn-change-map').addEventListener('click',()=>{
   // 在战斗页面显示地图选择弹窗
   const box=document.getElementById('modal-box');
