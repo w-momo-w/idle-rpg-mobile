@@ -577,8 +577,9 @@ body{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.6);z-index:9999;
   align-items:flex-end;justify-content:center;
+  pointer-events:none; /* 默认不拦截点击，防止残留show类阻断交互 */
 }
-#modal-overlay.show{display:flex}
+#modal-overlay.show{display:flex;pointer-events:auto;}
 
 /* 合成成功提示 Toast */
 .craft-toast{
