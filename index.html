@@ -1389,7 +1389,7 @@ const QUEST_TEMPLATES=[
   {type:'use_consumable',gen:function(G){
     const items=[{id:'hpPotion',name:'小血瓶',icon:'🧪'},{id:'hpLarge',name:'大血瓶',icon:'💉'},{id:'atkScroll',name:'攻击卷轴',icon:'📜'},{id:'defScroll',name:'防御卷轴',icon:'🛡️'},{id:'hpScroll',name:'生命卷轴',icon:'❤️'}];
     const item=pick(items);const tgt=randi(1,3)+Math.floor(G.level/30);
-    return{type:'use_consumable',text:`使用${tgt}个${item.icon}${item.name}`,reward:genQuestReward(G,{gold:randi(60,200)*Math.floor(G.level/5+1),xp:Math.floor(randi(25,100)*Math.floor(G.level/10+1))}),target:tgt,itemId:item.id,progress:0,submitted:false}}},
+    return{type:'use_consumable',text:`使用${tgt}个${item.icon}${item.name}`,reward:genQuestReward(G,{gold:randi(60,200)*Math.floor(G.level/5+1),xp:Math.floor(randi(25,100)*Math.floor(G.level/10+1))}),target:tgt,itemId:item.id,progress:0,_startCount:(G._consumableUseHistory?.[item.id]||0),submitted:false}}},
   {type:'enhance_count',gen:function(G){
     const tgt=randi(1,3)+Math.floor(G.level/30);
     return{type:'enhance_count',text:`强化装备${tgt}次（成功或失败都算）`,reward:genQuestReward(G,{gold:randi(100,350)*Math.floor(G.level/5+1),xp:Math.floor(randi(30,120)*Math.floor(G.level/10+1))}),target:tgt,progress:0,_startCount:(G.enhanceTotal||0),submitted:false}}},
@@ -2025,8 +2025,8 @@ function checkQuests(){
     if(q.type==='kill'){q.progress=Math.min(Math.max(0,(G.kills[q.monster]||0)-(q._startCount||0)),q.target);}
     else if(q.type==='kill_any'){q.progress=Math.min(Math.max(0,(G.killAnyCount||0)-(q._startCount||0)),q.target);}
     else if(q.type==='collect_gold'){q.progress=Math.min(q._goldCollected||0,q.target);}
-    else if(q.type==='collect_material'){q.progress=Math.min(Math.max(0,(G.materials[q.materialId]||0)-(q._startMatCount||0)),q.target);}
-    else if(q.type==='use_consumable'){q.progress=Math.min(G._consumableUseHistory?.[q.itemId]||0,q.target);}
+    else if(q.type==='collect_material'){const delta=Math.max(0,(G.materials[q.materialId]||0)-(q._startMatCount||0));q.progress=Math.max(q.progress,Math.min(delta,q.target));}
+    else if(q.type==='use_consumable'){q.progress=Math.min(Math.max(0,(G._consumableUseHistory?.[q.itemId]||0)-(q._startCount||0)),q.target);}
     else if(q.type==='enhance_count'){q.progress=Math.min(Math.max(0,(G.enhanceTotal||0)-(q._startCount||0)),q.target);}
   }
 }
@@ -3736,6 +3736,10 @@ function calculateOfflineRewards(offlineSec){
   
   totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100));
   G.gold += totalGold;
+  // 更新 collect_gold 任务离线进度
+  for(const q of G.quests){
+    if(!q.submitted && q.type==='collect_gold') q._goldCollected = (q._goldCollected||0) + totalGold;
+  }
   
   // 装备掉落（期望批量产出）
   const typeBase = 0.06;
