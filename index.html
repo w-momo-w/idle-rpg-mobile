@@ -2022,7 +2022,7 @@ function checkQuests(){
   // 仅更新任务进度，不自动完成
   for(const q of G.quests){
     if(q.submitted)continue;
-    if(q.type==='kill'){q.progress=Math.min(Math.max(0,(G.kills[q.monster]||0)-(q._startCount||0)),q.target);}
+    if(q.type==='kill'){q.progress=(G.curMap===q.mapId)?Math.min(Math.max(0,(G.kills[q.monster]||0)-(q._startCount||0)),q.target):q.progress;}
     else if(q.type==='kill_any'){q.progress=Math.min(Math.max(0,(G.killAnyCount||0)-(q._startCount||0)),q.target);}
     else if(q.type==='collect_gold'){q.progress=Math.min(q._goldCollected||0,q.target);}
     else if(q.type==='collect_material'){const delta=Math.max(0,(G.materials[q.materialId]||0)-(q._startMatCount||0));q.progress=Math.max(q.progress,Math.min(delta,q.target));}
@@ -2037,12 +2037,12 @@ function submitQuest(qIndex){
   if(q.type==='collect_material'){
     if((G.materials[q.materialId]||0)>=q.target){
       G.materials[q.materialId]-=q.target;
-    }else{return;}
+    }else{addLog('⚠️ 材料不足，无法提交任务','sys');return;}
   }
   if(q.type==='collect_gold'){
     if(G.gold>=q.target){
       G.gold-=q.target;
-    }else{return;}
+    }else{addLog(`⚠️ 金币不足（需要${fmt(q.target)}，当前${fmt(G.gold)}），无法提交任务`,'sys');return;}
   }
   q.submitted=true;
   // 发放奖励
