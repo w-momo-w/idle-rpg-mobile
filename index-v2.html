@@ -2480,28 +2480,16 @@ function renderBagMaterials(){
       div.addEventListener('touchstart',function(e){e.stopPropagation();});
       const acts=document.createElement('div');acts.className='skillbook-actions';acts.style.cssText='display:flex;gap:3px;flex-shrink:0;align-items:center;pointer-events:auto;z-index:1;position:relative;';
       if(canLearn){
-        const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';lb.type='button';
         const idx=g.indices[0];
-        lb.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();learnSkillBook(idx);});
-        lb.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();learnSkillBook(idx);});
-        acts.appendChild(lb);
+        acts.innerHTML+=`<button class="btn btn-green btn-xs" type="button" data-action="learn" data-idx="${idx}">学习</button>`;
       }
       if(g.count>1&&!canLearn){
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑换×${g.count}`;eb.type='button';
-        eb.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();batchExchangeSkillBooks([...g.indices]);});
-        eb.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();batchExchangeSkillBooks([...g.indices]);});
-        acts.appendChild(eb);
+        acts.innerHTML+=`<button class="btn btn-pink btn-xs" type="button" data-action="batchExchange" data-indices="${g.indices.join(',')}">💎兑换×${g.count}</button>`;
       }else if(g.count>1&&canLearn){
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent=`💎兑×${g.count-1}`;eb.type='button';
         const restIndices=g.indices.slice(1);
-        eb.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();batchExchangeSkillBooks(restIndices);});
-        eb.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();batchExchangeSkillBooks(restIndices);});
-        acts.appendChild(eb);
+        acts.innerHTML+=`<button class="btn btn-pink btn-xs" type="button" data-action="batchExchange" data-indices="${restIndices.join(',')}">💎兑×${g.count-1}</button>`;
       }else{
-        const eb=document.createElement('button');eb.className='btn btn-pink btn-xs';eb.textContent='💎兑换';eb.type='button';
-        eb.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();exchangeSkillBook(g.indices[0]);});
-        eb.addEventListener('touchend',function(e){e.stopPropagation();e.preventDefault();exchangeSkillBook(g.indices[0]);});
-        acts.appendChild(eb);
+        acts.innerHTML+=`<button class="btn btn-pink btn-xs" type="button" data-action="exchange" data-idx="${g.indices[0]}">💎兑换</button>`;
       }
       div.appendChild(acts);el.appendChild(div);
     }
@@ -4754,6 +4742,47 @@ if(bagSubtabs.length)bagSubtabs.forEach(b=>{
     if(b.dataset.bagtab==='craft')renderBagCraft();
   });
 });
+// ═══ 技能书按钮事件委托（解决addEventListener在innerHTML重建后失效的问题） ═══
+(function(){
+  const materialList=document.getElementById('material-list');
+  if(!materialList)return;
+  materialList.addEventListener('click',function(e){
+    const btn=e.target.closest('button');
+    if(!btn)return;
+    const action=btn.dataset.action;
+    if(!action)return;
+    e.stopPropagation();e.preventDefault();
+    if(action==='learn'){
+      const idx=parseInt(btn.dataset.idx);
+      if(!isNaN(idx))learnSkillBook(idx);
+    }else if(action==='exchange'){
+      const idx=parseInt(btn.dataset.idx);
+      if(!isNaN(idx))exchangeSkillBook(idx);
+    }else if(action==='batchExchange'){
+      const indices=btn.dataset.indices.split(',').map(Number);
+      if(indices.length>0)batchExchangeSkillBooks(indices);
+    }
+  });
+  // touchend for mobile
+  materialList.addEventListener('touchend',function(e){
+    const btn=e.target.closest('button');
+    if(!btn)return;
+    const action=btn.dataset.action;
+    if(!action)return;
+    e.stopPropagation();e.preventDefault();
+    if(action==='learn'){
+      const idx=parseInt(btn.dataset.idx);
+      if(!isNaN(idx))learnSkillBook(idx);
+    }else if(action==='exchange'){
+      const idx=parseInt(btn.dataset.idx);
+      if(!isNaN(idx))exchangeSkillBook(idx);
+    }else if(action==='batchExchange'){
+      const indices=btn.dataset.indices.split(',').map(Number);
+      if(indices.length>0)batchExchangeSkillBooks(indices);
+    }
+  });
+})();
+
 // 背包折叠/展开
 safeOn('btn-bag-toggle','click',function(){
   G.bagCollapsed=!G.bagCollapsed;
