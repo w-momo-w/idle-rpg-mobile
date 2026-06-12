@@ -2919,6 +2919,31 @@ function renderShop(){
     row.appendChild(btn);gs.appendChild(row);
   }
   el.appendChild(gs);
+  // 钻石抽取区
+  const ds=document.createElement('div');ds.className='shop-section';
+  ds.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">💎 钻石抽取（余额：${fmt(G.diamond)}）</h4>`;
+  const probs=gachaProb();
+  ds.innerHTML+=`<div class="gacha-rate">概率：${probs.map(p=>QUALITY[p.q]+p.pct+'%').join(' | ')}</div>`;
+  const row1=document.createElement('div');row1.className='shop-item-row';
+  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 5 钻石</div></div>`;
+  const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
+  b1.disabled=G.diamond<5;b1.addEventListener('click',()=>gachaPull(1));
+  row1.appendChild(b1);ds.appendChild(row1);
+  const row10=document.createElement('div');row10.className='shop-item-row';
+  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 45 钻石</div></div>`;
+  const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
+  b10.disabled=G.diamond<45;b10.addEventListener('click',()=>gachaPull(10));
+  row10.appendChild(b10);ds.appendChild(row10);
+  el.appendChild(ds);
+  const cs=document.createElement('div');cs.className='shop-section';
+  cs.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">🎒 消耗品</h4>`;
+  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0}];
+  for(const ci of items){
+    const cr=document.createElement('div');cr.className='shop-item-row';
+    cr.innerHTML=`<div class="shop-item-icon">${ci.icon}</div><div class="shop-item-info"><div class="shop-item-name">${ci.name}</div><div class="shop-item-desc">持有：<b>${ci.count}</b></div></div>`;
+    cs.appendChild(cr);
+  }
+  el.appendChild(cs);
 }
 // ═══ 钻石充值 ═══
 const DIAMOND_SHOP=[
@@ -2951,30 +2976,6 @@ function showDiamondShop(){
       renderAll();
     });
   }
-  const ds=document.createElement('div');ds.className='shop-section';
-  ds.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">💎 钻石抽取（余额：${fmt(G.diamond)}）</h4>`;
-  const probs=gachaProb();
-  ds.innerHTML+=`<div class="gacha-rate">概率：${probs.map(p=>QUALITY[p.q]+p.pct+'%').join(' | ')}</div>`;
-  const row1=document.createElement('div');row1.className='shop-item-row';
-  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 5 钻石</div></div>`;
-  const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
-  b1.disabled=G.diamond<5;b1.addEventListener('click',()=>gachaPull(1));
-  row1.appendChild(b1);ds.appendChild(row1);
-  const row10=document.createElement('div');row10.className='shop-item-row';
-  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 45 钻石</div></div>`;
-  const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
-  b10.disabled=G.diamond<45;b10.addEventListener('click',()=>gachaPull(10));
-  row10.appendChild(b10);ds.appendChild(row10);
-  el.appendChild(ds);
-  const cs=document.createElement('div');cs.className='shop-section';
-  cs.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">🎒 消耗品</h4>`;
-  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0}];
-  for(const ci of items){
-    const row=document.createElement('div');row.className='shop-item-row';
-    row.innerHTML=`<div class="shop-item-icon">${ci.icon}</div><div class="shop-item-info"><div class="shop-item-name">${ci.name}</div><div class="shop-item-desc">持有：${ci.count}个</div></div>`;
-    cs.appendChild(row);
-  }
-  el.appendChild(cs);
 }
 function renderBuffBar(){
   const el=document.getElementById('buff-bar');if(!el)return;
