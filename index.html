@@ -1023,6 +1023,7 @@ const EQ_NAMES={
   pendant:{warrior:['战士护符','龙晶','战斗宝珠','勇气符','战神符'],archer:['猎手护符','鹰眼符','疾风宝珠','精准符','暗影符'],mage:['魔法护符','元素符','圣光宝珠','奥术符','星辰符'],all:['木符','玉符','水晶','龙晶']},
 };
 const Q_PREFIX=['破损的','普通的','精良的','优质的','卓越的','史诗的','传说的','神话的','超神的'];
+const REFINE_COST=[500,1000,2000,3500,5500,8000,12000,18000,25000]; // 洗炼费用按品质递增
 
 const SETS=[
   {id:'warrior_set',name:'战神套装',bonus:{3:{atk:8,hp:40},5:{atk:18,def:8},7:{atk:35,def:18,hp:120}}},
@@ -1368,12 +1369,12 @@ function genQuestReward(G,base){
 }
 
 const GOLD_SHOP=[
-  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:80,buy:function(){if(G.gold<80)return addLog('⚠️ 金币不足','sys');confirmAction('购买小血瓶','🧪 确定花费 💰80 金币购买小血瓶吗？',()=>{G.gold-=80;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');renderShop();});}},
-  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:200,buy:function(){if(G.gold<200)return addLog('⚠️ 金币不足','sys');confirmAction('购买大血瓶','💉 确定花费 💰200 金币购买大血瓶吗？',()=>{G.gold-=200;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');renderShop();});}},
-  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:350,buy:function(){if(G.gold<350)return addLog('⚠️ 金币不足','sys');confirmAction('购买攻击卷轴','📜 确定花费 💰350 金币购买攻击卷轴吗？',()=>{G.gold-=350;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');renderShop();});}},
-  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:300,buy:function(){if(G.gold<300)return addLog('⚠️ 金币不足','sys');confirmAction('购买防御卷轴','🛡️ 确定花费 💰300 金币购买防御卷轴吗？',()=>{G.gold-=300;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');renderShop();});}},
-  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:320,buy:function(){if(G.gold<320)return addLog('⚠️ 金币不足','sys');confirmAction('购买生命卷轴','❤️ 确定花费 💰320 金币购买生命卷轴吗？',()=>{G.gold-=320;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');renderShop();});}},
-  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:500,buy:function(){const cost=500+G.bagExpansions*300;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');confirmAction('背包扩容','🎒 确定花费 💰'+cost+' 金币扩容背包（上限+10）吗？',()=>{G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');renderShop();});}},
+  {id:'hpSmall',icon:'🧪',name:'小血瓶',desc:'每秒恢复5%HP，持续5秒',cost:250,buy:function(){if(G.gold<250)return addLog('⚠️ 金币不足','sys');confirmAction('购买小血瓶','🧪 确定花费 💰250 金币购买小血瓶吗？',()=>{G.gold-=250;G.consumables.hpPotion=(G.consumables.hpPotion||0)+1;addLog('🧪 购买小血瓶×1','sys');renderShop();});}},
+  {id:'hpLarge',icon:'💉',name:'大血瓶',desc:'瞬间恢复40%生命值',cost:600,buy:function(){if(G.gold<600)return addLog('⚠️ 金币不足','sys');confirmAction('购买大血瓶','💉 确定花费 💰600 金币购买大血瓶吗？',()=>{G.gold-=600;G.consumables.hpLarge=(G.consumables.hpLarge||0)+1;addLog('💉 购买大血瓶×1','sys');renderShop();});}},
+  {id:'atkScroll',icon:'📜',name:'攻击卷轴',desc:'3分钟内攻击力+25%',cost:1000,buy:function(){if(G.gold<1000)return addLog('⚠️ 金币不足','sys');confirmAction('购买攻击卷轴','📜 确定花费 💰1000 金币购买攻击卷轴吗？',()=>{G.gold-=1000;G.consumables.atkScroll=(G.consumables.atkScroll||0)+1;addLog('📜 购买攻击卷轴×1','sys');renderShop();});}},
+  {id:'defScroll',icon:'🛡️',name:'防御卷轴',desc:'3分钟内防御+30%',cost:900,buy:function(){if(G.gold<900)return addLog('⚠️ 金币不足','sys');confirmAction('购买防御卷轴','🛡️ 确定花费 💰900 金币购买防御卷轴吗？',()=>{G.gold-=900;G.consumables.defScroll=(G.consumables.defScroll||0)+1;addLog('🛡️ 购买防御卷轴×1','sys');renderShop();});}},
+  {id:'hpScroll',icon:'❤️',name:'生命卷轴',desc:'3分钟内最大生命+30%',cost:950,buy:function(){if(G.gold<950)return addLog('⚠️ 金币不足','sys');confirmAction('购买生命卷轴','❤️ 确定花费 💰950 金币购买生命卷轴吗？',()=>{G.gold-=950;G.consumables.hpScroll=(G.consumables.hpScroll||0)+1;addLog('❤️ 购买生命卷轴×1','sys');renderShop();});}},
+  {id:'bagExpand',icon:'🎒',name:'背包扩容',desc:'背包上限+10（最多300格，价格递增）',cost:1500,buy:function(){const cost=1500+G.bagExpansions*900;if(G.gold<cost)return addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');if(G.maxInv>=300)return addLog('⚠️ 背包已达上限','sys');confirmAction('背包扩容','🎒 确定花费 💰'+cost+' 金币扩容背包（上限+10）吗？',()=>{G.gold-=cost;G.maxInv+=10;G.bagExpansions++;addLog('🎒 背包扩容至'+G.maxInv+'（已购买'+G.bagExpansions+'次）','sys');renderShop();});}},
 ];
 
 function gachaProb(){
@@ -2671,6 +2672,13 @@ function showItemModal(it,source,isEquipped){
     enhBtn.disabled=G.gold<enhGold||!hasOre;
     enhBtn.addEventListener('click',()=>{doEnhance(source);});
     acts.appendChild(enhBtn);
+    // 洗炼按钮
+    const refBtn=document.createElement('button');refBtn.className='btn btn-purple btn-sm';
+    const refCost=REFINE_COST[it.quality]||500;
+    refBtn.innerHTML=`🔄 洗炼 (💰${fmt(refCost)})`;
+    refBtn.disabled=G.gold<refCost;
+    refBtn.addEventListener('click',()=>{doRefine(source);});
+    acts.appendChild(refBtn);
     // 显示强化等级和下一级信息
     if(ENHANCE_BONUS[source]){
       const eb=ENHANCE_BONUS[source];
@@ -2729,6 +2737,88 @@ function doEnhance(slot){
   }else{
     addLog(`💔 强化失败！${it.name} 仍为 +${elv}`,'sys');
   }
+  computeStats();renderAll();
+  closeModal();showItemModal(it,slot,true);
+}
+function doRefine(slot){
+  const it=G.equipped[slot];if(!it)return;
+  const q=it.quality;
+  const cost=REFINE_COST[q]||500;
+  if(G.gold<cost){addLog('⚠️ 金币不足(需要'+fmt(cost)+')','sys');return;}
+  // 收集可洗炼的基础属性
+  const pool=[];
+  for(const k of ['atk','def','hp','critRate','critDmg','atkSpd']){
+    if(it.stats[k]!=null)pool.push(k);
+  }
+  // 也可能洗炼特殊属性
+  for(const sa of SPECIAL_ATTRS){
+    if(it.stats[sa.id]!=null)pool.push(sa.id);
+  }
+  if(pool.length===0){addLog('⚠️ 该装备没有可洗炼的属性','sys');return;}
+  const key=pick(pool);
+  const oldVal=it.stats[key];
+  const m=QMULT[q];
+  // 生成新值（与genEquip相同规则）
+  let newVal;
+  if(key==='atk'){
+    if(slot==='mainHand')newVal=randi(2,6)*m;
+    else if(slot==='bracer')newVal=randi(1,4)*m;
+    else if(slot==='necklace')newVal=randi(1,3)*m;
+    else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
+    else if(slot==='pendant')newVal=randi(1,5)*m;
+    else newVal=0;
+    newVal=Math.floor(newVal);
+  }else if(key==='def'){
+    if(slot==='offHand')newVal=randi(1,4)*m;
+    else if(slot==='armor')newVal=randi(2,5)*m;
+    else if(slot==='helmet')newVal=randi(1,3)*m;
+    else if(slot==='pants')newVal=randi(2,4)*m;
+    else if(slot==='pendant')newVal=randi(1,3)*m;
+    else newVal=0;
+    newVal=Math.floor(newVal);
+  }else if(key==='hp'){
+    if(slot==='armor')newVal=randi(5,20)*m;
+    else if(slot==='helmet')newVal=randi(5,15)*m;
+    else if(slot==='pants')newVal=randi(5,15)*m;
+    else if(slot==='pendant')newVal=randi(5,20)*m;
+    else newVal=0;
+    newVal=Math.floor(newVal);
+  }else if(key==='critRate'){
+    if(slot==='mainHand')newVal=randf(0,1)*m;
+    else if(slot==='bracer')newVal=randf(0,2)*m;
+    else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
+    else newVal=0;
+    newVal=Math.round(newVal*10)/10;
+  }else if(key==='critDmg'){
+    if(slot==='necklace')newVal=randi(5,20)*m;
+    else newVal=0;
+    newVal=Math.floor(newVal);
+  }else if(key==='atkSpd'){
+    if(slot==='boots')newVal=randi(2,8)*m;
+    else newVal=0;
+    newVal=Math.floor(newVal);
+  }else{
+    // 特殊属性：在同一范围内重新随机
+    const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+    if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+    else newVal=0;
+  }
+  G.gold-=cost;
+  if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
+    addLog(`🔄 洗炼完成，${key} 属性不变（${oldVal}），已消耗💰${cost}`,'sys');
+  }else{
+    const isSpecial=SPECIAL_ATTRS.find(x=>x.id===key);
+    const dispOld=isSpecial?isSpecial.fmt(oldVal):oldVal;
+    const dispNew=isSpecial?isSpecial.fmt(newVal):newVal;
+    addLog(`🔄 洗炼：${key} ${dispOld} → ${dispNew}（消耗💰${cost}）`,'sys');
+  }
+  it.stats[key]=newVal;
+  // 同步更新 specials 数组显示文本
+  if(it.specials){
+    const spEntry=it.specials.find(sp=>sp.id===key);
+    if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
+  }
+  it.power=itemPower(it);
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true);
 }
@@ -3089,7 +3179,7 @@ function renderShop(){
   for(const item of GOLD_SHOP){
     const row=document.createElement('div');row.className='shop-item-row';
     const isBag=item.id==='bagExpand';
-    const bagCost=500+G.bagExpansions*300;
+    const bagCost=1500+G.bagExpansions*900;
     const priceText=isBag?`💰 ${fmt(bagCost)} 金币`:`💰 ${fmt(item.cost)} 金币`;
     row.innerHTML=`<div class="shop-item-icon">${item.icon}</div><div class="shop-item-info"><div class="shop-item-name">${item.name}${isBag?` <span style="font-size:9px;color:var(--muted)">(第${G.bagExpansions+1}次)</span>`:''}</div><div class="shop-item-desc">${item.desc}</div><div class="shop-item-price" style="color:var(--gold)">${priceText}</div></div>`;
     const btn=document.createElement('button');btn.className='btn btn-gold btn-xs';
