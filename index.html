@@ -1989,7 +1989,7 @@ function onKill(){
       for(const cls of allClasses){
         const clsSkills=SKILLS[cls];
         for(const s of clsSkills){
-          if(s.skillType==='passive'&&!s.advReq){ // 排除转职专属技能
+          if(!s.advReq){ // 排除转职专属技能
             allBooks.push({...s,classReq:cls});
           }
         }
