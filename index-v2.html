@@ -3865,7 +3865,7 @@ function applySkillBuff(sk,gradeMult){
     case 'counter_strike': G.buffs.thorns={val:Math.floor(15*gradeMult),until:n+dur,...meta}; break;
     case 'second_wind': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.02*gradeMult),until:n+dur,...meta}; break;
     case 'titan_strength': G.buffs.atk={val:Math.floor(G.curAtk*0.20*gradeMult),until:n+dur,...meta}; break;
-    case 'immortal': G.buffs.revive={val:1,until:n+300000,healPct:Math.min(0.8,0.5*gradeMult),...meta}; break;
+    case 'immortal': {const healMap={D:0.5,C:0.57,B:0.67,A:0.73,S:0.8};const hGrade=sk.grade||'D';G.buffs.revive={val:1,until:n+300000,healPct:healMap[hGrade]||0.5,...meta};} break;
     // 被动技能 — 雷电术/陨石术/毒箭/鹰眼
     case 'lightning': G.buffs.armorPierce={val:Math.floor(12*gradeMult),until:n+dur,...meta}; break;
     case 'meteor': G.buffs.doubleAtk={val:Math.floor(10*gradeMult),until:n+dur,...meta}; break;
