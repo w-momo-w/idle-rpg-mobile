@@ -521,6 +521,7 @@ body{
 .map-monsters span{background:var(--card2);padding:1px 5px;border-radius:3px}
 .map-boss{color:var(--boss);font-weight:bold}
 .map-elite{color:var(--elite)}
+.map-normal{color:var(--muted)}
 
 /* 商店 */
 .shop-section{margin-bottom:12px}
@@ -2314,11 +2315,18 @@ function renderMaps(){
     const eliteKills = m.elite ? (G.kills[m.elite.name]||0) : 0;
     const bossKills = m.boss ? (G.kills[m.boss.name]||0) : 0;
     const totalKills = normalKills + eliteKills + bossKills;
-    // 怪物列表分类显示
+    // 怪物列表分类显示，带击杀数
     let monList = '';
-    monList += m.monsters.map(x=>`<span class="map-normal">${x.icon}${x.name}×${G.kills[x.name]||0}</span>`).join('');
-    if(m.elite) monList += `<span class="map-elite">${m.elite.icon}精英·${m.elite.name}×${eliteKills}</span>`;
-    if(m.boss) monList += `<span class="map-boss">${m.boss.icon}${m.boss.name}×${bossKills}</span>`;
+    monList += `<div style="font-size:9px;color:var(--muted);margin-bottom:2px">普通：</div>`;
+    monList += m.monsters.map(x=>`<span class="map-normal">${x.icon}${x.name} ×${G.kills[x.name]||0}</span>`).join('');
+    if(m.elite){
+      monList += `<div style="font-size:9px;color:var(--elite);margin-bottom:2px;margin-top:2px">精英：</div>`;
+      monList += `<span class="map-elite">${m.elite.icon}${m.elite.name} ×${eliteKills}</span>`;
+    }
+    if(m.boss){
+      monList += `<div style="font-size:9px;color:var(--boss);margin-bottom:2px;margin-top:2px">Boss：</div>`;
+      monList += `<span class="map-boss">${m.boss.icon}${m.boss.name} ×${bossKills}</span>`;
+    }
     div.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-info"><div class="map-name">${m.name}${locked?' 🔒':''} ⚡总击杀${totalKills}</div><div class="map-monsters">${monList}</div></div>`;
     if(!locked)div.addEventListener('click',()=>changeMap(m.id));
     el.appendChild(div);
