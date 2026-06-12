@@ -1641,7 +1641,7 @@ function playerDie(msg){
     const healPct=G.buffs.revive.healPct||0.5;
     delete G.buffs.revive;
     G.hp=Math.floor(G.maxHp*healPct);G.dead=false;G.deadUntil=0;
-    addLog(`👼 不死之身触发！你复活了（${Math.round(healPct*100)}%HP）！`,'sys');
+    addLog(`👼 不死之身·原地复活！恢复${Math.round(healPct*100)}%生命值`,'sys');
     return false;
   }
   G.hp=0;G.dead=true;G.deadUntil=now()+5000;
@@ -3981,7 +3981,7 @@ function gameTick(){
       G.dead=false;G.deadUntil=0;G.hp=Math.floor(G.maxHp*0.5);
       G.enemy=genMonster();G.killStreak=0;
       G._monsterSpawnTime=now(); // 复活后延迟1秒再战斗
-      addLog('🔄 你复活了！怪物已刷新','sys');
+      addLog('💀 等待结束，你复活了。怪物已刷新','sys');
     }
     // 更新死亡倒计时显示
     const remainSec=Math.ceil((G.deadUntil-now())/1000);
