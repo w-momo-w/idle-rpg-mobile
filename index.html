@@ -3225,22 +3225,56 @@ function gachaPull(count){
       equips.push(genEquip(slot,q,q,G.level));
     }
   }
-  if(count===10){equips.push(genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level));}
+  const pityEquip=count===10?genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level):null;
+  if(pityEquip)equips.push(pityEquip);
   let lostCount=0;
   for(const it of equips){
     if(G.inventory.length<G.maxInv){G.inventory.push(it);autoEquipCheck(it);}
     else{lostCount++;}
   }
-  if(lostCount>0)addLog(`⚠️ 背包已满，${lostCount}件装备丢失，请清理背包`,'sys');
-  const parts=[];
-  if(equips.length>0)parts.push(equips.length+'件装备');
   const consMap={};
   for(const c of consObtained)consMap[c]=(consMap[c]||0)+1;
-  for(const[c,num]of Object.entries(consMap)){
-    parts.push(CONSUMABLE_ICONS[c]+CONSUMABLE_NAMES[c]+'×'+num);
+  // 结果弹窗
+  const ov2=document.getElementById('modal-overlay'),box2=document.getElementById('modal-box');
+  let html='<h3>💎 抽取结果</h3>';
+  html+=`<div style="font-size:11px;margin-bottom:10px"><span style="color:var(--muted)">${count===10?'十连':'单次'}抽取 — 获得 </span>`;
+  if(equips.length>0)html+=`<b style="color:var(--purple)">${equips.length}件装备</b>`;
+  if(equips.length>0&&consObtained.length>0)html+=`<span style="color:var(--muted)">、</span>`;
+  if(consObtained.length>0)html+=`<b style="color:var(--pink)">${consObtained.length}个消耗品</b>`;
+  html+='</div>';
+  html+='<div style="max-height:280px;overflow-y:auto;margin-bottom:8px;background:rgba(0,0,0,.15);border-radius:6px;padding:4px 6px">';
+  // 装备列表
+  for(let i=0;i<equips.length;i++){
+    const it=equips[i];
+    const icon=eqIcon(it.slot,it.classReq||'all')||'❓';
+    const isPity=pityEquip&&i===equips.length-1&&equips.length>1;
+    html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 0;${i<equips.length-1||consObtained.length>0?'border-bottom:1px solid rgba(255,255,255,0.05)':''}">
+      <span style="font-size:16px;width:22px;text-align:center">${icon}</span>
+      <span style="color:${QCOLOR[it.quality]};font-weight:bold;font-size:11px;min-width:36px">${it.qName}</span>
+      <span style="flex:1;font-size:12px">${it.name}</span>
+      ${it.setName?`<span style="font-size:9px;color:var(--purple);background:rgba(167,139,250,.15);padding:1px 4px;border-radius:3px">${it.setName}</span>`:''}
+      ${isPity?`<span style="font-size:9px;color:#f0a500;background:rgba(240,165,0,.2);padding:1px 4px;border-radius:3px">保底</span>`:''}
+    </div>`;
   }
-  addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');
-  renderAll();renderShop();
+  // 消耗品列表
+  for(const[c,num]of Object.entries(consMap)){
+    html+=`<div style="display:flex;align-items:center;gap:6px;padding:5px 0">
+      <span style="font-size:16px;width:22px;text-align:center">${CONSUMABLE_ICONS[c]}</span>
+      <span style="flex:1;font-size:12px">${CONSUMABLE_NAMES[c]}</span>
+      <span style="font-weight:bold;color:var(--pink)">×${num}</span>
+    </div>`;
+  }
+  html+='</div>';
+  if(lostCount>0)html+=`<p style="font-size:11px;color:#f97316;margin:0 0 6px">⚠️ 背包已满，${lostCount}件装备丢失</p>`;
+  html+='<button class="btn btn-pink" style="width:100%" id="btn-gacha-result-ok">✅ 确认</button>';
+  ov2.classList.add('show');
+  box2.innerHTML=html;
+  document.getElementById('btn-gacha-result-ok').addEventListener('click',()=>{
+    closeModal();
+    renderAll();renderShop();
+    if(equips.length>0){const parts=[];parts.push(equips.length+'件装备');for(const[c,num]of Object.entries(consMap))parts.push(CONSUMABLE_ICONS[c]+CONSUMABLE_NAMES[c]+'×'+num);addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');}
+    else addLog('💎 '+count+'连抽！获得：'+consObtained.length+'个消耗品','drop');
+  });
   });
 }
 function useHpPotion(isAuto){
