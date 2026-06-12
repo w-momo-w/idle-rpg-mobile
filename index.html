@@ -1377,8 +1377,8 @@ const QUEST_TEMPLATES=[
 
 function genQuestReward(G,base){
   const rew={...base};
-  // ~55%概率随机给1~4颗钻石（独立于其他奖励）
-  if(Math.random()<0.55){rew.diamond=randi(1,4);}
+  // 5%概率随机给1~3颗钻石（独立于其他奖励）
+  if(Math.random()<0.05){rew.diamond=randi(1,3);}
   // 1%概率给1~2个重铸石
   if(Math.random()<0.01){rew.material='recastStone';rew.materialCount=randi(1,2);}
   else{
