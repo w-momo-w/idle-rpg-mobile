@@ -1376,17 +1376,17 @@ const MAPS=[
 
 // Enemy specials (elite/boss only)
 const ENEMY_SPECIALS=[
-  {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力+40%',apply(e){e.atk=Math.floor(e.atk*1.4);}},
-  {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+50%',apply(e){e.def=Math.floor(e.def*1.5);}},
-  {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复4%HP',isRegen:true,regenPct:0.04},
-  {id:'evasive',icon:'🌀',name:'闪避',desc:'20%闪避攻击',dodge:20},
-  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹25%伤害',thorns:25},
-  {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血30%',lifesteal:30},
-  {id:'tough',icon:'💪',name:'坚韧',desc:'生命+50%',apply(e){e.hp=Math.floor(e.hp*1.5);e.maxHp=e.hp;}},
-  // 减益效果 — 精英30%概率，Boss 60%概率附带
-  {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害50%',dmgReduce:0.5},
-  {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率40%',critReduce:40},
-  {id:'drain',icon:'🕳️',name:'汲取',desc:'降低玩家攻速35%',atkSpdReduce:35},
+  {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力+50%',apply(e){e.atk=Math.floor(e.atk*1.5);}},
+  {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+60%',apply(e){e.def=Math.floor(e.def*1.6);}},
+  {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复5%HP',isRegen:true,regenPct:0.05},
+  {id:'evasive',icon:'🌀',name:'闪避',desc:'25%闪避攻击',dodge:25},
+  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹30%伤害',thorns:30},
+  {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血35%',lifesteal:35},
+  {id:'tough',icon:'💪',name:'坚韧',desc:'生命+60%',apply(e){e.hp=Math.floor(e.hp*1.6);e.maxHp=e.hp;}},
+  // 减益效果
+  {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害55%',dmgReduce:0.55},
+  {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率45%',critReduce:45},
+  {id:'drain',icon:'🕳️',name:'汲取',desc:'降低玩家攻速40%',atkSpdReduce:40},
 ];
 // Boss skills
 const ENEMY_SKILLS=[
