@@ -4417,6 +4417,26 @@ if(questPanel){
   }
 }
 // ═══ 分解系统事件 ═══
+// 对背包中已有装备执行自动分解扫描
+function autoDecomposeExisting(){
+  if(!G.autoDecompose)return;
+  let decomposed=0,totalGold=0;
+  for(let i=G.inventory.length-1;i>=0;i--){
+    const it=G.inventory[i];
+    const matchQuality=it.quality<=G.decomposeThreshold;
+    const matchNonClass=G.decomposeNonClass&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
+    const shouldDecompose=G.decomposeNonClass?matchNonClass:matchQuality;
+    if(shouldDecompose){
+      totalGold+=decomposeItem(it);
+      G.inventory.splice(i,1);
+      decomposed++;
+    }
+  }
+  if(decomposed>0){
+    G.gold+=totalGold;
+    addLog(`⚡ 自动分解 ${decomposed} 件装备，获得 💰${fmt(totalGold)} 金币`,'sys');
+  }
+}
 safeOn('btn-decompose','click',toggleDecomposePanel);
 safeOn('btn-decompose-confirm','click',()=>{
   const thEl=document.getElementById('decompose-quality');
@@ -4433,17 +4453,28 @@ safeOn('auto-decompose','change',function(){
   G.autoDecompose=this.checked;
   const thEl=document.getElementById('decompose-quality');
   G.decomposeThreshold=thEl?parseInt(thEl.value):3;
-  if(this.checked)addLog(`⚡ 自动分解已开启（品质≤${QUALITY[G.decomposeThreshold]}）`,'sys');
-  else addLog('⚡ 自动分解已关闭','sys');
+  if(this.checked){
+    addLog(`⚡ 自动分解已开启（品质≤${QUALITY[G.decomposeThreshold]}）`,'sys');
+    autoDecomposeExisting();
+  }else{
+    addLog('⚡ 自动分解已关闭','sys');
+  }
 });
 safeOn('decompose-nonclass','change',function(){
   G.decomposeNonClass=this.checked;
-  if(this.checked)addLog('⚡ 非本职业装备自动分解已开启','sys');
-  else addLog('⚡ 非本职业装备自动分解已关闭','sys');
+  if(this.checked){
+    addLog('⚡ 非本职业装备自动分解已开启','sys');
+    autoDecomposeExisting();
+  }else{
+    addLog('⚡ 非本职业装备自动分解已关闭','sys');
+  }
 });
 safeOn('decompose-quality','change',function(){
   G.decomposeThreshold=parseInt(this.value);
-  if(G.autoDecompose)addLog(`⚡ 自动分解品质阈值已更新：≤${QUALITY[G.decomposeThreshold]}`,'sys');
+  if(G.autoDecompose){
+    addLog(`⚡ 自动分解品质阈值已更新：≤${QUALITY[G.decomposeThreshold]}`,'sys');
+    autoDecomposeExisting();
+  }
 });
 safeOn('btn-reset','click',resetGame);
 safeOn('btn-manual-save','click',manualSave);
