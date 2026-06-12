@@ -2863,8 +2863,13 @@ function init(){
   
   // 先尝试同步从 localStorage 加载（不阻塞渲染）
   const loaded = loadGameSync();
+  let offlineSec = 0;
   if(loaded){
     G = loaded;
+    // 计算离线时长
+    if(G._lastSaveTime > 0){
+      offlineSec = Math.floor((Date.now() - G._lastSaveTime) / 1000);
+    }
     addLog('💾 存档已加载，欢迎回来！','sys');
   }else{
     const cb=classBaseStats();G.str=0;G.vit=0;G.agi=0;G.dex=0;G.int=0;
@@ -2891,6 +2896,171 @@ function init(){
   setInterval(()=>{autoSaveToFile();},15000);
   // 首次保存
   autoSaveToFile();
+  // 离线收益结算（≥10秒离线才触发）
+  if(offlineSec >= 10){
+    const rewards = calculateOfflineRewards(offlineSec);
+    if(rewards) showOfflineModal(rewards);
+  }
+}
+// ═══ 离线收益计算 ═══
+function calculateOfflineRewards(offlineSec){
+  const MAX_OFFLINE = 8 * 3600; // 8小时上限
+  offlineSec = Math.min(offlineSec, MAX_OFFLINE);
+  
+  const m = MAPS.find(x=>x.id===G.curMap)||MAPS[0];
+  if(!m)return null;
+  
+  // 获取当前地图所有怪物
+  const allMon = [...m.monsters];
+  if(m.elite)allMon.push(m.elite);
+  if(m.boss)allMon.push(m.boss);
+  
+  // 计算平均怪物属性
+  let avgHp=0,avgDef=0,avgXp=0,avgGold=0,totalWeight=0;
+  const weights = allMon.map(mo=>{
+    const w = mo===m.boss ? 5 : mo===m.elite ? 15 : 80;
+    totalWeight += w;
+    return {mo,w};
+  });
+  for(const {mo,w} of weights){
+    const typeMult = mo===m.boss ? 5 : mo===m.elite ? 2.5 : 1;
+    avgHp += mo.hp * typeMult * w / totalWeight;
+    avgDef += mo.def * typeMult * w / totalWeight;
+    avgXp += mo.xp * w / totalWeight;
+    avgGold += mo.gold * w / totalWeight;
+  }
+  avgHp = Math.floor(avgHp); avgDef = Math.floor(avgDef); avgXp = Math.floor(avgXp); avgGold = Math.floor(avgGold);
+  
+  // 计算平均伤害和击杀时间
+  const avgDmg = Math.max(1, G.curAtk - Math.floor(avgDef * 0.3));
+  const critBonus = 1 + (G.curCritRate / 100) * ((G.curCritDmg - 100) / 100);
+  const effDmg = avgDmg * critBonus;
+  const atkInterval = Math.max(800, G.curAtkSpd * 10);
+  const hitsToKill = Math.ceil(avgHp / Math.max(1, effDmg));
+  const avgKillTimeMs = hitsToKill * atkInterval;
+  
+  // 离线击杀数（效率50%）
+  const offlineMs = offlineSec * 1000;
+  let killCount = Math.floor(offlineMs / avgKillTimeMs * 0.5);
+  if(killCount < 1) killCount = 1;
+  if(killCount > 100000) killCount = 100000;
+  
+  // 批量结算收益
+  let totalXp = 0, totalGold = 0;
+  const equipDrops = [];
+  const matDrops = {};
+  const levelBefore = G.level;
+  
+  totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100));
+  G.xp += totalXp;
+  while(G.xp >= xpForLevel(G.level) && G.level < 300){
+    G.xp -= xpForLevel(G.level);
+    levelUp();
+  }
+  const levelAfter = G.level;
+  
+  totalGold = Math.floor(killCount * avgGold * (1 + G.curGoldBonus / 100));
+  G.gold += totalGold;
+  
+  // 装备掉落（期望批量产出）
+  const typeBase = 0.06;
+  const lvBonus = Math.min(G.level/200, 0.10);
+  const mfBonus = G.curMagicFind / 200;
+  const avgDropRate = Math.min(typeBase + lvBonus + mfBonus, 0.65);
+  const equipCount = Math.floor(killCount * avgDropRate);
+  const monLv = Math.max(1, G.level - 3);
+  for(let i=0;i<Math.min(equipCount,50);i++){
+    const slot = pick(Object.keys(EQ_NAMES));
+    const it = genEquip(slot, 0, Math.min(8, Math.floor(G.level/20)+2), monLv);
+    if(G.inventory.length < G.maxInv){
+      G.inventory.push(it);
+      autoEquipCheck(it);
+    }else{
+      const goldGot = decomposeItem(it);
+      G.gold += goldGot;
+      totalGold += goldGot;
+    }
+    if(equipDrops.length < 20) equipDrops.push(it);
+  }
+  
+  // 材料掉落
+  for(const[mid,mdef] of Object.entries(MATERIALS)){
+    if(mdef.dropSources.includes('normal')||mdef.dropSources.includes('elite')||mdef.dropSources.includes('boss')){
+      const matCount = Math.floor(killCount * mdef.dropRate * 0.5);
+      if(matCount > 0){
+        G.materials[mid] = (G.materials[mid]||0) + matCount;
+        matDrops[mid] = (matDrops[mid]||0) + matCount;
+      }
+    }
+  }
+  
+  // 更新击杀计数
+  G.killAnyCount = (G.killAnyCount||0) + killCount;
+  for(const mo of m.monsters){
+    G.kills[mo.name] = (G.kills[mo.name]||0) + Math.floor(killCount * 0.8 / m.monsters.length);
+  }
+  
+  G.hp = G.maxHp;
+  G.enemy = genMonster();
+  checkQuests();
+  
+  return {
+    offlineSec, killCount,
+    totalXp, totalGold,
+    levelBefore, levelAfter,
+    equipDrops: equipDrops.slice(0, 10),
+    equipTotal: equipDrops.length,
+    matDrops,
+  };
+}
+
+function showOfflineModal(rewards){
+  const ov = document.getElementById('modal-overlay'), box = document.getElementById('modal-box');
+  ov.classList.add('show');
+  
+  const h = Math.floor(rewards.offlineSec/3600);
+  const m = Math.floor((rewards.offlineSec%3600)/60);
+  const s = rewards.offlineSec%60;
+  const timeStr = h>0 ? `${h}小时${m}分${s}秒` : m>0 ? `${m}分${s}秒` : `${s}秒`;
+  
+  let html = `<h3>⏰ 离线收益</h3>`;
+  html += `<p style="font-size:12px;color:var(--muted);margin-bottom:8px">你离开了 <b style="color:var(--gold)">${timeStr}</b>，离线挂机结算如下：</p>`;
+  html += `<div style="background:var(--card);border-radius:8px;padding:10px;margin-bottom:8px">`;
+  html += `<div style="display:flex;justify-content:space-between;font-size:12px"><span>⚔️ 击杀怪物</span><b>${fmt(rewards.killCount)} 只</b></div>`;
+  html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>✨ 获得经验</span><b style="color:var(--teal)">+${fmt(rewards.totalXp)}</b></div>`;
+  html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>💰 获得金币</span><b style="color:var(--gold)">+${fmt(rewards.totalGold)}</b></div>`;
+  if(rewards.levelAfter > rewards.levelBefore){
+    html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>⬆️ 等级提升</span><b style="color:var(--green)">Lv.${rewards.levelBefore} → Lv.${rewards.levelAfter}</b></div>`;
+  }
+  html += `</div>`;
+  
+  if(rewards.equipDrops.length > 0){
+    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🎁 获得装备 (${rewards.equipTotal}件，展示前${rewards.equipDrops.length}件)：</div>`;
+    html += `<div style="max-height:150px;overflow-y:auto;margin-bottom:8px;display:flex;flex-direction:column;gap:3px">`;
+    for(const it of rewards.equipDrops){
+      html += `<div style="font-size:11px;padding:3px 6px;background:var(--card);border-radius:4px;display:flex;justify-content:space-between"><span style="color:${QCOLOR[it.quality]}">${eqIcon(it.slot,it.classReq)} ${it.name}</span><span style="color:var(--muted)">战力${it.power}</span></div>`;
+    }
+    html += `</div>`;
+  }
+  
+  const matEntries = Object.entries(rewards.matDrops);
+  if(matEntries.length > 0){
+    html += `<div style="font-size:11px;color:var(--muted);margin-bottom:4px">📦 获得材料：</div>`;
+    html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">`;
+    for(const[mid,count] of matEntries){
+      const md = MATERIALS[mid];
+      html += `<span style="font-size:11px;background:var(--card);padding:2px 6px;border-radius:4px">${md.icon}${md.name}×${count}</span>`;
+    }
+    html += `</div>`;
+  }
+  
+  html += `<button class="btn btn-purple" style="width:100%" id="btn-offline-ok">✅ 确认领取</button>`;
+  box.innerHTML = html;
+  document.getElementById('btn-offline-ok').addEventListener('click', ()=>{
+    closeModal();
+    computeStats(); renderAll();
+    addLog(`⏰ 离线${timeStr}，击杀${fmt(rewards.killCount)}只怪物，经验+${fmt(rewards.totalXp)}，金币+${fmt(rewards.totalGold)}`,'sys');
+  });
 }
 
 // 同步加载（从localStorage，启动时不阻塞）
@@ -2898,7 +3068,9 @@ function loadGameSync(){
   try{
     const raw = localStorage.getItem('legend_idle_save');
     if(!raw) return null;
-    return restoreGameData(JSON.parse(raw));
+    const parsed = JSON.parse(raw);
+    parsed._rawTimestamp = parsed.timestamp || 0; // 保留原始时间戳
+    return restoreGameData(parsed);
   }catch(e){console.error('Load failed:',e);return null;}
 }
 
@@ -2967,6 +3139,7 @@ function restoreGameData(d){
   G.classStatsAdv = d.classStatsAdv || {};
   G.classIcon = d.classIcon || null;
   G.logs = d.logs || [];
+  G._lastSaveTime = d.timestamp || 0; // 离线收益用
   
   for(const it of G.inventory){if(it.quality==null)it.quality=0;if(it.power==null)it.power=itemPower(it);}
   for(const k in G.equipped){const it=G.equipped[k];if(it){if(it.quality==null)it.quality=0;if(it.power==null)it.power=itemPower(it);}}
