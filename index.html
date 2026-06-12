@@ -2067,9 +2067,9 @@ function onKill(){
       else addLog('⚠️ 背包已满，装备丢失！','sys');
     }
   }
-  // 技能书掉落：10级后怪物可掉落，普通1%/精英5%/Boss10%，随机种类
+  // 技能书掉落：10级后怪物可掉落，普通2%/精英8%/Boss15%，随机种类
   if(monLv>=10){
-    const bookRate = G.enemy.type==='boss'?0.05:G.enemy.type==='elite'?0.025:0.005;
+    const bookRate = G.enemy.type==='boss'?0.15:G.enemy.type==='elite'?0.08:0.02;
     if(Math.random()<bookRate){
       // 随机所有职业的技能书
       const allClasses=['warrior','archer','mage'];
@@ -4099,6 +4099,30 @@ function calculateOfflineRewards(offlineSec){
       }
     }
   }
+
+  // 离线技能书掉落（同在线逻辑：普通2%/精英8%/Boss15%按击杀数批量结算）
+  let offlineBookCount = 0;
+  if(G.level >= 10){
+    const bookRate = 0.02; // 离线默认按普通怪概率
+    const bookRolls = killCount;
+    for(let i = 0; i < Math.min(bookRolls, 5000); i++){
+      if(Math.random() < bookRate) offlineBookCount++;
+    }
+    if(offlineBookCount > 0){
+      const allClasses=['warrior','archer','mage'];
+      const allBooks=[];
+      for(const cls of allClasses){
+        const clsSkills=SKILLS[cls];
+        for(const s of clsSkills){
+          if(!s.advReq) allBooks.push({...s,classReq:cls});
+        }
+      }
+      for(let i=0;i<Math.min(offlineBookCount,20);i++){
+        const sb=pick(allBooks);
+        G.skillBooks.push({type:'skillBook',skillId:sb.id,name:sb.name,icon:sb.icon,desc:sb.desc,classReq:sb.classReq,reqLv:10});
+      }
+    }
+  }
   
   // 更新击杀计数（包含精英和Boss）
   G.killAnyCount = (G.killAnyCount||0) + killCount;
@@ -4121,6 +4145,7 @@ function calculateOfflineRewards(offlineSec){
     equipTotal: equipKept,
     matDrops,
     skillUpgrades,
+    offlineBookCount,
   };
 }
 
@@ -4144,6 +4169,9 @@ function showOfflineModal(rewards){
   }
   if(rewards.skillUpgrades && rewards.skillUpgrades.length > 0){
     html += `<div style="font-size:11px;color:var(--green);margin-top:4px">⭐ 技能升级：${rewards.skillUpgrades.map(s=>s.icon+s.name+'→'+s.grade+'级').join(' ')}</div>`;
+  }
+  if(rewards.offlineBookCount > 0){
+    html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>📖 获得技能书</span><b style="color:var(--purple)">+${rewards.offlineBookCount} 本</b></div>`;
   }
   if(rewards.levelAfter > rewards.levelBefore){
     html += `<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:2px"><span>⬆️ 等级提升</span><b style="color:var(--green)">Lv.${rewards.levelBefore} → Lv.${rewards.levelAfter}</b></div>`;
