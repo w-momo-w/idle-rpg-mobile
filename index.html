@@ -736,21 +736,6 @@ body{
       <div id="center" class="panel">
         <div class="panel-hd"><span class="ph-icon">⚔️</span>战斗 — <span id="cur-map-name">新手村</span></div>
         <div class="panel-bd">
-          <!-- 自动战斗设置 & 存档按钮 -->
-          <div class="auto-battle-bar">
-            <label class="auto-label"><input type="checkbox" id="auto-atk"> 自动攻击</label>
-            <label class="auto-label"><input type="checkbox" id="auto-skill"> 自动技能</label>
-            <label class="auto-label"><input type="checkbox" id="auto-hp-small"> 🧪自动小</label>
-            <label class="auto-label"><input type="checkbox" id="auto-hp-large"> 💉自动大</label>
-            <label class="auto-label"><input type="checkbox" id="auto-equip"> 自动穿装</label>
-          </div>
-          <div class="save-btns-bar">
-            <span id="save-indicator">💾 已保存</span>
-            <button class="btn btn-blue btn-xs" id="btn-manual-save">💾 保存</button>
-            <button class="btn btn-green btn-xs" id="btn-export-save">📥 导出</button>
-            <button class="btn btn-gold btn-xs" id="btn-import-save">📤 导入</button>
-            <button class="btn btn-red btn-xs" id="btn-reset">🗑️ 重置</button>
-          </div>
           <!-- 战斗动画区 -->
           <div id="battle-anim" style="display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0;min-height:60px;position:relative">
             <div id="anim-player" style="text-align:center;font-size:40px;transition:transform .15s">🧑</div>
@@ -776,6 +761,21 @@ body{
             <button class="btn btn-red2" id="btn-use-hp-scroll">❤️ 生命</button>
           </div>
           <div id="combat-log"></div>
+          <!-- 自动战斗设置 & 存档按钮 -->
+          <div class="auto-battle-bar">
+            <label class="auto-label"><input type="checkbox" id="auto-atk"> 自动攻击</label>
+            <label class="auto-label"><input type="checkbox" id="auto-skill"> 自动技能</label>
+            <label class="auto-label"><input type="checkbox" id="auto-hp-small"> 🧪自动小</label>
+            <label class="auto-label"><input type="checkbox" id="auto-hp-large"> 💉自动大</label>
+            <label class="auto-label"><input type="checkbox" id="auto-equip"> 自动穿装</label>
+          </div>
+          <div class="save-btns-bar">
+            <span id="save-indicator">💾 已保存</span>
+            <button class="btn btn-blue btn-xs" id="btn-manual-save">💾 保存</button>
+            <button class="btn btn-green btn-xs" id="btn-export-save">📥 导出</button>
+            <button class="btn btn-gold btn-xs" id="btn-import-save">📤 导入</button>
+            <button class="btn btn-red btn-xs" id="btn-reset">🗑️ 重置</button>
+          </div>
         </div>
       </div>
       <!-- 属性面板（折叠在战斗页底部） -->
@@ -1090,7 +1090,6 @@ const MATERIALS={
   herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.028,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
   ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.024,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
   dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.006,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
-  recastStone:{id:'recastStone',name:'重铸石',icon:'♻️',desc:'用于重铸装备特殊属性词条',dropRate:0,dropSources:[],use:{count:1,desc:'重铸石用于装备详情中的重铸功能'}},
 };
 
 // Material synthesis: combine materials to craft specific-slot equipment
@@ -1378,10 +1377,8 @@ function genQuestReward(G,base){
   // 30%概率给药水
   else if(r<0.60){const potions=['hpPotion','atkScroll','defScroll','hpScroll'];rew.potion=pick(potions);rew.potionCount=randi(1,2);}
   // 25%概率给材料
-  else if(r<0.85){const mids=Object.keys(MATERIALS).filter(k=>k!=='recastStone');rew.material=pick(mids);rew.materialCount=randi(2,6);}
+  else if(r<0.85){const mids=Object.keys(MATERIALS);rew.material=pick(mids);rew.materialCount=randi(2,6);}
   // 其余只给基础奖励
-  // 极低概率（5%）给重铸石
-  if(Math.random()<0.05){rew.recastStone=randi(1,2);}
   return rew;
 }
 
@@ -1431,7 +1428,7 @@ function rollWeightedQ(minQ,maxQ){
 //  GAME STATE
 // ═══════════════════════════════════════════
 let G={
-  level:1,xp:0,gold:0,diamond:100,classId:'warrior',classTier:0,className:'战士学徒',
+  level:1,xp:0,gold:0,diamond:10,classId:'warrior',classTier:0,className:'战士学徒',
   // base stats from class
   str:0,vit:0,agi:0,dex:0,int:0, // allocated points
   hp:100,maxHp:100,curAtk:5,curDef:2,curCritRate:5,curCritDmg:150,curAtkSpd:100,
@@ -1994,7 +1991,6 @@ function submitQuest(qIndex){
   if(q.reward.equipQ!==undefined){const slot=pick(Object.keys(EQ_NAMES));const it=genEquip(slot,q.reward.equipQ,Math.min(8,q.reward.equipQ+2),G.level);if(G.inventory.length<G.maxInv)G.inventory.push(it);else addLog('⚠️ 背包已满，装备奖励丢失','sys');}
   if(q.reward.potion){const key=q.reward.potion;G.consumables[key]=(G.consumables[key]||0)+q.reward.potionCount;}
   if(q.reward.material){const mk=q.reward.material;G.materials[mk]=(G.materials[mk]||0)+q.reward.materialCount;}
-  if(q.reward.recastStone){G.materials.recastStone=(G.materials.recastStone||0)+q.reward.recastStone;}
   const rewardText=[];
   if(q.reward.gold)rewardText.push('💰'+fmt(q.reward.gold));
   if(q.reward.diamond)rewardText.push('💎'+q.reward.diamond);
@@ -2002,7 +1998,6 @@ function submitQuest(qIndex){
   if(q.reward.equipQ!==undefined)rewardText.push('🎁'+QUALITY[q.reward.equipQ]+'+装备');
   if(q.reward.potion){const pn={hpPotion:'🧪小血瓶',hpLarge:'💉大血瓶',atkScroll:'📜攻击卷轴',defScroll:'🛡️防御卷轴',hpScroll:'❤️生命卷轴'};rewardText.push(pn[q.reward.potion]+'×'+q.reward.potionCount);}
   if(q.reward.material){const md=MATERIALS[q.reward.material];rewardText.push(md.icon+md.name+'×'+q.reward.materialCount);}
-  if(q.reward.recastStone){rewardText.push('♻️重铸石×'+q.reward.recastStone);}
   addLog(`✅ 任务完成：【${q.text}】获得 ${rewardText.join(' ')}`,'quest');
   // 替换已完成任务
   replaceQuest(qIndex);
@@ -2242,19 +2237,16 @@ function renderBagMaterials(){
       const md=MATERIALS[mid];const div=document.createElement('div');
       div.className='shop-item-row';
       div.innerHTML=`<div class="shop-item-icon">${md.icon}</div><div class="shop-item-info"><div class="shop-item-name">${md.name}<span style="font-size:9px;color:var(--muted);margin-left:4px">×${count}</span></div><div class="shop-item-desc">${md.desc} · <span style="color:var(--purple)">${md.use.desc}</span></div></div>`;
-      // 重铸石不显示出售/使用按钮
-      if(mid!=='recastStone'){
-        // 出售按钮
-        const sb=document.createElement('button');sb.className='btn btn-red btn-xs';sb.textContent='出售';
-        sb.addEventListener('click',(function(id,cnt){return function(){showMaterialSellModal(id,cnt);};})(mid,count));
-        div.appendChild(sb);
-        // 非合成材料（草药）保留使用按钮，合成相关材料只出售
-        const isCraftMat=['beastHide','crystalShard','ironOre','dragonScale'].includes(md.id);
-        if(!isCraftMat){
-          const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
-          ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
-          div.appendChild(ub);
-        }
+      // 出售按钮
+      const sb=document.createElement('button');sb.className='btn btn-red btn-xs';sb.textContent='出售';
+      sb.addEventListener('click',(function(id,cnt){return function(){showMaterialSellModal(id,cnt);};})(mid,count));
+      div.appendChild(sb);
+      // 非合成材料（草药）保留使用按钮，合成相关材料只出售
+      const isCraftMat=['beastHide','crystalShard','ironOre','dragonScale'].includes(md.id);
+      if(!isCraftMat){
+        const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
+        ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
+        div.appendChild(ub);
       }
       el.appendChild(div);
     }
@@ -2588,7 +2580,6 @@ function renderQuests(){
     if(q.reward.equipQ!==undefined)rw.push('🎁'+QUALITY[q.reward.equipQ]+'+装备');
     if(q.reward.potion){const pn={hpPotion:'🧪小血瓶',hpLarge:'💉大血瓶',atkScroll:'📜攻击卷轴',defScroll:'🛡️防御卷轴',hpScroll:'❤️生命卷轴'};rw.push(pn[q.reward.potion]+'×'+q.reward.potionCount);}
     if(q.reward.material){const md=MATERIALS[q.reward.material];rw.push(md.icon+md.name+'×'+q.reward.materialCount);}
-    if(q.reward.recastStone){rw.push('♻️重铸石×'+q.reward.recastStone);}
     div.innerHTML=`<div class="quest-title">${q.type==='kill'?'🗡️':q.type==='kill_any'?'⚔️':q.type==='collect_gold'?'💰':q.type==='collect_material'?'📦':'🎒'} ${q.text}</div><div class="quest-progress">进度：<span style="font-weight:bold;color:${canSubmit?'var(--green)':'var(--purple)'}">${q.progress}/${q.target}</span> (${pct}%)${canSubmit?' ✅ 可提交':''}</div><div class="quest-reward">奖励：${rw.join(' ')}</div>`;
     if(canSubmit){
       const sbtn=document.createElement('button');
@@ -2607,7 +2598,7 @@ function renderLog(){
     const p=document.createElement('p');p.className=l.cls||'';p.innerHTML=`<span style="color:var(--muted);margin-right:4px;font-size:10px">${l.time}</span>${l.msg}`;el.appendChild(p);
   }
 }
-function showItemModal(it,source,isEquipped,activeTab){
+function showItemModal(it,source,isEquipped){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   const eqIt=!isEquipped?G.equipped[it.slot]:null;
   const clsNames2={warrior:'战士',archer:'射手',mage:'法师',all:'通用'};
@@ -2646,41 +2637,32 @@ function showItemModal(it,source,isEquipped,activeTab){
     }
     html+=`</div>`;
   }
-  // 如果有已装备的同部位装备，显示比对；没有则只显示新装备属性
-  if(!isEquipped){
-    const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
-    const basicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
-    if(eqIt){
-      // 有已装备：左右对比
-      html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-        <div style="border:1px solid var(--border);border-radius:5px;padding:6px;font-size:11px">
-          <div style="font-weight:bold;margin-bottom:4px;color:var(--muted)">📊 当前装备</div>
-          <div style="font-weight:bold;color:${QCOLOR[eqIt.quality]};margin-bottom:4px">${eqIt.name}${(G.slotEnhance[eqIt.slot]||0)>0?` <span style="color:var(--orange)">+${G.slotEnhance[eqIt.slot]}</span>`:''}</div>
-          <div style="font-size:9px;color:var(--muted);margin-bottom:2px">需要 Lv${eqIt.reqLv||1}</div>`;
-      for(const k of basicKeys){if(eqIt.stats[k]){const v=Math.round(eqIt.stats[k]*10)/10;const r=eqIt.statRanges&&eqIt.statRanges[k];html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="font-weight:bold">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
-      if(eqIt.specials&&eqIt.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${eqIt.specials.map(sp=>sp.text).join(' ')}</div>`;}
-      html+=`</div>`;
-      // 新装备属性（带颜色比对）
-      html+=`<div style="border:2px solid var(--purple);border-radius:5px;padding:6px;font-size:11px">
-          <div style="font-weight:bold;margin-bottom:4px;color:var(--purple)">🆕 新装备</div>
-          <div style="font-weight:bold;color:${QCOLOR[it.quality]};margin-bottom:4px">${it.name}</div>
-          <div style="font-size:9px;color:${it.reqLv&&G.level<it.reqLv?'var(--orange)':'var(--muted)'};margin-bottom:2px">需要 Lv${it.reqLv||1}</div>`;
-      for(const k of basicKeys){if(it.stats[k]||(eqIt.stats[k]&&!it.stats[k])){const newV=it.stats[k]||0;const oldV=eqIt.stats[k]||0;const diff=newV-oldV;let cls='';if(diff>0.05)cls='color:var(--green)';else if(diff<-0.05)cls='color:var(--red)';const fmtDiff=Math.abs(diff)<0.01?'':(diff>0?'↑+':'↓')+Math.round(diff*10)/10;const nr=it.statRanges&&it.statRanges[k];html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="font-weight:bold">+${Math.round(newV*10)/10}${nr?` <span style="font-size:8px;color:var(--muted)">(${nr.min}-${nr.max})</span>`:''} <span style="${cls}">${fmtDiff}</span></span></div>`;}}
-      if(it.specials&&it.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${it.specials.map(sp=>sp.text).join(' ')}</div>`;}
-      html+=`</div></div>`;
-      const totalCur=eqIt.power||0;const totalNew=it.power||0;const pwDiff=totalNew-totalCur;
-      html+=`<div style="text-align:center;margin-top:6px;font-size:12px;font-weight:bold;color:${pwDiff>=0?'var(--green)':'var(--red)'}">⚡ 战力对比：${totalCur} → ${totalNew} (${pwDiff>=0?'+':''}${pwDiff})</div>`;
-    }else{
-      // 无已装备：直接显示新装备全属性
-      html+=`<div style="border:1px solid var(--border);border-radius:5px;padding:8px;margin-top:6px;font-size:11px">
-        <div style="font-weight:bold;margin-bottom:6px;color:var(--teal)">📊 装备属性</div>`;
-      for(const k of basicKeys){if(it.stats[k]){const v=Math.round(it.stats[k]*10)/10;const r=it.statRanges&&it.statRanges[k];html+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green);font-weight:bold">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
-      if(it.specials&&it.specials.length>0){
-        html+=`<div style="font-size:10px;color:var(--teal);margin-top:4px;font-weight:bold;border-top:1px solid var(--border);padding-top:4px">✨ 特殊属性</div>`;
-        for(const sp of it.specials){const sr=it.statRanges&&it.statRanges[sp.id];html+=`<div class="stat-line"><span>${sp.name}</span><span style="color:var(--teal);font-weight:bold">${sp.text}${sr?` <span style="font-size:8px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:''}</span></div>`;}
-      }
-      html+=`</div>`;
-    }
+  // 如果有已装备的同部位装备，显示比对
+  if(eqIt&&!isEquipped){
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+      <div style="border:1px solid var(--border);border-radius:5px;padding:6px;font-size:11px">
+        <div style="font-weight:bold;margin-bottom:4px;color:var(--muted)">📊 当前装备</div>
+        <div style="font-weight:bold;color:${QCOLOR[eqIt.quality]};margin-bottom:4px">${eqIt.name}${(G.slotEnhance[eqIt.slot]||0)>0?` <span style="color:var(--orange)">+${G.slotEnhance[eqIt.slot]}</span>`:''}</div>
+        <div style="font-size:9px;color:var(--muted);margin-bottom:2px">需要 Lv${eqIt.reqLv||1}</div>`;
+    // 当前装备属性
+    const eqBasicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
+    const eqBasicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
+    for(const k of eqBasicKeys){if(eqIt.stats[k]){const v=Math.round(eqIt.stats[k]*10)/10;const r=eqIt.statRanges&&eqIt.statRanges[k];html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
+    if(eqIt.specials&&eqIt.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${eqIt.specials.map(sp=>sp.text).join(' ')}</div>`;}
+    html+=`</div>`;
+    // 新装备属性（带颜色比对）
+    html+=`<div style="border:2px solid var(--purple);border-radius:5px;padding:6px;font-size:11px">
+        <div style="font-weight:bold;margin-bottom:4px;color:var(--purple)">🆕 新装备</div>
+        <div style="font-weight:bold;color:${QCOLOR[it.quality]};margin-bottom:4px">${it.name}</div>
+        <div style="font-size:9px;color:${it.reqLv&&G.level<it.reqLv?'var(--orange)':'var(--muted)'};margin-bottom:2px">需要 Lv${it.reqLv||1}</div>`;
+    for(const k of eqBasicKeys){if(it.stats[k]||(eqIt.stats[k]&&!it.stats[k])){const newV=it.stats[k]||0;const oldV=eqIt.stats[k]||0;const diff=newV-oldV;let cls='';if(diff>0.05)cls='color:var(--green)';else if(diff<-0.05)cls='color:var(--red)';const fmtDiff=Math.abs(diff)<0.01?'':(diff>0?'↑+':'↓')+Math.round(diff*10)/10;const nr=it.statRanges&&it.statRanges[k];html+=`<div class="stat-line"><span>${eqBasicLbls[k]||k}</span><span style="font-weight:bold">+${Math.round(newV*10)/10}${nr?` <span style="font-size:8px;color:var(--muted)">(${nr.min}-${nr.max})</span>`:''} <span style="${cls}">${fmtDiff}</span></span></div>`;}}
+    if(it.specials&&it.specials.length>0){html+=`<div style="font-size:10px;color:var(--teal);margin-top:3px">✨ 特殊：${it.specials.map(sp=>sp.text).join(' ')}</div>`;}
+    html+=`</div></div>`;
+    // 战力对比（不含强化战力）
+    const totalCur=eqIt.power||0;
+    const totalNew=it.power||0;
+    const pwDiff=totalNew-totalCur;
+    html+=`<div style="text-align:center;margin-top:6px;font-size:12px;font-weight:bold;color:${pwDiff>=0?'var(--green)':'var(--red)'}">⚡ 战力对比：${totalCur} → ${totalNew} (${pwDiff>=0?'+':''}${pwDiff})</div>`;
   }
   box.innerHTML=html;
   const acts=document.createElement('div');acts.className='modal-actions';acts.style.marginTop='8px';
@@ -2689,13 +2671,13 @@ function showItemModal(it,source,isEquipped,activeTab){
     const attrLbls2={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率',critDmg:'暴击伤害',atkSpd:'攻速',block:'格挡',dodge:'闪避'};
     const attrOrder=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
     const refineAttrs=[];
-    const specialIds=it.specials?it.specials.map(sp=>sp.id):[];
-    for(const k of attrOrder){if(it.stats[k]!=null&&it.stats[k]>0&&!specialIds.includes(k))refineAttrs.push(k);}
+    for(const k of attrOrder){if(it.stats[k]!=null)refineAttrs.push(k);}
+    if(it.specials){for(const sp of it.specials)refineAttrs.push(sp.id);}
     // 构建详情Tab内容
     let infoHtml='';
     const basicLbls={atk:'攻击力',def:'防御力',hp:'生命值',critRate:'暴击率%',critDmg:'暴击伤害%',atkSpd:'攻速',block:'格挡%',dodge:'闪避%'};
     const basicKeys=['atk','def','hp','critRate','critDmg','atkSpd','block','dodge'];
-    for(const k of basicKeys){if(it.stats[k]!=null){const v=Math.round(it.stats[k]*10)/10;const r=it.statRanges&&it.statRanges[k];infoHtml+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green)">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
+    for(const k of basicKeys){if(it.stats[k]){const v=Math.round(it.stats[k]*10)/10;const r=it.statRanges&&it.statRanges[k];infoHtml+=`<div class="stat-line"><span>${basicLbls[k]||k}</span><span style="color:var(--green)">+${v}${r?` <span style="font-size:8px;color:var(--muted)">(${r.min}-${r.max})</span>`:''}</span></div>`;}}
     if(it.specials&&it.specials.length>0){infoHtml+=`<div style="font-size:11px;color:var(--teal);margin-top:4px;font-weight:bold;border-top:1px solid var(--border);padding-top:4px">✨ 特殊属性</div>`;for(const sp of it.specials){const sr=it.statRanges&&it.statRanges[sp.id];infoHtml+=`<div class="stat-line"><span>${sp.name}</span><span style="color:var(--teal)">${sp.text}${sr?` <span style="font-size:8px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:''}</span></div>`;}}
     const slotElv=G.slotEnhance[source]||0;
     if(ENHANCE_BONUS[source]){
@@ -2710,71 +2692,53 @@ function showItemModal(it,source,isEquipped,activeTab){
       if(eb.dodge)nextParts.push('闪避+'+(eb.dodge*(slotElv+1)).toFixed(1)+'%');
       infoHtml+=`<div style="font-size:10px;color:var(--orange);margin-top:4px">强化+${slotElv} → +${slotElv+1}：${nextParts.join(' · ')}</div>`;
     }
-    // 构建洗炼Tab内容（逐条基本属性）
+    // 构建洗炼Tab内容（逐条属性）
     const rm=REFINE_MATERIALS[source]||{material:'ironOre',baseCount:1};
     const md=MATERIALS[rm.material];
-    let refineHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条洗炼基础属性，数值在范围内随机重roll</div>';
+    let refineHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条洗炼属性词条，数值在范围内随机重roll</div>';
     for(const rk of refineAttrs){
-      const lbl=attrLbls2[rk]||rk;
-      const isPct=['critRate','dodge'].includes(rk);
-      const curVal=(isPct?Math.round(it.stats[rk]*10)/10:it.stats[rk])+(isPct?'%':'');
-      const range=it.statRanges&&it.statRanges[rk];
+      const isSp=SPECIAL_ATTRS.find(x=>x.id===rk);
+      let lbl,curVal,range;
+      if(isSp){lbl=isSp.name;curVal=isSp.fmt(it.stats[rk]);range=it.statRanges&&it.statRanges[rk];}
+      else{
+        lbl=attrLbls2[rk]||rk;
+        const isPct=['critRate','dodge'].includes(rk);
+        curVal=(isPct?Math.round(it.stats[rk]*10)/10:it.stats[rk])+(isPct?'%':'');
+        range=it.statRanges&&it.statRanges[rk];
+      }
       const rGold=Math.floor((REFINE_COST[it.quality]||500)/3);
       const rMat=rm.baseCount+it.quality;
       const canRef=G.gold>=rGold&&(G.materials[rm.material]||0)>=rMat;
       const rangeStr=range?` <span style="font-size:9px;color:var(--muted)">(${range.min}-${range.max})</span>`:'';
       refineHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
-        <span style="flex:1;font-size:12px;font-weight:bold">${lbl}</span>
-        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${curVal}${rangeStr}</span>
+        <span style="flex:1;font-size:12px;font-weight:bold">${lbl}${rangeStr}</span>
+        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${curVal}</span>
         <button class="btn btn-purple btn-sm refine-attr-btn" data-key="${rk}" ${canRef?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">🔄 💰${rGold}+${md.icon}${rMat}</button>
       </div>`;
     }
-    // 构建重铸Tab内容（只显示特殊属性词条）
-    let recastHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条重铸特殊属性词条，数值在范围内随机重roll，消耗♻️重铸石×1/次</div>';
-    for(const sp of it.specials||[]){
-      const sr=it.statRanges&&it.statRanges[sp.id];
-      const rangeStr=sr?` <span style="font-size:9px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:'';
-      const canRecast=(G.materials.recastStone||0)>=1;
-      recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
-        <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}</span>
-        <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}${rangeStr}</span>
-        <button class="btn btn-pink btn-sm recast-attr-btn" data-key="${sp.id}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ ♻️${1}个</button>
-      </div>`;
-    }
-    // 检查哪些Tab需要显示
-    const hasRefine=refineAttrs.length>0;
-    const hasRecast=it.specials&&it.specials.length>0;
-    // 动态构建Tab栏
-    if(!activeTab)activeTab='info';
+    if(refineAttrs.length===0)refineHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有可洗炼的属性</div>';
+    // 插入Tab栏到modal-box
     const tabBlock=document.createElement('div');
-    let tabsHtml=`<div class="tabs" style="margin-top:8px">
-      <button class="tab-btn${activeTab==='info'?' active':''}" data-equiptab="info">📋 详情</button>`;
-    if(hasRefine)tabsHtml+=`<button class="tab-btn${activeTab==='refine'?' active':''}" data-equiptab="refine">🔄 洗炼</button>`;
-    if(hasRecast)tabsHtml+=`<button class="tab-btn${activeTab==='recast'?' active':''}" data-equiptab="recast">♻️ 重铸</button>`;
-    tabsHtml+=`</div>
-    <div class="bag-tab-content${activeTab==='info'?' active':''}" id="equip-tab-info">${infoHtml}</div>`;
-    if(hasRefine)tabsHtml+=`<div class="bag-tab-content${activeTab==='refine'?' active':''}" id="equip-tab-refine">${refineHtml}</div>`;
-    if(hasRecast)tabsHtml+=`<div class="bag-tab-content${activeTab==='recast'?' active':''}" id="equip-tab-recast">${recastHtml}</div>`;
-    tabBlock.innerHTML=tabsHtml;
+    tabBlock.innerHTML=`<div class="tabs" style="margin-top:8px">
+      <button class="tab-btn active" data-equiptab="info">📋 详情</button>
+      <button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>
+    </div>
+    <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>
+    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>`;
     box.appendChild(tabBlock);
-    // Tab切换（通用处理）
+    // Tab切换
     box.querySelectorAll('[data-equiptab]').forEach(btn=>{
       btn.addEventListener('click',function(){
         box.querySelectorAll('[data-equiptab]').forEach(b=>b.classList.remove('active'));
         this.classList.add('active');
         const tn=this.dataset.equiptab;
-        box.querySelectorAll('.bag-tab-content').forEach(el=>el.classList.remove('active'));
-        const target=document.getElementById('equip-tab-'+tn);
-        if(target)target.classList.add('active');
+        document.getElementById('equip-tab-info').classList.toggle('active',tn==='info');
+        document.getElementById('equip-tab-refine').classList.toggle('active',tn==='refine');
       });
     });
     // 逐条洗炼按钮事件
     box.querySelectorAll('.refine-attr-btn').forEach(btn=>{
       btn.addEventListener('click',function(){doRefineAttr(source,this.dataset.key);});
-    });
-    // 逐条重铸按钮事件
-    box.querySelectorAll('.recast-attr-btn').forEach(btn=>{
-      btn.addEventListener('click',function(){doRecastAttr(source,this.dataset.key);});
     });
     // 卸下按钮
     const ub=document.createElement('button');ub.className='btn btn-red btn-sm';ub.textContent='卸下装备';
@@ -2844,133 +2808,73 @@ function doRefineAttr(slot,key){
   if((G.materials[rm.material]||0)<matCost){addLog('⚠️ '+md.name+'不足(需要'+matCost+')','sys');return;}
   const oldVal=it.stats[key];
   const range=it.statRanges&&it.statRanges[key];
-  // 获取当前活动tab
-  const activeTabBtn=document.querySelector('#modal-box [data-equiptab].active');
-  const activeTab=activeTabBtn?activeTabBtn.dataset.equiptab:'info';
-  function execute(){
-    let newVal;
-    if(range){
-      const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
-      if(isIntStat){newVal=randi(range.min,range.max);}
-      else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}
+  let newVal;
+  if(range){
+    const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
+    if(isIntStat){newVal=randi(range.min,range.max);}
+    else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}
+  }else{
+    const m=QMULT[q];
+    if(key==='atk'){
+      if(slot==='mainHand')newVal=randi(2,6)*m;
+      else if(slot==='bracer')newVal=randi(1,4)*m;
+      else if(slot==='necklace')newVal=randi(1,3)*m;
+      else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
+      else if(slot==='pendant')newVal=randi(1,5)*m;
+      else newVal=0;
+      newVal=Math.floor(newVal);
+    }else if(key==='def'){
+      if(slot==='offHand')newVal=randi(1,4)*m;
+      else if(slot==='armor')newVal=randi(2,5)*m;
+      else if(slot==='helmet')newVal=randi(1,3)*m;
+      else if(slot==='pants')newVal=randi(2,4)*m;
+      else if(slot==='pendant')newVal=randi(1,3)*m;
+      else newVal=0;
+      newVal=Math.floor(newVal);
+    }else if(key==='hp'){
+      if(slot==='armor')newVal=randi(5,20)*m;
+      else if(slot==='helmet')newVal=randi(5,15)*m;
+      else if(slot==='pants')newVal=randi(5,15)*m;
+      else if(slot==='pendant')newVal=randi(5,20)*m;
+      else newVal=0;
+      newVal=Math.floor(newVal);
+    }else if(key==='critRate'){
+      if(slot==='mainHand')newVal=randf(0,1)*m;
+      else if(slot==='bracer')newVal=randf(0,2)*m;
+      else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
+      else newVal=0;
+      newVal=Math.round(newVal*10)/10;
+    }else if(key==='critDmg'){
+      if(slot==='necklace')newVal=randi(5,20)*m;
+      else newVal=0;
+      newVal=Math.floor(newVal);
+    }else if(key==='atkSpd'){
+      if(slot==='boots')newVal=randi(2,8)*m;
+      else newVal=0;
+      newVal=Math.floor(newVal);
     }else{
-      const m=QMULT[q];
-      if(key==='atk'){
-        if(slot==='mainHand')newVal=randi(2,6)*m;
-        else if(slot==='bracer')newVal=randi(1,4)*m;
-        else if(slot==='necklace')newVal=randi(1,3)*m;
-        else if(slot==='ring1'||slot==='ring2')newVal=randi(1,4)*m;
-        else if(slot==='pendant')newVal=randi(1,5)*m;
-        else newVal=0;
-        newVal=Math.floor(newVal);
-      }else if(key==='def'){
-        if(slot==='offHand')newVal=randi(1,4)*m;
-        else if(slot==='armor')newVal=randi(2,5)*m;
-        else if(slot==='helmet')newVal=randi(1,3)*m;
-        else if(slot==='pants')newVal=randi(2,4)*m;
-        else if(slot==='pendant')newVal=randi(1,3)*m;
-        else newVal=0;
-        newVal=Math.floor(newVal);
-      }else if(key==='hp'){
-        if(slot==='armor')newVal=randi(5,20)*m;
-        else if(slot==='helmet')newVal=randi(5,15)*m;
-        else if(slot==='pants')newVal=randi(5,15)*m;
-        else if(slot==='pendant')newVal=randi(5,20)*m;
-        else newVal=0;
-        newVal=Math.floor(newVal);
-      }else if(key==='critRate'){
-        if(slot==='mainHand')newVal=randf(0,1)*m;
-        else if(slot==='bracer')newVal=randf(0,2)*m;
-        else if(slot==='ring1'||slot==='ring2')newVal=randf(0.5,2)*m;
-        else newVal=0;
-        newVal=Math.round(newVal*10)/10;
-      }else if(key==='critDmg'){
-        if(slot==='necklace')newVal=randi(5,20)*m;
-        else newVal=0;
-        newVal=Math.floor(newVal);
-      }else if(key==='atkSpd'){
-        if(slot==='boots')newVal=randi(2,8)*m;
-        else newVal=0;
-        newVal=Math.floor(newVal);
-      }else{
-        const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-        if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
-        else newVal=0;
-      }
-    }
-    G.gold-=goldCost;G.materials[rm.material]-=matCost;
-    if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
-      addLog(`🔄 洗炼完成，${key} 属性不变（${oldVal}），消耗💰${goldCost}+${md.icon}${matCost}`,'sys');
-    }else{
-      const isSpecial=SPECIAL_ATTRS.find(x=>x.id===key);
-      const dispOld=isSpecial?isSpecial.fmt(oldVal):oldVal;
-      const dispNew=isSpecial?isSpecial.fmt(newVal):newVal;
-      addLog(`🔄 洗炼：${key} ${dispOld} → ${dispNew}（消耗💰${goldCost}+${md.icon}${matCost}）`,'sys');
-    }
-    it.stats[key]=newVal;
-    if(it.specials){
-      const spEntry=it.specials.find(sp=>sp.id===key);
-      if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
-    }
-    it.power=itemPower(it);
-    computeStats();renderAll();
-    closeModal();showItemModal(it,slot,true,activeTab);
-  }
-  // 检查是否已达最大值
-  if(range&&oldVal>=range.max){
-    confirmAction('已达到最大值','该属性当前值('+oldVal+')已达到范围最大值('+range.max+')，是否继续洗练？',execute);
-    return;
-  }
-  execute();
-}
-// 重铸：针对装备特殊属性词条，消耗重铸石，在范围内随机重roll
-function doRecastAttr(slot,key){
-  const it=G.equipped[slot];if(!it)return;
-  if(!it.specials||!it.specials.find(sp=>sp.id===key)){addLog('⚠️ 该装备无此特殊属性','sys');return;}
-  if((G.materials.recastStone||0)<1){addLog('⚠️ 重铸石不足(需要1个)','sys');return;}
-  const oldVal=it.stats[key];
-  const range=it.statRanges&&it.statRanges[key];
-  const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-  // 获取当前活动tab
-  const activeTabBtn=document.querySelector('#modal-box [data-equiptab].active');
-  const activeTab=activeTabBtn?activeTabBtn.dataset.equiptab:'info';
-  function execute(){
-    let newVal;
-    if(range){
-      if(sa){
-        const isInt=sa.step>=1;
-        if(isInt){newVal=randi(range.min/sa.step,range.max/sa.step)*sa.step;}
-        else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10))/10)/10;}
-      }else{
-        newVal=randi(range.min,range.max);
-      }
-    }else{
+      const sa=SPECIAL_ATTRS.find(x=>x.id===key);
       if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
-      else newVal=oldVal;
+      else newVal=0;
     }
-    G.materials.recastStone-=1;
-    const dispOld=sa?sa.fmt(oldVal):oldVal;
-    const dispNew=sa?sa.fmt(newVal):newVal;
-    if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
-      addLog(`♻️ 重铸完成，${sa?sa.name:key} 属性不变（${dispOld}），消耗♻️重铸石×1`,'sys');
-    }else{
-      addLog(`♻️ 重铸：${sa?sa.name:key} ${dispOld} → ${dispNew}（消耗♻️重铸石×1）`,'sys');
-    }
-    it.stats[key]=newVal;
+  }
+  G.gold-=goldCost;G.materials[rm.material]-=matCost;
+  if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
+    addLog(`🔄 洗炼完成，${key} 属性不变（${oldVal}），消耗💰${goldCost}+${md.icon}${matCost}`,'sys');
+  }else{
+    const isSpecial=SPECIAL_ATTRS.find(x=>x.id===key);
+    const dispOld=isSpecial?isSpecial.fmt(oldVal):oldVal;
+    const dispNew=isSpecial?isSpecial.fmt(newVal):newVal;
+    addLog(`🔄 洗炼：${key} ${dispOld} → ${dispNew}（消耗💰${goldCost}+${md.icon}${matCost}）`,'sys');
+  }
+  it.stats[key]=newVal;
+  if(it.specials){
     const spEntry=it.specials.find(sp=>sp.id===key);
-    if(spEntry){spEntry.val=newVal;spEntry.text=(sa||spEntry).fmt(newVal);}
-    it.power=itemPower(it);
-    computeStats();renderAll();
-    closeModal();showItemModal(it,slot,true,activeTab);
+    if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
   }
-  // 检查是否已达最大值
-  if(range&&oldVal>=range.max){
-    const dispVal=sa?sa.fmt(oldVal):oldVal;
-    const dispMax=sa?sa.fmt(range.max):range.max;
-    confirmAction('已达到最大值','该属性当前值('+dispVal+')已达到范围最大值('+dispMax+')，是否继续重铸？',execute);
-    return;
-  }
-  execute();
+  it.power=itemPower(it);
+  computeStats();renderAll();
+  closeModal();showItemModal(it,slot,true);
 }
 function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
@@ -3154,23 +3058,15 @@ function gachaPull(count){
     G.diamond-=cost;
   const equips=[];
   const consObtained=[];
-  let recastCount=0;
   for(let i=0;i<count;i++){
-    const roll=randi(1,100);
-    if(roll<=40){
-      // 40% 消耗品
+    if(randi(1,100)<=30){
       const ct=randomConsumableType();
       consObtained.push(ct);
       G.consumables[ct]=(G.consumables[ct]||0)+1;
-    }else if(roll<=95){
-      // 55% 装备 (41-95)
+    }else{
       const q=rollGachaQuality();
       const slot=pick(Object.keys(EQ_NAMES));
       equips.push(genEquip(slot,q,q,G.level));
-    }else{
-      // 5% 重铸石 (96-100)
-      recastCount++;
-      G.materials.recastStone=(G.materials.recastStone||0)+1;
     }
   }
   if(count===10&&equips.length>0){equips[randi(0,equips.length-1)]=genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level);}
@@ -3185,7 +3081,6 @@ function gachaPull(count){
   for(const[c,num]of Object.entries(consMap)){
     parts.push(CONSUMABLE_ICONS[c]+CONSUMABLE_NAMES[c]+'×'+num);
   }
-  if(recastCount>0)parts.push('♻️重铸石×'+recastCount);
   addLog('💎 '+count+'连抽！获得：'+parts.join('、'),'drop');
   renderAll();renderShop();
   });
@@ -3355,39 +3250,19 @@ function renderShop(){
   const probs=gachaProb();
   ds.innerHTML+=`<div class="gacha-rate">概率：${probs.map(p=>QUALITY[p.q]+p.pct+'%').join(' | ')}</div>`;
   const row1=document.createElement('div');row1.className='shop-item-row';
-  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备/消耗品/重铸石（40%消耗品/55%装备/5%重铸石）</div><div class="shop-item-price diamond">💎 10 钻石</div></div>`;
+  row1.innerHTML=`<div class="shop-item-icon">🎲</div><div class="shop-item-info"><div class="shop-item-name">单次抽取</div><div class="shop-item-desc">随机获得装备或消耗品（30%消耗品/70%装备）</div><div class="shop-item-price diamond">💎 10 钻石</div></div>`;
   const b1=document.createElement('button');b1.className='btn btn-pink btn-xs';b1.textContent='抽取';
   b1.disabled=G.diamond<10;b1.addEventListener('click',()=>gachaPull(1));
   row1.appendChild(b1);ds.appendChild(row1);
   const row10=document.createElement('div');row10.className='shop-item-row';
-  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品/重铸石</div><div class="shop-item-price diamond">💎 90 钻石</div></div>`;
+  row10.innerHTML=`<div class="shop-item-icon">🎰</div><div class="shop-item-info"><div class="shop-item-name">十连抽取</div><div class="shop-item-desc">9折！保底1件高级装备，含消耗品</div><div class="shop-item-price diamond">💎 90 钻石</div></div>`;
   const b10=document.createElement('button');b10.className='btn btn-pink btn-xs';b10.textContent='十连抽';
   b10.disabled=G.diamond<90;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
   el.appendChild(ds);
-  // 钻石商店区（用钻石购买道具）
-  const dshop=document.createElement('div');dshop.className='shop-section';
-  dshop.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">💎 钻石商店（余额：💎${fmt(G.diamond)}）</h4>`;
-  // 重铸石
-  const recastRow=document.createElement('div');recastRow.className='shop-item-row';
-  recastRow.innerHTML=`<div class="shop-item-icon">♻️</div><div class="shop-item-info"><div class="shop-item-name">重铸石</div><div class="shop-item-desc">用于重铸装备特殊属性词条</div><div class="shop-item-price diamond">💎 20 钻石</div></div>`;
-  const recastBtn=document.createElement('button');recastBtn.className='btn btn-pink btn-xs';
-  recastBtn.textContent='购买';
-  recastBtn.disabled=G.diamond<20;
-  recastBtn.addEventListener('click',()=>{
-    if(G.diamond<20)return addLog('⚠️ 钻石不足','sys');
-    confirmAction('购买重铸石','♻️ 确定花费 💎20 钻石购买1个重铸石吗？',()=>{
-      G.diamond-=20;
-      G.materials.recastStone=(G.materials.recastStone||0)+1;
-      addLog('♻️ 购买重铸石×1','sys');
-      renderAll();renderShop();
-    });
-  });
-  recastRow.appendChild(recastBtn);dshop.appendChild(recastRow);
-  el.appendChild(dshop);
   const cs=document.createElement('div');cs.className='shop-section';
   cs.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">🎒 消耗品</h4>`;
-  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0},{icon:'♻️',name:'重铸石',count:G.materials.recastStone||0}];
+  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0}];
   for(const ci of items){
     const cr=document.createElement('div');cr.className='shop-item-row';
     cr.innerHTML=`<div class="shop-item-icon">${ci.icon}</div><div class="shop-item-info"><div class="shop-item-name">${ci.name}</div><div class="shop-item-desc">持有：<b>${ci.count}</b></div></div>`;
@@ -3606,27 +3481,6 @@ function gameTick(){
   const n=now();for(const id in G.buffs){if(G.buffs[id].until<n)delete G.buffs[id];}
   if(Object.keys(G.buffs).length>0)computeStats();
 }
-// 迁移旧存档：给没有statRanges的装备补全范围
-function patchStatRanges(it){
-  const m=QMULT[it.quality]||1;
-  it.statRanges={};
-  // 基础属性：按部位匹配genEquip中的范围定义
-  const s=it.slot;
-  if(s==='mainHand'){it.statRanges.atk={min:2*m,max:6*m};it.statRanges.critRate={min:0,max:Math.round(m*10)/10};}
-  else if(s==='offHand'){it.statRanges.def={min:1*m,max:4*m};it.statRanges.block={min:1*m,max:3*m};}
-  else if(s==='armor'){it.statRanges.def={min:2*m,max:5*m};it.statRanges.hp={min:5*m,max:20*m};}
-  else if(s==='helmet'){it.statRanges.hp={min:5*m,max:15*m};it.statRanges.def={min:1*m,max:3*m};}
-  else if(s==='bracer'){it.statRanges.atk={min:1*m,max:4*m};it.statRanges.critRate={min:0,max:Math.round(2*m*10)/10};}
-  else if(s==='pants'){it.statRanges.def={min:2*m,max:4*m};it.statRanges.hp={min:5*m,max:15*m};}
-  else if(s==='boots'){it.statRanges.atkSpd={min:2*m,max:8*m};it.statRanges.dodge={min:Math.round(0.5*m*10)/10,max:Math.round(2*m*10)/10};}
-  else if(s==='necklace'){it.statRanges.critDmg={min:5*m,max:20*m};it.statRanges.atk={min:1*m,max:3*m};}
-  else if(s==='ring1'||s==='ring2'){it.statRanges.atk={min:1*m,max:4*m};it.statRanges.critRate={min:Math.round(0.5*m*10)/10,max:Math.round(2*m*10)/10};}
-  else if(s==='pendant'){it.statRanges.atk={min:1*m,max:5*m};it.statRanges.hp={min:5*m,max:20*m};it.statRanges.def={min:1*m,max:3*m};}
-  // 特殊属性：用SPECIAL_ATTRS的范围
-  if(it.specials){for(const sp of it.specials){const sa=SPECIAL_ATTRS.find(x=>x.id===sp.id);if(sa)it.statRanges[sp.id]={min:sa.min,max:sa.max};}}
-  // 确保整数值范围
-  for(const k in it.statRanges){const r=it.statRanges[k];if(['atk','def','hp','critDmg','atkSpd','block'].includes(k)){it.statRanges[k]={min:Math.floor(r.min),max:Math.floor(r.max)};}}
-}
 function init(){
   // 初始化存档系统（异步，不阻塞启动）
   initSaveSystem();
@@ -3657,12 +3511,8 @@ function init(){
   if(!G.learnedSkills)G.learnedSkills={};
   if(!G.skillBooks)G.skillBooks=[];
   if(!G.materials)G.materials={};
-  if(G.materials.recastStone===undefined)G.materials.recastStone=0;
   if(G.dead===undefined||G.dead===null)G.dead=false;
   if(!G.deadUntil)G.deadUntil=0;
-  // 迁移旧存档: 给没有statRanges的装备补全范围
-  for(const slot in G.equipped){const it=G.equipped[slot];if(it&&!it.statRanges)patchStatRanges(it);}
-  for(const it of G.inventory){if(it&&!it.statRanges)patchStatRanges(it);}
   computeStats();G.hp=Math.min(G.maxHp,G.hp);
   renderAll();renderShop();
   setInterval(gameTick,1000);
