@@ -3818,9 +3818,9 @@ function calculateOfflineRewards(offlineSec){
   const hitsToKill = Math.ceil(avgHp / Math.max(1, effDmg));
   const avgKillTimeMs = hitsToKill * atkInterval;
   
-  // 离线击杀数（效率50%）
+  // 离线击杀数（在线80%效率）
   const offlineMs = offlineSec * 1000;
-  let killCount = Math.floor(offlineMs / avgKillTimeMs * 0.5);
+  let killCount = Math.floor(offlineMs / avgKillTimeMs * 0.8);
   if(killCount < 1) killCount = 1;
   if(killCount > 100000) killCount = 100000;
   
