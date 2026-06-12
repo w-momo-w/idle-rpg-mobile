@@ -3984,6 +3984,7 @@ function gameTick(){
       G.enemy=genMonster();G.killStreak=0;
       G._monsterSpawnTime=now(); // 复活后延迟1秒再战斗
       addLog('💀 等待结束，你复活了。怪物已刷新','sys');
+      return; // 复活后立即返回，避免继续显示倒计时
     }
     // 更新死亡倒计时显示
     const remainSec=Math.ceil((G.deadUntil-now())/1000);
