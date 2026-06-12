@@ -847,14 +847,6 @@ body{
       </div>
     </div>
 
-    <!-- 隐藏的旧版tab容器，JS需要 -->
-    <div style="display:none">
-      <div class="tab-content active" id="tab-bag"></div>
-      <div class="tab-content" id="tab-skills"></div>
-      <div class="tab-content" id="tab-quests"></div>
-      <div class="tab-content" id="tab-shop"></div>
-      <div class="tab-content" id="tab-maps"></div>
-    </div>
   </div>
 
   <!-- ===== 底部设置栏（战斗日志） ===== -->
@@ -3549,9 +3541,9 @@ function init(){
   if(!G.deadUntil)G.deadUntil=0;
   computeStats();G.hp=Math.min(G.maxHp,G.hp);
   renderAll();renderShop();
-  setInterval(gameTick,1000);
+  if(!G._tickInterval)G._tickInterval=setInterval(gameTick,1000);
   // 自动保存：每15秒
-  setInterval(()=>{autoSaveToFile();},15000);
+  if(!G._saveInterval)G._saveInterval=setInterval(()=>{autoSaveToFile();},15000);
   // 首次保存
   autoSaveToFile();
   // 离线收益结算（≥10秒离线才触发）
@@ -4111,7 +4103,7 @@ function showImportConfirmModal(data){
       setTimeout(()=>location.reload(),500);
     }
   });
-  document.getElementById('btn-import-cancel').addEventListener('click',closeModal);
+  const elBtnImportCancel=document.getElementById('btn-import-cancel');if(elBtnImportCancel)elBtnImportCancel.addEventListener('click',closeModal);
 }
 
 function showResetConfirmModal(){
@@ -4142,33 +4134,38 @@ function showResetConfirmModal(){
 }
 
 // ═══════════════════════════════════════════
-//  EVENTS
+//  EVENTS (安全绑定，元素不存在时静默跳过)
 // ═══════════════════════════════════════════
-document.getElementById('btn-attack').addEventListener('click',()=>playerAttack(false));
+function safeOn(id, event, fn){
+  const el=document.getElementById(id);
+  if(el)el.addEventListener(event,fn);
+}
+safeOn('btn-attack','click',()=>playerAttack(false));
 // 技能按钮由 refreshSkillBtns 动态管理
-document.getElementById('btn-change-map').addEventListener('click',()=>{
-  // 在战斗页面显示地图选择弹窗
+safeOn('btn-change-map','click',()=>{
   const box=document.getElementById('modal-box');
+  if(!box)return;
   box.innerHTML='<div class="modal-hd">🗺️ 选择地图</div><div class="modal-bd" id="map-list"></div><button class="btn btn-xs" style="margin:10px auto;display:block" onclick="closeModal()">关闭</button>';
   renderMaps();
-  document.getElementById('modal-overlay').classList.add('show');
+  const ov=document.getElementById('modal-overlay');if(ov)ov.classList.add('show');
 });
-document.getElementById('btn-use-hp-small').addEventListener('click',function(){useHpPotionSmall(false);});
-document.getElementById('btn-use-hp-large').addEventListener('click',function(){useHpPotionLarge(false);});
-document.getElementById('btn-use-atk-scroll').addEventListener('click',useAtkScroll);
-document.getElementById('btn-use-def-scroll').addEventListener('click',useDefScroll);
-document.getElementById('btn-use-hp-scroll').addEventListener('click',useHpScroll);
-document.getElementById('btn-class-switch').addEventListener('click',showClassSwitchModal);
-document.getElementById('btn-diamond-shop').addEventListener('click',showDiamondShop);
-document.getElementById('auto-atk').addEventListener('change',function(){G.autoAtk=this.checked;});
-document.getElementById('auto-skill').addEventListener('change',function(){G.autoSkill=this.checked;});
-document.getElementById('auto-equip').addEventListener('change',function(){G.autoEquip=this.checked;});
-document.getElementById('auto-hp-small').addEventListener('change',function(){G.autoHpSmall=this.checked;});
-document.getElementById('auto-hp-large').addEventListener('change',function(){G.autoHpLarge=this.checked;});
-document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+safeOn('btn-use-hp-small','click',function(){useHpPotionSmall(false);});
+safeOn('btn-use-hp-large','click',function(){useHpPotionLarge(false);});
+safeOn('btn-use-atk-scroll','click',useAtkScroll);
+safeOn('btn-use-def-scroll','click',useDefScroll);
+safeOn('btn-use-hp-scroll','click',useHpScroll);
+safeOn('btn-class-switch','click',showClassSwitchModal);
+safeOn('btn-diamond-shop','click',showDiamondShop);
+safeOn('auto-atk','change',function(){G.autoAtk=this.checked;});
+safeOn('auto-skill','change',function(){G.autoSkill=this.checked;});
+safeOn('auto-equip','change',function(){G.autoEquip=this.checked;});
+safeOn('auto-hp-small','change',function(){G.autoHpSmall=this.checked;});
+safeOn('auto-hp-large','change',function(){G.autoHpLarge=this.checked;});
+safeOn('modal-overlay','click',function(e){if(e.target===this)closeModal();});
 // 旧版tab切换逻辑已移除，使用底部导航栏切换
 // 背包子标签切换
-document.querySelectorAll('#bag-subtabs .tab-btn').forEach(b=>{
+const bagSubtabs=document.querySelectorAll('#bag-subtabs .tab-btn');
+if(bagSubtabs.length)bagSubtabs.forEach(b=>{
   b.addEventListener('click',function(e){
     e.stopPropagation();
     document.querySelectorAll('#bag-subtabs .tab-btn').forEach(x=>x.classList.remove('active'));
@@ -4181,10 +4178,11 @@ document.querySelectorAll('#bag-subtabs .tab-btn').forEach(b=>{
   });
 });
 // 背包折叠/展开
-document.getElementById('btn-bag-toggle').addEventListener('click',function(){
+safeOn('btn-bag-toggle','click',function(){
   G.bagCollapsed=!G.bagCollapsed;
   const collapsible=document.getElementById('bag-collapsible');
   const toggle=document.getElementById('btn-bag-toggle');
+  if(!collapsible||!toggle)return;
   if(G.bagCollapsed){
     collapsible.style.display='none';
     toggle.textContent='▶ 展开';
@@ -4204,42 +4202,44 @@ const questPanel = document.getElementById('tab-page-quests');
 if(questPanel){
   const qb = questPanel.querySelector('.panel-bd');
   if(qb){
-    // 添加倒计时显示元素
     const cdEl=document.createElement('div');cdEl.id='quest-refresh-cd';cdEl.style.cssText='text-align:center;font-size:11px;color:var(--muted);margin-top:4px';
     qb.appendChild(cdEl);
     qb.appendChild(rqBtn);
   }
 }
 // ═══ 分解系统事件 ═══
-document.getElementById('btn-decompose').addEventListener('click',toggleDecomposePanel);
-document.getElementById('btn-decompose-confirm').addEventListener('click',()=>{
-  const th=parseInt(document.getElementById('decompose-quality').value);
-  const nc=document.getElementById('decompose-nonclass').checked;
+safeOn('btn-decompose','click',toggleDecomposePanel);
+safeOn('btn-decompose-confirm','click',()=>{
+  const thEl=document.getElementById('decompose-quality');
+  const ncEl=document.getElementById('decompose-nonclass');
+  const th=thEl?parseInt(thEl.value):3;
+  const nc=ncEl?ncEl.checked:false;
   doDecompose(th,nc);
 });
-document.getElementById('btn-decompose-cancel').addEventListener('click',()=>{
-  document.getElementById('decompose-panel').style.display='none';
+safeOn('btn-decompose-cancel','click',()=>{
+  const dp=document.getElementById('decompose-panel');
+  if(dp)dp.style.display='none';
 });
-document.getElementById('auto-decompose').addEventListener('change',function(){
+safeOn('auto-decompose','change',function(){
   G.autoDecompose=this.checked;
-  const th=parseInt(document.getElementById('decompose-quality').value);
-  G.decomposeThreshold=th;
-  if(this.checked)addLog(`⚡ 自动分解已开启（品质≤${QUALITY[th]}）`,'sys');
+  const thEl=document.getElementById('decompose-quality');
+  G.decomposeThreshold=thEl?parseInt(thEl.value):3;
+  if(this.checked)addLog(`⚡ 自动分解已开启（品质≤${QUALITY[G.decomposeThreshold]}）`,'sys');
   else addLog('⚡ 自动分解已关闭','sys');
 });
-document.getElementById('decompose-nonclass').addEventListener('change',function(){
+safeOn('decompose-nonclass','change',function(){
   G.decomposeNonClass=this.checked;
   if(this.checked)addLog('⚡ 非本职业装备自动分解已开启','sys');
   else addLog('⚡ 非本职业装备自动分解已关闭','sys');
 });
-document.getElementById('decompose-quality').addEventListener('change',function(){
+safeOn('decompose-quality','change',function(){
   G.decomposeThreshold=parseInt(this.value);
   if(G.autoDecompose)addLog(`⚡ 自动分解品质阈值已更新：≤${QUALITY[G.decomposeThreshold]}`,'sys');
 });
-document.getElementById('btn-reset').addEventListener('click',resetGame);
-document.getElementById('btn-manual-save').addEventListener('click',manualSave);
-document.getElementById('btn-export-save').addEventListener('click',exportSave);
-document.getElementById('btn-import-save').addEventListener('click',importSave);
+safeOn('btn-reset','click',resetGame);
+safeOn('btn-manual-save','click',manualSave);
+safeOn('btn-export-save','click',exportSave);
+safeOn('btn-import-save','click',importSave);
 // FAB菜单按钮事件
 const fabManualSave=document.getElementById('fab-manual-save');
 const fabExport=document.getElementById('fab-export');
