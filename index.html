@@ -1090,6 +1090,7 @@ const MATERIALS={
   herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.028,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
   ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.024,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
   dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.006,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
+  recastStone:{id:'recastStone',name:'重铸石',icon:'♻️',desc:'用于重铸装备特殊属性词条',dropRate:0,dropSources:[],use:{count:1,desc:'重铸石用于装备详情中的重铸功能'}},
 };
 
 // Material synthesis: combine materials to craft specific-slot equipment
@@ -1379,6 +1380,8 @@ function genQuestReward(G,base){
   // 25%概率给材料
   else if(r<0.85){const mids=Object.keys(MATERIALS);rew.material=pick(mids);rew.materialCount=randi(2,6);}
   // 其余只给基础奖励
+  // 极低概率（5%）给重铸石
+  if(Math.random()<0.05){rew.recastStone=randi(1,2);}
   return rew;
 }
 
@@ -1991,6 +1994,7 @@ function submitQuest(qIndex){
   if(q.reward.equipQ!==undefined){const slot=pick(Object.keys(EQ_NAMES));const it=genEquip(slot,q.reward.equipQ,Math.min(8,q.reward.equipQ+2),G.level);if(G.inventory.length<G.maxInv)G.inventory.push(it);else addLog('⚠️ 背包已满，装备奖励丢失','sys');}
   if(q.reward.potion){const key=q.reward.potion;G.consumables[key]=(G.consumables[key]||0)+q.reward.potionCount;}
   if(q.reward.material){const mk=q.reward.material;G.materials[mk]=(G.materials[mk]||0)+q.reward.materialCount;}
+  if(q.reward.recastStone){G.materials.recastStone=(G.materials.recastStone||0)+q.reward.recastStone;}
   const rewardText=[];
   if(q.reward.gold)rewardText.push('💰'+fmt(q.reward.gold));
   if(q.reward.diamond)rewardText.push('💎'+q.reward.diamond);
@@ -1998,6 +2002,7 @@ function submitQuest(qIndex){
   if(q.reward.equipQ!==undefined)rewardText.push('🎁'+QUALITY[q.reward.equipQ]+'+装备');
   if(q.reward.potion){const pn={hpPotion:'🧪小血瓶',hpLarge:'💉大血瓶',atkScroll:'📜攻击卷轴',defScroll:'🛡️防御卷轴',hpScroll:'❤️生命卷轴'};rewardText.push(pn[q.reward.potion]+'×'+q.reward.potionCount);}
   if(q.reward.material){const md=MATERIALS[q.reward.material];rewardText.push(md.icon+md.name+'×'+q.reward.materialCount);}
+  if(q.reward.recastStone){rewardText.push('♻️重铸石×'+q.reward.recastStone);}
   addLog(`✅ 任务完成：【${q.text}】获得 ${rewardText.join(' ')}`,'quest');
   // 替换已完成任务
   replaceQuest(qIndex);
@@ -2580,6 +2585,7 @@ function renderQuests(){
     if(q.reward.equipQ!==undefined)rw.push('🎁'+QUALITY[q.reward.equipQ]+'+装备');
     if(q.reward.potion){const pn={hpPotion:'🧪小血瓶',hpLarge:'💉大血瓶',atkScroll:'📜攻击卷轴',defScroll:'🛡️防御卷轴',hpScroll:'❤️生命卷轴'};rw.push(pn[q.reward.potion]+'×'+q.reward.potionCount);}
     if(q.reward.material){const md=MATERIALS[q.reward.material];rw.push(md.icon+md.name+'×'+q.reward.materialCount);}
+    if(q.reward.recastStone){rw.push('♻️重铸石×'+q.reward.recastStone);}
     div.innerHTML=`<div class="quest-title">${q.type==='kill'?'🗡️':q.type==='kill_any'?'⚔️':q.type==='collect_gold'?'💰':q.type==='collect_material'?'📦':'🎒'} ${q.text}</div><div class="quest-progress">进度：<span style="font-weight:bold;color:${canSubmit?'var(--green)':'var(--purple)'}">${q.progress}/${q.target}</span> (${pct}%)${canSubmit?' ✅ 可提交':''}</div><div class="quest-reward">奖励：${rw.join(' ')}</div>`;
     if(canSubmit){
       const sbtn=document.createElement('button');
@@ -2717,14 +2723,32 @@ function showItemModal(it,source,isEquipped){
       </div>`;
     }
     if(refineAttrs.length===0)refineHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有可洗炼的属性</div>';
+    // 构建重铸Tab内容（只显示特殊属性词条）
+    let recastHtml='<div style="font-size:11px;color:var(--muted);margin-bottom:6px">逐条重铸特殊属性词条，数值在范围内随机重roll，消耗♻️重铸石×1/次</div>';
+    if(it.specials&&it.specials.length>0){
+      for(const sp of it.specials){
+        const sr=it.statRanges&&it.statRanges[sp.id];
+        const rangeStr=sr?` <span style="font-size:9px;color:var(--muted)">(${sr.min}-${sr.max})</span>`:'';
+        const canRecast=(G.materials.recastStone||0)>=1;
+        recastHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--border);gap:6px">
+          <span style="flex:1;font-size:12px;font-weight:bold">${sp.name}${rangeStr}</span>
+          <span style="color:var(--teal);font-size:12px;min-width:36px;text-align:right">${sp.text}</span>
+          <button class="btn btn-pink btn-sm recast-attr-btn" data-key="${sp.id}" ${canRecast?'':'disabled'} style="font-size:10px;padding:3px 6px;white-space:nowrap">♻️ ♻️${1}个</button>
+        </div>`;
+      }
+    }else{
+      recastHtml='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px">该装备没有特殊属性可重铸</div>';
+    }
     // 插入Tab栏到modal-box
     const tabBlock=document.createElement('div');
     tabBlock.innerHTML=`<div class="tabs" style="margin-top:8px">
       <button class="tab-btn active" data-equiptab="info">📋 详情</button>
       <button class="tab-btn" data-equiptab="refine">🔄 洗炼</button>
+      <button class="tab-btn" data-equiptab="recast">♻️ 重铸</button>
     </div>
     <div class="bag-tab-content active" id="equip-tab-info">${infoHtml}</div>
-    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>`;
+    <div class="bag-tab-content" id="equip-tab-refine">${refineHtml}</div>
+    <div class="bag-tab-content" id="equip-tab-recast">${recastHtml}</div>`;
     box.appendChild(tabBlock);
     // Tab切换
     box.querySelectorAll('[data-equiptab]').forEach(btn=>{
@@ -2734,11 +2758,16 @@ function showItemModal(it,source,isEquipped){
         const tn=this.dataset.equiptab;
         document.getElementById('equip-tab-info').classList.toggle('active',tn==='info');
         document.getElementById('equip-tab-refine').classList.toggle('active',tn==='refine');
+        document.getElementById('equip-tab-recast').classList.toggle('active',tn==='recast');
       });
     });
     // 逐条洗炼按钮事件
     box.querySelectorAll('.refine-attr-btn').forEach(btn=>{
       btn.addEventListener('click',function(){doRefineAttr(source,this.dataset.key);});
+    });
+    // 逐条重铸按钮事件
+    box.querySelectorAll('.recast-attr-btn').forEach(btn=>{
+      btn.addEventListener('click',function(){doRecastAttr(source,this.dataset.key);});
     });
     // 卸下按钮
     const ub=document.createElement('button');ub.className='btn btn-red btn-sm';ub.textContent='卸下装备';
@@ -2872,6 +2901,44 @@ function doRefineAttr(slot,key){
     const spEntry=it.specials.find(sp=>sp.id===key);
     if(spEntry){spEntry.val=newVal;spEntry.text=(SPECIAL_ATTRS.find(x=>x.id===key)||spEntry).fmt(newVal);}
   }
+  it.power=itemPower(it);
+  computeStats();renderAll();
+  closeModal();showItemModal(it,slot,true);
+}
+// 重铸：针对装备特殊属性词条，消耗重铸石，在范围内随机重roll
+function doRecastAttr(slot,key){
+  const it=G.equipped[slot];if(!it)return;
+  if(!it.specials||!it.specials.find(sp=>sp.id===key)){addLog('⚠️ 该装备无此特殊属性','sys');return;}
+  if((G.materials.recastStone||0)<1){addLog('⚠️ 重铸石不足(需要1个)','sys');return;}
+  const oldVal=it.stats[key];
+  const range=it.statRanges&&it.statRanges[key];
+  let newVal;
+  if(range){
+    const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+    if(sa){
+      const isInt=sa.step>=1;
+      if(isInt){newVal=randi(range.min/sa.step,range.max/sa.step)*sa.step;}
+      else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10))/10)/10;}
+    }else{
+      newVal=randi(range.min,range.max);
+    }
+  }else{
+    const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+    if(sa){newVal=randi(sa.min/sa.step,sa.max/sa.step)*sa.step;}
+    else newVal=oldVal;
+  }
+  G.materials.recastStone-=1;
+  const sa=SPECIAL_ATTRS.find(x=>x.id===key);
+  const dispOld=sa?sa.fmt(oldVal):oldVal;
+  const dispNew=sa?sa.fmt(newVal):newVal;
+  if(newVal===0||newVal===oldVal||Math.abs(newVal-oldVal)<0.01){
+    addLog(`♻️ 重铸完成，${sa?sa.name:key} 属性不变（${dispOld}），消耗♻️重铸石×1`,'sys');
+  }else{
+    addLog(`♻️ 重铸：${sa?sa.name:key} ${dispOld} → ${dispNew}（消耗♻️重铸石×1）`,'sys');
+  }
+  it.stats[key]=newVal;
+  const spEntry=it.specials.find(sp=>sp.id===key);
+  if(spEntry){spEntry.val=newVal;spEntry.text=(sa||spEntry).fmt(newVal);}
   it.power=itemPower(it);
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true);
@@ -3260,9 +3327,29 @@ function renderShop(){
   b10.disabled=G.diamond<90;b10.addEventListener('click',()=>gachaPull(10));
   row10.appendChild(b10);ds.appendChild(row10);
   el.appendChild(ds);
+  // 钻石商店区（用钻石购买道具）
+  const dshop=document.createElement('div');dshop.className='shop-section';
+  dshop.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">💎 钻石商店（余额：💎${fmt(G.diamond)}）</h4>`;
+  // 重铸石
+  const recastRow=document.createElement('div');recastRow.className='shop-item-row';
+  recastRow.innerHTML=`<div class="shop-item-icon">♻️</div><div class="shop-item-info"><div class="shop-item-name">重铸石</div><div class="shop-item-desc">用于重铸装备特殊属性词条</div><div class="shop-item-price diamond">💎 20 钻石</div></div>`;
+  const recastBtn=document.createElement('button');recastBtn.className='btn btn-pink btn-xs';
+  recastBtn.textContent='购买';
+  recastBtn.disabled=G.diamond<20;
+  recastBtn.addEventListener('click',()=>{
+    if(G.diamond<20)return addLog('⚠️ 钻石不足','sys');
+    confirmAction('购买重铸石','♻️ 确定花费 💎20 钻石购买1个重铸石吗？',()=>{
+      G.diamond-=20;
+      G.materials.recastStone=(G.materials.recastStone||0)+1;
+      addLog('♻️ 购买重铸石×1','sys');
+      renderAll();renderShop();
+    });
+  });
+  recastRow.appendChild(recastBtn);dshop.appendChild(recastRow);
+  el.appendChild(dshop);
   const cs=document.createElement('div');cs.className='shop-section';
   cs.innerHTML=`<h4 style="font-size:12px;margin-bottom:4px">🎒 消耗品</h4>`;
-  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0}];
+  const items=[{icon:'🧪',name:'小血瓶',count:G.consumables.hpPotion||0},{icon:'💉',name:'大血瓶',count:G.consumables.hpLarge||0},{icon:'📜',name:'攻击卷轴',count:G.consumables.atkScroll||0},{icon:'🛡️',name:'防御卷轴',count:G.consumables.defScroll||0},{icon:'❤️',name:'生命卷轴',count:G.consumables.hpScroll||0},{icon:'♻️',name:'重铸石',count:G.materials.recastStone||0}];
   for(const ci of items){
     const cr=document.createElement('div');cr.className='shop-item-row';
     cr.innerHTML=`<div class="shop-item-icon">${ci.icon}</div><div class="shop-item-info"><div class="shop-item-name">${ci.name}</div><div class="shop-item-desc">持有：<b>${ci.count}</b></div></div>`;
@@ -3511,6 +3598,7 @@ function init(){
   if(!G.learnedSkills)G.learnedSkills={};
   if(!G.skillBooks)G.skillBooks=[];
   if(!G.materials)G.materials={};
+  if(G.materials.recastStone===undefined)G.materials.recastStone=0;
   if(G.dead===undefined||G.dead===null)G.dead=false;
   if(!G.deadUntil)G.deadUntil=0;
   computeStats();G.hp=Math.min(G.maxHp,G.hp);
