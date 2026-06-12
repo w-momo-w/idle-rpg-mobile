@@ -1991,7 +1991,11 @@ function renderEnemy(){
   const card=document.getElementById('enemy-card');card.className=e.type==='boss'?'boss':e.type==='elite'?'elite':'';
   // Show level badge
   document.getElementById('en-name').textContent=e.name||'???';
-  document.getElementById('en-lv-tag').textContent=e.type==='boss'?'Lv.'+(e.level||1):e.type==='elite'?'Lv.'+(e.level||1):'';
+  if(e.type==='boss'||e.type==='elite'){
+    document.getElementById('en-lv-tag').textContent='Lv.'+(e.level||1);
+  }else{
+    document.getElementById('en-lv-tag').textContent='Lv.'+(e.level||1);
+  }
   const typeTag=document.getElementById('en-type-tag');
   if(e.type==='boss'){typeTag.textContent='BOSS';typeTag.className='enemy-type-tag boss';}
   else if(e.type==='elite'){typeTag.textContent='精英';typeTag.className='enemy-type-tag elite';}
