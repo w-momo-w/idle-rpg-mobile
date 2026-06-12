@@ -1690,7 +1690,8 @@ function genEquip(slot,minQ,maxQ,monsterLv){
 
   // special attributes: bronze(q=1)+ gets q special attr slots
   // 特殊属性同时受品质系数和等级系数影响
-  const spFactor=lvFactor*(0.7+q*0.15); // 品质越高特殊属性越强：青铜0.85→超神级1.9
+  const spLvFactor=1+((monsterLv||1)-1)*0.005; // 特殊属性等级缩放：0.5%/级（温和增长）
+  const spFactor=spLvFactor*(0.7+q*0.10); // 品质系数降低：青铜0.8→超神级1.5
   const specials=[];
   if(q>=1){
     const numSpecials=q; // 青铜1个，白银2个，黄金3个...
@@ -1699,7 +1700,16 @@ function genEquip(slot,minQ,maxQ,monsterLv){
     const shuffled=[...pool].sort(()=>Math.random()-0.5);
     for(let i=0;i<Math.min(numSpecials,shuffled.length);i++){
       const sa=shuffled[i];
-      const val=randi(Math.floor(sa.min*spFactor/sa.step),Math.floor(sa.max*spFactor/sa.step))*sa.step;
+      let val=randi(Math.floor(sa.min*spFactor/sa.step),Math.floor(sa.max*spFactor/sa.step))*sa.step;
+      // 单件装备特殊属性上限（防止百分比属性溢出）
+      if(sa.id==='lifesteal')val=Math.min(val,10);
+      else if(sa.id==='dodge')val=Math.min(val,10);
+      else if(sa.id==='block')val=Math.min(val,8);
+      else if(sa.id==='doubleAtk')val=Math.min(val,8);
+      else if(sa.id==='thorns')val=Math.min(val,10);
+      else if(sa.id==='armorPierce')val=Math.min(val,15);
+      else if(sa.id==='critBonus')val=Math.min(val,15);
+      else if(sa.id==='siphon')val=Math.min(val,8);
       s[sa.id]=val;statRanges[sa.id]={min:Math.round(sa.min*spFactor*10)/10,max:Math.round(sa.max*spFactor*10)/10};chosen.push({...sa,val,text:sa.fmt(val)});
     }
     specials.push(...chosen);
@@ -3060,7 +3070,17 @@ function doRefineAttr(slot,key){
     const isSpecial=it.specials&&it.specials.find(sp=>sp.id===key);
     if(isSpecial){
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){const rf=(1+((it.reqLv||1)-1)*0.02)*(0.7+q*0.15);newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;}
+      if(sa){const rf=(1+((it.reqLv||1)-1)*0.005)*(0.7+q*0.10);newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;
+        // 单件上限
+        if(sa.id==='lifesteal')newVal=Math.min(newVal,10);
+        else if(sa.id==='dodge')newVal=Math.min(newVal,10);
+        else if(sa.id==='block')newVal=Math.min(newVal,8);
+        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,8);
+        else if(sa.id==='thorns')newVal=Math.min(newVal,10);
+        else if(sa.id==='armorPierce')newVal=Math.min(newVal,15);
+        else if(sa.id==='critBonus')newVal=Math.min(newVal,15);
+        else if(sa.id==='siphon')newVal=Math.min(newVal,8);
+      }
       else{const isIntFb=['atk','def','hp','critDmg','atkSpd','block'].includes(key);if(isIntFb){newVal=randi(range.min,range.max);}else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}}
     }else{
       const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
@@ -3110,7 +3130,17 @@ function doRefineAttr(slot,key){
       newVal=Math.floor(newVal);
     }else{
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){const rf2=(1+((it.reqLv||1)-1)*0.02)*(0.7+q*0.15);newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;}
+      if(sa){const rf2=(1+((it.reqLv||1)-1)*0.005)*(0.7+q*0.10);newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;
+        // 单件上限
+        if(sa.id==='lifesteal')newVal=Math.min(newVal,10);
+        else if(sa.id==='dodge')newVal=Math.min(newVal,10);
+        else if(sa.id==='block')newVal=Math.min(newVal,8);
+        else if(sa.id==='doubleAtk')newVal=Math.min(newVal,8);
+        else if(sa.id==='thorns')newVal=Math.min(newVal,10);
+        else if(sa.id==='armorPierce')newVal=Math.min(newVal,15);
+        else if(sa.id==='critBonus')newVal=Math.min(newVal,15);
+        else if(sa.id==='siphon')newVal=Math.min(newVal,8);
+      }
       else newVal=0;
     }
   }
