@@ -1687,10 +1687,12 @@ function genMonster(){
   if(roll<0.05&&m.boss){template=m.boss;type='boss';}
   else if(roll<0.20&&m.elite){template=m.elite;type='elite';}
   else{template=pick(m.monsters);}
-  // Monster level: between map min level and map max level
-  const maxLv = m.maxLv || m.lv + 10;
-  const minLv = m.lv;
-  const monLv = randi(minLv, maxLv);
+  // Monster level: 人物等级 ±3 波动，受地图上下限约束
+  const mapMaxLv = m.maxLv || m.lv + 10;
+  const mapMinLv = m.lv;
+  const minLv = Math.max(mapMinLv, G.level - 3);
+  const maxLv = Math.min(mapMaxLv, G.level + 3);
+  const monLv = randi(Math.max(minLv, 1), Math.max(maxLv, 1));
   // Monster level actually matters now: 6%/lv stat scaling + 4%/lv reward scaling
   const typeMult=type==='boss'?5:type==='elite'?2.5:1;
   const diffMult=G.level>=10?1.2:1;
