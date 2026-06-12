@@ -586,6 +586,8 @@ body{
   opacity:0;transition:opacity .3s,transform .3s;
 }
 .craft-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.craft-toast.success{border:2px solid var(--green)}
+.craft-toast.error{border:2px solid var(--red)}
 
 /* 地图切换过渡 */
 #map-flash{
@@ -2622,6 +2624,21 @@ function showCraftResult(it){
   box.innerHTML=html;
   document.getElementById('btn-craft-ok').addEventListener('click',closeModal);
 }
+function showToast(title,msg,type){
+  // 复用已有的 craft-toast 样式
+  let toastEl=document.getElementById('toast-popup');
+  if(!toastEl){
+    toastEl=document.createElement('div');
+    toastEl.id='toast-popup';
+    toastEl.className='craft-toast';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.className='craft-toast '+(type||'');
+  toastEl.innerHTML=`<div style="font-size:18px;margin-bottom:4px">${title}</div><div style="font-size:13px;color:var(--muted)">${msg}</div>`;
+  toastEl.classList.add('show');
+  clearTimeout(toastEl._timer);
+  toastEl._timer=setTimeout(()=>{toastEl.classList.remove('show');},1500);
+}
 function craftEquip(craftIndex){
   const recipe=MATERIAL_CRAFT[craftIndex];
   if(!recipe)return;
@@ -3014,8 +3031,12 @@ function doEnhance(slot){
     G.slotEnhance[slot]=(G.slotEnhance[slot]||0)+1;
     const ep=getEnhancePower(slot);
     addLog(`⚒️ 强化成功！${it.name} → +${G.slotEnhance[slot]}（战力${it.power+ep}）`,'sys');
+    // 弹窗提示强化成功
+    showToast(`⚒️ 强化成功！`, `${it.name} → +${G.slotEnhance[slot]}`, 'success');
   }else{
     addLog(`💔 强化失败！${it.name} 仍为 +${elv}`,'sys');
+    // 弹窗提示强化失败
+    showToast(`💔 强化失败`, `${it.name} 仍为 +${elv}`, 'error');
   }
   computeStats();renderAll();
   closeModal();showItemModal(it,slot,true);
