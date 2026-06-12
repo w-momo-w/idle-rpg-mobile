@@ -1786,27 +1786,29 @@ function genMonster(){
 
   // Elite/Boss get special attributes
   if(type==='elite'){
-    const sp=pick(ENEMY_SPECIALS);
-    enemy.specials.push({...sp});
-    if(sp.apply)sp.apply(enemy);
-    if(sp.isRegen)enemy._regen=sp.regenPct;
-    if(sp.dodge)enemy._dodge=sp.dodge;
-    if(sp.thorns)enemy._thorns=sp.thorns;
-    if(sp.lifesteal)enemy._lifesteal=sp.lifesteal;
-    if(sp.dmgReduce)enemy._dmgReduce=sp.dmgReduce;
-    if(sp.critReduce)enemy._critReduce=sp.critReduce;
-    if(sp.atkSpdReduce)enemy._atkSpdReduce=sp.atkSpdReduce;
-    // 精英40%概率额外附带一个减益效果
-    if(Math.random()<0.4){
-      const debuffs=ENEMY_SPECIALS.filter(s=>s.dmgReduce||s.critReduce||s.atkSpdReduce);
-      if(debuffs.length>0){
-        const db=pick(debuffs);
-        if(db.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,db.dmgReduce);
-        if(db.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,db.critReduce);
-        if(db.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,db.atkSpdReduce);
-        enemy.specials.push({...db});
-      }
-    }
+    // 精英获得2个特殊属性
+    const sp1=pick(ENEMY_SPECIALS);
+    enemy.specials.push({...sp1});
+    if(sp1.apply)sp1.apply(enemy);
+    if(sp1.isRegen)enemy._regen=sp1.regenPct;
+    if(sp1.dodge)enemy._dodge=sp1.dodge;
+    if(sp1.thorns)enemy._thorns=sp1.thorns;
+    if(sp1.lifesteal)enemy._lifesteal=sp1.lifesteal;
+    if(sp1.dmgReduce)enemy._dmgReduce=sp1.dmgReduce;
+    if(sp1.critReduce)enemy._critReduce=sp1.critReduce;
+    if(sp1.atkSpdReduce)enemy._atkSpdReduce=sp1.atkSpdReduce;
+    // 第二个属性：排除已选的
+    const pool2=ENEMY_SPECIALS.filter(s=>s.id!==sp1.id);
+    const sp2=pick(pool2);
+    enemy.specials.push({...sp2});
+    if(sp2.apply)sp2.apply(enemy);
+    if(sp2.isRegen)enemy._regen=(enemy._regen||0)+sp2.regenPct;
+    if(sp2.dodge)enemy._dodge=(enemy._dodge||0)+sp2.dodge;
+    if(sp2.thorns)enemy._thorns=(enemy._thorns||0)+sp2.thorns;
+    if(sp2.lifesteal)enemy._lifesteal=(enemy._lifesteal||0)+sp2.lifesteal;
+    if(sp2.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp2.dmgReduce);
+    if(sp2.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp2.critReduce);
+    if(sp2.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp2.atkSpdReduce);
   }
   if(type==='boss'){
     const shuffled=[...ENEMY_SPECIALS].sort(()=>Math.random()-0.5);
