@@ -1689,6 +1689,8 @@ function genEquip(slot,minQ,maxQ,monsterLv){
   s.block=Math.floor(s.block||0);s.dodge=Math.round((s.dodge||0)*10)/10;
 
   // special attributes: bronze(q=1)+ gets q special attr slots
+  // 特殊属性同时受品质系数和等级系数影响
+  const spFactor=lvFactor*(0.7+q*0.15); // 品质越高特殊属性越强：青铜0.85→超神级1.9
   const specials=[];
   if(q>=1){
     const numSpecials=q; // 青铜1个，白银2个，黄金3个...
@@ -1697,8 +1699,8 @@ function genEquip(slot,minQ,maxQ,monsterLv){
     const shuffled=[...pool].sort(()=>Math.random()-0.5);
     for(let i=0;i<Math.min(numSpecials,shuffled.length);i++){
       const sa=shuffled[i];
-      const val=randi(Math.floor(sa.min*lvFactor/sa.step),Math.floor(sa.max*lvFactor/sa.step))*sa.step;
-      s[sa.id]=val;statRanges[sa.id]={min:Math.round(sa.min*lvFactor*10)/10,max:Math.round(sa.max*lvFactor*10)/10};chosen.push({...sa,val,text:sa.fmt(val)});
+      const val=randi(Math.floor(sa.min*spFactor/sa.step),Math.floor(sa.max*spFactor/sa.step))*sa.step;
+      s[sa.id]=val;statRanges[sa.id]={min:Math.round(sa.min*spFactor*10)/10,max:Math.round(sa.max*spFactor*10)/10};chosen.push({...sa,val,text:sa.fmt(val)});
     }
     specials.push(...chosen);
   }
@@ -3058,7 +3060,7 @@ function doRefineAttr(slot,key){
     const isSpecial=it.specials&&it.specials.find(sp=>sp.id===key);
     if(isSpecial){
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){const rf=1+((it.reqLv||1)-1)*0.02;newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;}
+      if(sa){const rf=(1+((it.reqLv||1)-1)*0.02)*(0.7+q*0.15);newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;}
       else{const isIntFb=['atk','def','hp','critDmg','atkSpd','block'].includes(key);if(isIntFb){newVal=randi(range.min,range.max);}else{newVal=Math.round(randi(Math.round(range.min*10),Math.round(range.max*10)))/10;}}
     }else{
       const isIntStat=['atk','def','hp','critDmg','atkSpd','block'].includes(key);
@@ -3108,7 +3110,7 @@ function doRefineAttr(slot,key){
       newVal=Math.floor(newVal);
     }else{
       const sa=SPECIAL_ATTRS.find(x=>x.id===key);
-      if(sa){const rf2=1+((it.reqLv||1)-1)*0.02;newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;}
+      if(sa){const rf2=(1+((it.reqLv||1)-1)*0.02)*(0.7+q*0.15);newVal=randi(Math.floor(sa.min*rf2/sa.step),Math.floor(sa.max*rf2/sa.step))*sa.step;}
       else newVal=0;
     }
   }
@@ -3151,7 +3153,7 @@ function doRecastAttr(slot,key){
 }
 function doRecastAttrInner(slot,key,it,sa,range){
   G.materials.recastStone--;
-  const rf=1+((it.reqLv||1)-1)*0.02;
+  const rf=(1+((it.reqLv||1)-1)*0.02)*(0.7+(it.quality||0)*0.15);
   let newVal;
   if(range){
     newVal=randi(Math.floor(sa.min*rf/sa.step),Math.floor(sa.max*rf/sa.step))*sa.step;
