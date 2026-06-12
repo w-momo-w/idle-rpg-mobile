@@ -1574,7 +1574,14 @@ function levelUp(){
   const growth=CLASS_GROWTH[G.classId];
   G.str+=growth.str;G.vit+=growth.vit;G.agi+=growth.agi;G.dex+=growth.dex;G.int+=growth.int;
   G.hp=G.maxHp;
-  if(G.level===10){G.skill2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);addLog(`📖 学会新技能：${G.skill2.name}`,'sys');refreshSkillBtns();}
+  if(G.level===10){
+    const sk2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);
+    if(sk2){
+      G.skill2={...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0};
+      G.skills.push({...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});
+      addLog(`📖 学会新技能：${G.skill2.name}`,'sys');refreshSkillBtns();
+    }
+  }
   const adv=CLASS_ADV.find(a=>a.lv===G.level);
   if(adv){const opts=adv[G.classId];if(opts&&opts.length>0)showAdvModal(opts);}
   if(G.level===50&&!G.classTier){G.classTier=1;addLog('🌟 达到50级！已解锁一转资格','sys');}
