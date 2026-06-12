@@ -1980,7 +1980,6 @@ function onKill(){
   G.killStreak++;
   G.kills[e.originalName||e.name]=(G.kills[e.originalName||e.name]||0)+1;G.killAnyCount++;
   gainXp(e.xp);gainGold(e.gold);
-  if(G.curHpRegen){G._regenTick=(G._regenTick||0)+1;if(G._regenTick>=2){G._regenTick=0;G.hp=Math.min(G.maxHp,G.hp+G.curHpRegen);}}
   if(G.curSiphon)G.hp=Math.min(G.maxHp,G.hp+Math.floor(G.maxHp*G.curSiphon/100));
   // 装备掉落 — 按怪物类型区分基础概率（已下调）
   const monLv=G.enemy.level||1;
@@ -3691,6 +3690,11 @@ function gameTick(){
   } else if(!G.enemy&&(!G._nextMonsterTime||now()>=G._nextMonsterTime)){
     G.enemy=genMonster();G._nextMonsterTime=0;
     G._monsterSpawnTime=now(); // 记录怪物刷新时间，用于1秒战斗延迟
+  }
+  // 装备恢复属性 — 战斗中/脱战每2秒回复一次
+  if(G.curHpRegen&&G.hp<G.maxHp){
+    G._regenTick=(G._regenTick||0)+1;
+    if(G._regenTick>=2){G._regenTick=0;G.hp=Math.min(G.maxHp,G.hp+G.curHpRegen);}
   }
   // 小血瓶HoT处理
   if(G._hpSmallHoT&&now()<G._hpSmallHoT.until){
