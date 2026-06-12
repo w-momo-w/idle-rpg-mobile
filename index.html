@@ -279,7 +279,7 @@ body{
   border:1px solid var(--border);
 }
 .save-btns-bar .btn{min-height:32px;padding:5px 10px;font-size:12px}
-#save-indicator{font-size:11px;color:var(--muted);margin-right:4px;white-space:nowrap}
+#save-indicator{font-size:11px;color:var(--green);margin-right:4px;white-space:nowrap;display:none}
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:2px;
@@ -558,7 +558,7 @@ body{
 }
 #event-log p{padding:1px 0;border-bottom:1px solid var(--border);line-height:1.5}
 
-#save-indicator{font-size:11px;color:var(--green);display:none}
+
 
 /* ═══ Buff ═══ */
 #buff-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;min-height:20px}
@@ -1187,49 +1187,49 @@ function skillXpForGrade(gradeIdx){
   return [0, 100, 300, 900, 2700][gradeIdx] || 10000;
 }
 
-// 转职专属技能（转职后解锁对应技能）
+// 转职专属技能（转职后解锁对应技能，都是buff技能，作为被动显示）
 const ADV_SKILLS={
   berserker:[
-    {id:'blood_rage',name:'血怒',icon:'🩸',desc:'攻击力+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'berserker'},
-    {id:'frenzy',name:'狂热',icon:'🔥',desc:'攻速+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'berserker'},
+    {id:'blood_rage',name:'血怒',icon:'🩸',desc:'攻击力+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'berserker'},
+    {id:'frenzy',name:'狂热',icon:'🔥',desc:'攻速+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'berserker'},
   ],
   paladin:[
-    {id:'holy_shield',name:'圣盾',icon:'✨',desc:'防御+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'paladin'},
-    {id:'divine_heal',name:'圣疗',icon:'💚',desc:'每秒恢复3%HP',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'paladin'},
+    {id:'holy_shield',name:'圣盾',icon:'✨',desc:'防御+40%',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'paladin'},
+    {id:'divine_heal',name:'圣疗',icon:'💚',desc:'每秒恢复3%HP',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'paladin'},
   ],
   sniper:[
-    {id:'headshot',name:'爆头',icon:'💀',desc:'暴击率+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'sniper'},
-    {id:'long_shot',name:'远射',icon:'🏹',desc:'伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'sniper'},
+    {id:'headshot',name:'爆头',icon:'💀',desc:'暴击率+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'sniper'},
+    {id:'long_shot',name:'远射',icon:'🏹',desc:'伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'sniper'},
   ],
   shunter:[
-    {id:'shadow_step',name:'暗影步',icon:'🌑',desc:'闪避+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'shunter'},
-    {id:'poison_blade',name:'淬毒',icon:'☠️',desc:'攻击附带额外毒伤',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'shunter'},
+    {id:'shadow_step',name:'暗影步',icon:'🌑',desc:'闪避+25%',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'shunter'},
+    {id:'poison_blade',name:'淬毒',icon:'☠️',desc:'攻击附带额外毒伤',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'shunter'},
   ],
   elementalist:[
-    {id:'fire_mastery',name:'火焰精通',icon:'🔥',desc:'火系伤害+30%',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'elementalist'},
-    {id:'ice_mastery',name:'冰霜精通',icon:'❄️',desc:'冰系伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'elementalist'},
+    {id:'fire_mastery',name:'火焰精通',icon:'🔥',desc:'火系伤害+30%',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'elementalist'},
+    {id:'ice_mastery',name:'冰霜精通',icon:'❄️',desc:'冰系伤害+30%',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'elementalist'},
   ],
   warlock:[
-    {id:'soul_drain',name:'灵魂吸取',icon:'💀',desc:'每秒恢复3%HP，持续10秒',cdMs:60000,type:'buff',unlockLv:50,skillType:'active',advReq:'warlock'},
-    {id:'dark_pact',name:'黑暗契约',icon:'📜',desc:'攻击力+40%，持续10秒',cdMs:60000,type:'buff',unlockLv:70,skillType:'active',advReq:'warlock'},
+    {id:'soul_drain',name:'灵魂吸取',icon:'💀',desc:'每秒恢复3%HP，持续10秒',cdMs:60000,type:'buff',unlockLv:50,skillType:'passive',advReq:'warlock'},
+    {id:'dark_pact',name:'黑暗契约',icon:'📜',desc:'攻击力+40%，持续10秒',cdMs:60000,type:'buff',unlockLv:70,skillType:'passive',advReq:'warlock'},
   ],
   warlord:[
-    {id:'war_rage',name:'战争怒火',icon:'👑',desc:'攻击力+50%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'warlord'},
+    {id:'war_rage',name:'战争怒火',icon:'👑',desc:'攻击力+50%',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'warlord'},
   ],
   dknight:[
-    {id:'death_grip',name:'死亡之握',icon:'💀',desc:'攻击吸血+20%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'dknight'},
+    {id:'death_grip',name:'死亡之握',icon:'💀',desc:'攻击吸血+20%',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'dknight'},
   ],
   ranger_lord:[
-    {id:'arrow_rain',name:'箭雨风暴',icon:'🌧️',desc:'攻速+35%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'ranger_lord'},
+    {id:'arrow_rain',name:'箭雨风暴',icon:'🌧️',desc:'攻速+35%',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'ranger_lord'},
   ],
   assassin:[
-    {id:'lethal_blade',name:'致命利刃',icon:'🗡️',desc:'暴击伤害+80%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'assassin'},
+    {id:'lethal_blade',name:'致命利刃',icon:'🗡️',desc:'暴击伤害+80%',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'assassin'},
   ],
   archmage:[
-    {id:'arcane_brilliance',name:'奥术光辉',icon:'✨',desc:'技能伤害+40%',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'archmage'},
+    {id:'arcane_brilliance',name:'奥术光辉',icon:'✨',desc:'技能伤害+40%',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'archmage'},
   ],
   necromancer:[
-    {id:'undead_army',name:'亡灵大军',icon:'💀',desc:'30%概率额外50%伤害',cdMs:60000,type:'buff',unlockLv:150,skillType:'active',advReq:'necromancer'},
+    {id:'undead_army',name:'亡灵大军',icon:'💀',desc:'30%概率额外50%伤害',cdMs:60000,type:'buff',unlockLv:150,skillType:'passive',advReq:'necromancer'},
   ],
 };
 
@@ -1530,11 +1530,30 @@ function computeStats(){
   G.curGoldBonus=Math.min(goldBonus,200);G.curHpRegen=hpRegen;G.curDoubleAtk=Math.min(doubleAtk,40);
   G.curArmorPierce=Math.min(armorPierce,50);G.curSiphon=Math.min(siphon,30);
   // store raw stats for display
-  G.rawST=ST;G.rawVT=VT;G.rawAG=AG;G.rawDX=DX;G.rawIN=IN;
+  G.rawST=ST||0;G.rawVT=VT||0;G.rawAG=AG||0;G.rawDX=DX||0;G.rawIN=IN||0;
 
   const n=now();
-  for(const id in G.buffs){if(G.buffs[id].until<n){delete G.buffs[id];continue;}if(id==='atk')G.curAtk+=G.buffs[id].val;else if(id==='def')G.curDef+=G.buffs[id].val;else if(id==='maxhp_cd')G.maxHp+=G.buffs[id].val;}
+  for(const id in G.buffs){const b=G.buffs[id];if(b.until<n){delete G.buffs[id];continue;}
+    if(id==='atk')G.curAtk+=b.val||0;else if(id==='def')G.curDef+=b.val||0;else if(id==='maxhp_cd')G.maxHp+=b.val||0;
+    else if(id==='critRate')G.curCritRate+=b.val||0;else if(id==='critDmg')G.curCritDmg+=b.val||0;else if(id==='atkSpd')G.curAtkSpd-=b.val||0;
+    else if(id==='dodge')G.curDodge+=b.val||0;else if(id==='block')G.curBlock+=b.val||0;
+    else if(id==='lifesteal')G.curLifesteal+=b.val||0;else if(id==='thorns')G.curThorns+=b.val||0;
+    else if(id==='armorPierce')G.curArmorPierce+=b.val||0;else if(id==='doubleAtk')G.curDoubleAtk+=b.val||0;
+    else if(id==='hpRegen')G.curHpRegen=b.val||0;else if(id==='cdReduce')G.curAtkSpd+=b.val||0;
+  }
   if(G.hp>G.maxHp)G.hp=G.maxHp;
+}
+function playerDie(msg){
+  // 不死之身：有revive buff时自动复活
+  if(G.buffs.revive&&G.buffs.revive.until>now()){
+    delete G.buffs.revive;
+    G.hp=Math.floor(G.maxHp*0.5);G.dead=false;G.deadUntil=0;
+    addLog('👼 不死之身触发！你复活了（50%HP）！','sys');
+    return false;
+  }
+  G.hp=0;G.dead=true;G.deadUntil=now()+5000;
+  if(msg)addLog(msg,'die');
+  return true;
 }
 
 function xpForLevel(lv){return Math.floor(100*Math.pow(lv,2.2)+50*lv);}
@@ -1773,7 +1792,7 @@ function playerAttack(useSkill){
         // 连击触发吸血
         if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
         // 连击触发敌人荆棘
-        if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！','die');}}
+        if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;playerDie('💀 被荆棘反弹致死！');}}
         if(G.enemy&&G.enemy.hp<=0){onKill();return;}
       }
     }
@@ -1782,7 +1801,7 @@ function playerAttack(useSkill){
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);} }
   G.enemy.hp-=dmg;
   // Enemy thorns (reflect damage back to player)
-  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！5秒后复活...','die');}}
+  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;playerDie('💀 被荆棘反弹致死！5秒后复活...');}}
   if(G.enemy&&G.enemy.hp<=0){onKill();return;}
   enemyAttack();renderAll();
 }
@@ -1823,7 +1842,7 @@ function playerAttackWithSkill(sk){
   if(G.curLifesteal&&dmg>0){const heal=Math.floor(dmg*G.curLifesteal/100);if(heal>0){G.hp=Math.min(G.maxHp,G.hp+heal);}}
   G.enemy.hp-=dmg;
   // Enemy thorns
-  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！5秒后复活...','die');}}
+  if(G.enemy&&G.enemy._thorns&&dmg>0){const etDmg=Math.floor(dmg*G.enemy._thorns/100);G.hp-=etDmg;if(G.hp>0)addLog(`🌵 ${G.enemy.name}的荆棘反弹 ${etDmg} 点伤害`,'hit');if(G.hp<=0){G.hp=0;playerDie('💀 被荆棘反弹致死！5秒后复活...');}}
   if(G.enemy&&G.enemy.hp<=0){onKill();return;}
   // double attack
   if(G.curDoubleAtk&&Math.random()*100<G.curDoubleAtk){
@@ -1839,7 +1858,7 @@ function playerAttackWithSkill(sk){
       else{addLog(`🔁 连击！追加 ${d2} 点伤害`,'skill');}
       G.enemy.hp-=d2;
       if(G.curLifesteal&&d2>0){const heal2=Math.floor(d2*G.curLifesteal/100);if(heal2>0){G.hp=Math.min(G.maxHp,G.hp+heal2);}}
-      if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 被荆棘反弹致死！','die');}}
+      if(G.enemy&&G.enemy._thorns&&d2>0){const etDmg2=Math.floor(d2*G.enemy._thorns/100);G.hp-=etDmg2;if(G.hp<=0){G.hp=0;playerDie('💀 被荆棘反弹致死！');}}
       if(G.enemy&&G.enemy.hp<=0){onKill();return;}
     }
   }
@@ -1878,8 +1897,7 @@ function enemyAttack(){
   if(G.curThorns&&G.enemy){const tDmg=Math.floor(dmg*G.curThorns/100);G.enemy.hp-=tDmg;if(G.enemy.hp<=0){addLog(`🛡️ 荆棘反弹！击杀 ${e.name}`,'die');onKill();return;}addLog(`⚡ 荆棘反弹 ${tDmg} 点伤害`,'skill');}
 
   if(G.hp<=0){
-    G.hp=0;G.dead=true;G.deadUntil=now()+5000;
-    addLog('💀 你被击败了！5秒后复活...','die');
+    G.hp=0;playerDie('💀 你被击败了！5秒后复活...');
   }
 }
 function onKill(){
@@ -2127,7 +2145,7 @@ function renderEnemy(){
   else if(e.type==='elite'){typeTag.textContent='精英';typeTag.className='enemy-type-tag elite';}
   else{typeTag.textContent='';typeTag.className='';}
   document.getElementById('en-hp').textContent=fmt(Math.max(0,e.hp))+'/'+fmt(e.maxHp);
-  document.getElementById('en-hp-bar').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';
+  document.getElementById('en-hp-bar').style.width=(e.maxHp>0?Math.max(0,e.hp/e.maxHp*100):0)+'%';
   document.getElementById('en-atk').textContent=e.atk;document.getElementById('en-def').textContent=e.def;
   // Show death state
   const actBtns=document.querySelector('.act-btns');
@@ -2313,7 +2331,7 @@ function doDecompose(threshold,nonClassOnly){
     const matchQuality=it.quality<=threshold;
     const matchNonClass=nonClassOnly&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
     // 非本职业：只看职业不匹配；品质：只看品质阈值
-    const shouldDecompose = matchNonClass || (!nonClassOnly && matchQuality) || (nonClassOnly && matchQuality);
+    const shouldDecompose = nonClassOnly ? matchNonClass : matchQuality;
     if(shouldDecompose){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
@@ -2381,7 +2399,7 @@ function showMaterialSellModal(mid,count){
   html+=`<input type="number" id="inp-sellm-count" value="${Math.min(count,10)}" min="1" max="${count}" style="width:60px;text-align:center;border:1px solid var(--border);border-radius:4px;padding:4px;background:var(--card);color:var(--text)">`;
   html+=`<button class="btn btn-sm" id="btn-sellm-plus">+</button>`;
   html+=`<button class="btn btn-sm" id="btn-sellm-max">最大</button></div>`;
-  const unitGold=md.use&&md.use.gold?md.use.gold/md.use.count:1;
+  const unitGold=md.use&&md.use.gold&&md.use.count?md.use.gold/md.use.count:1;
   html+=`<p style="font-size:11px;color:var(--muted)" id="sellm-preview">预计获得：💰${Math.min(count,10)*unitGold} 金币</p>`;
   html+=`<div style="display:flex;gap:8px"><button class="btn btn-red" style="flex:1" id="btn-sellm-confirm">💰 出售</button><button class="btn btn-sm" style="flex:1" id="btn-sellm-cancel">取消</button></div>`;
   box.innerHTML=html;
@@ -2748,8 +2766,10 @@ function showItemModal(it,source,isEquipped){
     acts.appendChild(ub);
     // 强化按钮
     const enhBtn=document.createElement('button');enhBtn.className='btn btn-gold btn-sm';
-    const enhGold=200+slotElv*200;const enhOre=3+slotElv*2;
-    const enhRate=Math.max(5,100-slotElv*7);
+    const tier=Math.floor(slotElv/10);const inTier=(slotElv%10)+1;
+    const enhGold=200+slotElv*150+tier*500;
+    const enhOre=3+slotElv*2+tier*3;
+    const enhRate=Math.max(5,100-(inTier-1)*10);
     enhBtn.innerHTML=`⚒️ 强化 (💰${enhGold}+🪨${enhOre}) ${enhRate}%`;
     enhBtn.disabled=G.gold<enhGold||(G.materials.ironOre||0)<enhOre;
     enhBtn.addEventListener('click',()=>{doEnhance(source);});
@@ -2881,7 +2901,7 @@ function doRefineAttr(slot,key){
 function showEnhanceSelectModal(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');ov.classList.add('show');
   let html='<h3>⚒️ 选择要强化的装备</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">消耗 🪨铁矿石 + 💰金币，上限+300，成功率随等级递减</p><div style="display:flex;flex-direction:column;gap:6px">';
-  const slotNames={mainHand:'主手武器',offHand:'副手',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指1',ring2:'戒指2',pendant:'吊坠'};
+  const slotNames={mainHand:'主手武器',offHand:'副武器',armor:'铠甲',helmet:'头盔',bracer:'护腕',pants:'护腿',boots:'战靴',necklace:'项链',ring1:'戒指①',ring2:'戒指②',pendant:'佩饰'};
   let hasItems=false;
   for(const slot in G.equipped){
     const it=G.equipped[slot];if(!it)continue;hasItems=true;
@@ -3072,10 +3092,12 @@ function gachaPull(count){
     }
   }
   if(count===10&&equips.length>0){equips[randi(0,equips.length-1)]=genEquip(pick(Object.keys(EQ_NAMES)),Math.max(4,rollGachaQuality()),8,G.level);}
+  let lostCount=0;
   for(const it of equips){
     if(G.inventory.length<G.maxInv){G.inventory.push(it);autoEquipCheck(it);}
-    else{addLog('⚠️ 背包已满，部分装备丢失','sys');break;}
+    else{lostCount++;}
   }
+  if(lostCount>0)addLog(`⚠️ 背包已满，${lostCount}件装备丢失，请清理背包`,'sys');
   const parts=[];
   if(equips.length>0)parts.push(equips.length+'件装备');
   const consMap={};
@@ -3193,7 +3215,8 @@ function switchClass(newClassId){
   G.learnedSkills[G.classId]=G.skills.filter(s=>s.skillType==='passive').map(s=>({...s}));
   G.classId=newClassId;G.classTier=0;G.className=clsNames[newClassId]+'学徒';G.classIcon=null;G.classStatsAdv={};G.classAdvId=null;
   const savedSkills=G.learnedSkills[newClassId]||[];
-  G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
+  const defSkill=SKILLS[G.classId]&&SKILLS[G.classId].find(s=>s.unlockLv===0);
+  G.skills=defSkill?[{...defSkill,lastUsed:0,gradeIdx:0,grade:'D',xp:0}]:[];
   for(const ss of savedSkills){if(!G.skills.find(s=>s.id===ss.id))G.skills.push({...ss,lastUsed:0});}
   G.skill2=G.level>=10?SKILLS[G.classId].find(sk=>sk.unlockLv===10):null;
   if(G.skill2&&!G.skills.find(s=>s.id===G.skill2.id))G.skills.push({...G.skill2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});
@@ -3337,6 +3360,11 @@ function applySkillBuff(sk,gradeMult){
     case 'second_wind': G.buffs.hpRegen={val:Math.floor(G.maxHp*0.02*gradeMult),until:n+dur}; break;
     case 'titan_strength': G.buffs.atk={val:Math.floor(G.curAtk*0.20*gradeMult),until:n+dur}; break;
     case 'immortal': G.buffs.revive={val:1,until:n+300000}; break;
+    // 被动技能 — 雷电术/陨石术/毒箭/鹰眼
+    case 'lightning': G.buffs.armorPierce={val:Math.floor(12*gradeMult),until:n+dur}; break;
+    case 'meteor': G.buffs.doubleAtk={val:Math.floor(10*gradeMult),until:n+dur}; break;
+    case 'poison_arrow': G.buffs.dot={dmg:Math.floor(G.curAtk*0.05*gradeMult),until:n+dur,icon:'☠️'}; break;
+    case 'hawk_eye': G.buffs.critRate={val:Math.floor(20*gradeMult),until:n+dur}; break;
     case 'agility': G.buffs.dodge={val:Math.floor(8*gradeMult),until:n+dur}; break;
     case 'poison_master': G.buffs.atk={val:Math.floor(G.curAtk*0.15*gradeMult),until:n+dur}; break;
     case 'critical_focus': G.buffs.critDmg={val:Math.floor(40*gradeMult),until:n+dur}; break;
@@ -3363,8 +3391,11 @@ function renderBuffBar(){
     if(buff.until<n){delete G.buffs[id];continue;}
     const sec=Math.ceil((buff.until-n)/1000);
     const tag=document.createElement('span');tag.className='buff-tag';
-    const icons={atk:'⚔️',def:'🛡️',maxhp_cd:'❤️'};
-    tag.textContent=`${icons[id]||''}${id==='maxhp_cd'?'+':''}${buff.val} (${sec}s)`;
+    const icons={atk:'⚔️',def:'🛡️',maxhp_cd:'❤️',critRate:'🎯',critDmg:'💥',atkSpd:'💨',dodge:'👟',block:'🛡️',lifesteal:'🩸',thorns:'🌵',armorPierce:'🗡️',doubleAtk:'🔁',hpRegen:'💚',cdReduce:'⏳',dot:'☠️',revive:'👼'};
+    const label=icons[id]||id;
+    let valStr='';
+    if(buff.val!=null)valStr=buff.val;else if(buff.dmg!=null)valStr=buff.dmg;else valStr='?';
+    tag.textContent=`${label} ${id==='maxhp_cd'?'+':''}${valStr} (${sec}s)`;
     el.appendChild(tag);
   }
 }
@@ -3465,7 +3496,7 @@ function gameTick(){
   // DOT damage from enemy
   if(G.buffs.dot&&now()<G.buffs.dot.until){
     G.hp-=G.buffs.dot.dmg;
-    if(G.hp<=0){G.hp=0;G.dead=true;G.deadUntil=now()+5000;addLog('💀 毒发身亡！5秒后复活...','die');}
+    if(G.hp<=0){G.hp=0;playerDie('💀 毒发身亡！5秒后复活...');}
   }
   // Slow debuff consumption
   if(G._slowUntil&&now()<G._slowUntil){G._slowed=true;}else{G._slowed=false;}
@@ -3480,7 +3511,7 @@ function gameTick(){
   if(G.buffs.dot&&now()>=G.buffs.dot.until)delete G.buffs.dot;
   if(G._slowUntil&&now()>=G._slowUntil){G._slowUntil=0;G._slowed=false;}
   renderTopBar();renderEnemy();refreshSkillBtns();renderLog();refreshQuestUI();renderBuffBar();refreshConsumableBtns();
-  const n=now();for(const id in G.buffs){if(G.buffs[id].until<n)delete G.buffs[id];}
+  const n2=now();const expiredKeys=[];for(const id in G.buffs){if(G.buffs[id].until<n2)expiredKeys.push(id);}for(const id of expiredKeys)delete G.buffs[id];
   if(Object.keys(G.buffs).length>0)computeStats();
 }
 function init(){
@@ -3498,8 +3529,9 @@ function init(){
     }
     addLog('💾 存档已加载，欢迎回来！','sys');
   }else{
-    const cb=classBaseStats();G.str=0;G.vit=0;G.agi=0;G.dex=0;G.int=0;
-    G.skills=[{...SKILLS[G.classId].find(s=>s.unlockLv===0),lastUsed:0,gradeIdx:0,grade:'D',xp:0}];
+    G.str=0;G.vit=0;G.agi=0;G.dex=0;G.int=0;
+    const defSkill2=SKILLS[G.classId]&&SKILLS[G.classId].find(s=>s.unlockLv===0);
+    G.skills=defSkill2?[{...defSkill2,lastUsed:0,gradeIdx:0,grade:'D',xp:0}]:[];
     G.enemy=genMonster();refreshQuests();computeStats();G.hp=G.maxHp;
     G.consumables={hpPotion:2,hpLarge:0,atkScroll:0,defScroll:0,hpScroll:0};
     addLog('⚔️ 踏入传奇世界...','sys');
@@ -3576,6 +3608,7 @@ function calculateOfflineRewards(offlineSec){
   const equipDrops = [];
   const matDrops = {};
   const levelBefore = G.level;
+  let equipKept = 0; // 实际保留的装备数量
   
   totalXp = Math.floor(killCount * avgXp * (1 + G.curExpBonus / 100));
   G.xp += totalXp;
@@ -3616,6 +3649,7 @@ function calculateOfflineRewards(offlineSec){
     }else if(G.inventory.length < G.maxInv){
       G.inventory.push(it);
       autoEquipCheck(it);
+      equipKept++;
       if(equipDrops.length < 10) equipDrops.push(it);
     }else{
       const goldGot = decomposeItem(it);
@@ -3650,7 +3684,7 @@ function calculateOfflineRewards(offlineSec){
     totalXp, totalGold,
     levelBefore, levelAfter,
     equipDrops: equipDrops.slice(0, 10),
-    equipTotal: equipDrops.length,
+    equipTotal: equipKept,
     matDrops,
   };
 }
@@ -3800,14 +3834,16 @@ function restoreGameData(d){
     }
   }
   if(G.skills.length === 0 && SKILLS[G.classId]){
-    G.skills = [{...SKILLS[G.classId].find(s=>s.unlockLv===0), lastUsed: 0, gradeIdx:0, grade:'D', xp:0}];
+    const defSkill3=SKILLS[G.classId].find(s=>s.unlockLv===0);
+    if(defSkill3) G.skills = [{...defSkill3, lastUsed: 0, gradeIdx:0, grade:'D', xp:0}];
   }
   if(d.skill2Id){
     const sk2 = (SKILLS[G.classId] || []).find(s=>s.id===d.skill2Id);
     if(sk2){
-      G.skill2 = {...sk2, lastUsed:0, gradeIdx:0, grade:'D', xp:0};
+      const savedGrade2=(d.skillGrades||[]).find(g=>g.id===d.skill2Id);
+      G.skill2 = {...sk2, lastUsed:0, gradeIdx:savedGrade2?savedGrade2.gradeIdx||0:0, grade:savedGrade2?savedGrade2.grade||'D':'D', xp:savedGrade2?savedGrade2.xp||0:0};
       if(!G.skills.find(s=>s.id===sk2.id)){
-        G.skills.push({...sk2, lastUsed:0, gradeIdx:0, grade:'D', xp:0});
+        G.skills.push({...G.skill2});
       }
     }
   }
@@ -3919,7 +3955,7 @@ async function autoSaveToFile(){
 function buildSaveData(now_){
   const saveData = {
     version: 2,
-    timestamp: Date.now(),
+    timestamp: now_,
     level: G.level, xp: G.xp, gold: G.gold, diamond: G.diamond,
     classId: G.classId, classTier: G.classTier, className: G.className,
     classSwitchCost: G.classSwitchCost, switchCount: G.switchCount,
