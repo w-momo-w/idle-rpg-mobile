@@ -1090,17 +1090,17 @@ const ENHANCE_BONUS={
 
 // Special attributes pool (青铜品质以上随机获得)
 const SPECIAL_ATTRS=[
-  {id:'lifesteal',name:'吸血',desc:'攻击时回复{val}%伤害的生命值',fmt:v=>'攻击回复'+v+'%',min:1,max:6,step:1},
-  {id:'thorns',name:'荆棘',desc:'反弹{val}%受到的伤害',fmt:v=>'反弹'+v+'%伤害',min:3,max:15,step:3},
-  {id:'magicFind',name:'寻宝',desc:'装备掉落率+{val}%',fmt:v=>'掉落率+'+v+'%',min:2,max:12,step:2},
-  {id:'expBonus',name:'睿智',desc:'经验获取+{val}%',fmt:v=>'经验+'+v+'%',min:5,max:30,step:5},
-  {id:'goldBonus',name:'贪婪',desc:'金币获取+{val}%',fmt:v=>'金币+'+v+'%',min:5,max:30,step:5},
-  {id:'block',name:'格挡',desc:'{val}%概率格挡本次攻击',fmt:v=>'格挡'+v+'%',min:3,max:12,step:3},
-  {id:'dodge',name:'闪避',desc:'{val}%概率闪避本次攻击',fmt:v=>'闪避'+v+'%',min:3,max:12,step:3},
+  {id:'lifesteal',name:'吸血',desc:'攻击时回复{val}%伤害的生命值',fmt:v=>'攻击回复'+v+'%',min:1,max:6,step:0.5},
+  {id:'thorns',name:'荆棘',desc:'反弹{val}%受到的伤害',fmt:v=>'反弹'+v+'%伤害',min:3,max:15,step:1},
+  {id:'magicFind',name:'寻宝',desc:'装备掉落率+{val}%',fmt:v=>'掉落率+'+v+'%',min:2,max:12,step:1},
+  {id:'expBonus',name:'睿智',desc:'经验获取+{val}%',fmt:v=>'经验+'+v+'%',min:5,max:30,step:1},
+  {id:'goldBonus',name:'贪婪',desc:'金币获取+{val}%',fmt:v=>'金币+'+v+'%',min:5,max:30,step:1},
+  {id:'block',name:'格挡',desc:'{val}%概率格挡本次攻击',fmt:v=>'格挡'+v+'%',min:3,max:12,step:1},
+  {id:'dodge',name:'闪避',desc:'{val}%概率闪避本次攻击',fmt:v=>'闪避'+v+'%',min:3,max:12,step:1},
   {id:'hpRegen',name:'恢复',desc:'每2秒恢复{val}点生命值',fmt:v=>'每2秒回'+v+'HP',min:2,max:18,step:1},
-  {id:'doubleAtk',name:'连击',desc:'{val}%概率追加一次攻击',fmt:v=>'连击'+v+'%',min:2,max:9,step:3},
-  {id:'armorPierce',name:'破甲',desc:'无视{val}%敌人防御',fmt:v=>'破甲'+v+'%',min:5,max:30,step:5},
-  {id:'critBonus',name:'致命',desc:'暴击伤害额外+{val}%',fmt:v=>'暴伤+'+v+'%',min:5,max:25,step:5},
+  {id:'doubleAtk',name:'连击',desc:'{val}%概率追加一次攻击',fmt:v=>'连击'+v+'%',min:2,max:9,step:1},
+  {id:'armorPierce',name:'破甲',desc:'无视{val}%敌人防御',fmt:v=>'破甲'+v+'%',min:5,max:30,step:1},
+  {id:'critBonus',name:'致命',desc:'暴击伤害额外+{val}%',fmt:v=>'暴伤+'+v+'%',min:5,max:25,step:1},
   {id:'siphon',name:'汲魂',desc:'击杀恢复{val}%最大生命值',fmt:v=>'击杀回复'+v+'%',min:2,max:12,step:1},
 ];
 
@@ -1725,6 +1725,8 @@ function genEquip(slot,minQ,maxQ,monsterLv){
     for(let i=0;i<Math.min(numSpecials,shuffled.length);i++){
       const sa=shuffled[i];
       let val=randi(Math.floor(sa.min*spFactor/sa.step),Math.floor(sa.max*spFactor/sa.step))*sa.step;
+      // 吸血保留一位小数
+      if(sa.id==='lifesteal')val=Math.round(val*10)/10;
       // 单件装备特殊属性上限（防止百分比属性溢出）
       if(sa.id==='lifesteal')val=Math.min(val,10);
       else if(sa.id==='dodge')val=Math.min(val,10);
