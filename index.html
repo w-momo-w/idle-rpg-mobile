@@ -2469,8 +2469,8 @@ function renderBagMaterials(){
       const g=groups[key];const sb=g.sb;const div=document.createElement('div');
       const isMyClass=sb.classReq===G.classId;
       const alreadyHave=G.skills.find(s=>s.id===sb.skillId);
-      const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
-      const reqLv=skillDef?skillDef.unlockLv||0:0;
+      const skillDef=getSkillDefById(sb.skillId);
+      const reqLv=skillDef?skillDef.unlockLv||0:(sb.reqLv!=null?sb.reqLv:0);
       const canLearn=isMyClass&&!alreadyHave&&G.level>=reqLv;
       const lvNote=isMyClass&&!alreadyHave&&G.level<reqLv?` <span style="color:var(--red);font-size:9px">(需Lv.${reqLv})</span>`:'';
       const countTag=g.count>1?` <span style="color:var(--muted);font-size:9px">×${g.count}</span>`:'';
