@@ -2091,8 +2091,9 @@ function renderBagMaterials(){
       const sb=document.createElement('button');sb.className='btn btn-red btn-xs';sb.textContent='出售';
       sb.addEventListener('click',(function(id,cnt){return function(){showMaterialSellModal(id,cnt);};})(mid,count));
       div.appendChild(sb);
-      // 非铁矿石的材料保留使用按钮
-      if(md.id!=='ironOre'){
+      // 非合成材料（草药）保留使用按钮，合成相关材料只出售
+      const isCraftMat=['beastHide','crystalShard','ironOre','dragonScale'].includes(md.id);
+      if(!isCraftMat){
         const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
         ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
         div.appendChild(ub);
