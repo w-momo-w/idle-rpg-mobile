@@ -2455,11 +2455,14 @@ function renderBagMaterials(){
       const sb=G.skillBooks[i];const div=document.createElement('div');
       const clsNames2={warrior:'战士',archer:'射手',mage:'法师'};
       const isMyClass=sb.classReq===G.classId;
-      const alreadyHave=G.skills.find(s=>s.id===sb.skillId);
+      const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
+      const reqLv=skillDef?skillDef.unlockLv||0:0;
+      const canLearn=isMyClass&&!alreadyHave&&G.level>=reqLv;
+      const lvNote=isMyClass&&!alreadyHave&&G.level<reqLv?` <span style="color:var(--red);font-size:9px">(需Lv.${reqLv})</span>`:'';
       div.className='skill-item';
-      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'}</div></div>`;
+      div.innerHTML=`<div class="skill-icon">${sb.icon}</div><div class="skill-info"><div class="skill-name">${sb.name}${alreadyHave?' <span style="color:var(--muted);font-size:9px">(已学)</span>':''}${lvNote}</div><div class="skill-desc">${sb.desc} · ${clsNames2[sb.classReq]||'通用'} · <span style="color:var(--orange)">Lv.${reqLv}</span></div></div>`;
       const acts=document.createElement('div');acts.style.display='flex';acts.style.gap='3px';
-      if(isMyClass&&!alreadyHave){
+      if(canLearn){
         const lb=document.createElement('button');lb.className='btn btn-green btn-xs';lb.textContent='学习';
         lb.addEventListener('click',(function(idx){return function(){learnSkillBook(idx);};})(i));
         acts.appendChild(lb);
@@ -2586,9 +2589,15 @@ function learnSkillBook(index){
   if(G.skills.find(s=>s.id===sb.skillId)){addLog('⚠️ 已学会该技能','sys');return;}
   const skillDef=SKILLS[G.classId].find(s=>s.id===sb.skillId);
   if(!skillDef)return;
+  // 检查等级要求
+  const reqLv=skillDef.unlockLv||0;
+  if(G.level<reqLv){
+    addLog(`⚠️ 等级不足！学习【${sb.name}】需要Lv.${reqLv}`,'sys');
+    return;
+  }
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
   ov.classList.add('show');
-  box.innerHTML=`<h3>📖 学习技能</h3><p style="font-size:12px;margin:8px 0">确定学习 <b>${sb.icon} ${sb.name}</b> 吗？</p><p style="font-size:10px;color:var(--muted)">${sb.desc} · 等级：<span style="color:${SKILL_GRADE_COLOR.D}">D</span></p>
+  box.innerHTML=`<h3>📖 学习技能</h3><p style="font-size:12px;margin:8px 0">确定学习 <b>${sb.icon} ${sb.name}</b> 吗？</p><p style="font-size:10px;color:var(--muted)">${sb.desc} · 需要等级：<span style="color:var(--orange)">Lv.${reqLv}</span> · 初始品质：<span style="color:${SKILL_GRADE_COLOR.D}">D</span></p>
     <div style="display:flex;gap:8px"><button class="btn btn-purple" style="flex:1" id="btn-learn-yes">✅ 学习</button><button class="btn btn-sm" style="flex:1" id="btn-learn-no">❌ 取消</button></div>`;
   document.getElementById('btn-learn-no').addEventListener('click',closeModal);
   document.getElementById('btn-learn-yes').addEventListener('click',()=>{
