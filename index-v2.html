@@ -570,7 +570,9 @@ body{
   font-size:10px;padding:2px 8px;border-radius:12px;
   background:rgba(236,72,153,.15);border:1px solid var(--pink);color:var(--pink);
   display:flex;align-items:center;gap:2px;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
 }
+.buff-tag:active{opacity:0.7;}
 
 /* ═══ 弹窗 ═══ */
 #modal-overlay{
@@ -3874,6 +3876,13 @@ function applySkillBuff(sk,gradeMult){
     default: addLog(`⚠️ 未知buff技能：${sk.name}`,'sys');
   }
 }
+function getSkillDefById(skillId){
+  for(const cls of Object.keys(SKILLS)){
+    const found=SKILLS[cls].find(s=>s.id===skillId);
+    if(found)return found;
+  }
+  return null;
+}
 function renderBuffBar(){
   const el=document.getElementById('buff-bar');if(!el)return;
   el.innerHTML='';const n=now();
@@ -3889,8 +3898,29 @@ function renderBuffBar(){
     let valStr='';
     if(buff.val!=null)valStr=buff.val;else if(buff.dmg!=null)valStr=buff.dmg;else valStr='?';
     const valPrefix=(id==='maxhp_cd')?'+':(buff.val>=0?'+':'');
-    tag.innerHTML=`${skillIcon} <b>${skillName}</b> ${valPrefix}${valStr} <span style="font-size:9px;opacity:0.7">${sec}s</span>`;
-    tag.title=`${skillName}: ${valPrefix}${valStr}（来自被动技能，剩余${sec}秒）`;
+    // 检查是否为永久被动（cdMs=0），永久被动不显示倒计时
+    const skillDef=buff.skillId?getSkillDefById(buff.skillId):null;
+    const isPerma=skillDef&&skillDef.cdMs===0;
+    const timeStr=isPerma?'<span style="font-size:9px;opacity:0.7">∞</span>':`<span style="font-size:9px;opacity:0.7">${sec}s</span>`;
+    tag.innerHTML=`${skillIcon} <b>${skillName}</b> ${valPrefix}${valStr} ${timeStr}`;
+    tag.style.cursor='pointer';
+    // tooltip
+    const desc=skillDef?skillDef.desc:`${skillName}: ${valPrefix}${valStr}`;
+    tag.title=isPerma?`${desc}（永久被动，持续生效）`:`${desc}（剩余${sec}秒）`;
+    // 点击弹出技能描述
+    tag.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const ov=document.getElementById('modal-overlay');
+      const box=document.getElementById('modal-box');
+      const grade=skillDef?(G.skills.find(s=>s.id===buff.skillId)?.grade||'D'):'?';
+      const gradeColor=skillDef&&SKILL_GRADE_COLOR[grade]?SKILL_GRADE_COLOR[grade]:'#9ca3af';
+      ov.classList.add('show');
+      box.innerHTML=`<h3>${skillIcon} ${skillName}</h3>
+        <p style="font-size:11px;color:var(--muted);margin:6px 0">${desc}</p>
+        <p style="font-size:10px;margin:4px 0"><b>效果：</b>${valPrefix}${valStr} · 品质：<span style="color:${gradeColor}">${grade}</span>${isPerma?' · <span style="color:var(--green)">永久被动</span>':''}</p>
+        <p style="font-size:10px;color:var(--muted)">${isPerma?'每秒自动刷新，无需操作':'剩余持续时间：'+sec+'秒'}</p>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="closeModal()">关闭</button>`;
+    });
     el.appendChild(tag);
   }
 }
