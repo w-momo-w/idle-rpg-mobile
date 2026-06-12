@@ -1385,14 +1385,14 @@ const ENEMY_SPECIALS=[
   {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力大幅提升',apply(e){e.atk=Math.floor(e.atk*1.5);}},
   {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+60%',apply(e){e.def=Math.floor(e.def*1.6);}},
   {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复5%HP',isRegen:true,regenPct:0.05},
-  {id:'evasive',icon:'🌀',name:'闪避',desc:'35%闪避攻击',dodge:35},
-  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹40%伤害',thorns:40},
+  {id:'evasive',icon:'🌀',name:'闪避',desc:'45%闪避攻击',dodge:45},
+  {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹50%伤害',thorns:50},
   {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血35%',lifesteal:35},
   {id:'tough',icon:'💪',name:'坚韧',desc:'生命+60%',apply(e){e.hp=Math.floor(e.hp*1.6);e.maxHp=e.hp;}},
   // 新增进攻属性
-  {id:'accurate',icon:'🎯',name:'精准',desc:'命中率+30%（降低玩家闪避）',hitRate:30},
-  {id:'piercing',icon:'🗡️',name:'穿甲',desc:'无视40%玩家防御',armorPierce:40},
-  {id:'ferocious',icon:'🔥',name:'凶猛',desc:'暴击率+25%·暴伤180%',critRate:25,critDmg:180},
+  {id:'accurate',icon:'🎯',name:'精准',desc:'命中率+45%（降低玩家闪避）',hitRate:45},
+  {id:'piercing',icon:'🗡️',name:'穿甲',desc:'无视55%玩家防御',armorPierce:55},
+  {id:'ferocious',icon:'🔥',name:'凶猛',desc:'暴击率+35%·暴伤220%',critRate:35,critDmg:220},
   // 减益效果
   {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害55%',dmgReduce:0.55},
   {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率45%',critReduce:45},
@@ -2101,23 +2101,37 @@ function enemyAttack(){
   }
   // player dodge/block — 怪物命中率降低玩家闪避
   let playerDodge=G.curDodge;
-  if(e._hitRate)playerDodge=Math.max(0,playerDodge-e._hitRate);
+  // 精英命中+30%，Boss命中+60%
+  let hitMult=1;
+  if(e.type==='elite')hitMult=1.3;
+  else if(e.type==='boss')hitMult=1.6;
+  if(e._hitRate)playerDodge=Math.max(0,playerDodge-Math.floor(e._hitRate*hitMult));
   if(!useEnemySkill&&playerDodge&&Math.random()*100<playerDodge){addLog(`🌀 闪避！躲过了${e.name}的攻击`,'sys');return;}
   if(!useEnemySkill&&G.curBlock&&Math.random()*100<G.curBlock){addLog(`🛡️ 格挡！${e.name}的攻击被格挡`,'sys');return;}
   let dmg;
   if(useEnemySkill){
     dmg=enemySkillDmg;
   }else{
-    // 怪物穿甲：无视部分玩家防御
+    // 怪物穿甲：无视部分玩家防御，精英+30%，Boss+60%
     let effectiveDef=G.curDef;
-    if(e._armorPierce)effectiveDef=Math.floor(G.curDef*(1-e._armorPierce/100));
+    if(e._armorPierce){
+      let apMult=1;
+      if(e.type==='elite')apMult=1.3;
+      else if(e.type==='boss')apMult=1.6;
+      effectiveDef=Math.floor(G.curDef*(1-Math.min(100,e._armorPierce*apMult)/100));
+    }
     dmg=Math.max(1,e.atk-Math.floor(effectiveDef*0.3));
   }
-  // 怪物暴击
+  // 怪物暴击，精英暴击率+30%，Boss暴击率+60%
   let enemyCrit=false;
-  if(e._critRate&&Math.random()*100<e._critRate){
-    enemyCrit=true;
-    dmg=Math.floor(dmg*(e._critDmg||180)/100);
+  if(e._critRate){
+    let crMult=1;
+    if(e.type==='elite')crMult=1.3;
+    else if(e.type==='boss')crMult=1.6;
+    if(Math.random()*100<Math.min(100,e._critRate*crMult)){
+      enemyCrit=true;
+      dmg=Math.floor(dmg*(e._critDmg||220)/100);
+    }
   }
   // slow debuff
   if(useEnemySkill&&e.skill&&e.skill.slow)G._slowUntil=now()+e.skill.slowDur*1000;
