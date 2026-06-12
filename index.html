@@ -2091,7 +2091,7 @@ function onKill(){
   }
   // 技能书掉落：10级后怪物可掉落，普通2%/精英8%/Boss15%，随机种类
   if(monLv>=10){
-    const bookRate = G.enemy.type==='boss'?0.15:G.enemy.type==='elite'?0.08:0.02;
+    const bookRate = G.enemy.type==='boss'?0.05:G.enemy.type==='elite'?0.027:0.007;
     if(Math.random()<bookRate){
       // 随机所有职业的技能书
       const allClasses=['warrior','archer','mage'];
@@ -4125,7 +4125,7 @@ function calculateOfflineRewards(offlineSec){
   // 离线技能书掉落（同在线逻辑：普通2%/精英8%/Boss15%按击杀数批量结算）
   let offlineBookCount = 0;
   if(G.level >= 10){
-    const bookRate = 0.02; // 离线默认按普通怪概率
+    const bookRate = 0.007; // 离线默认按普通怪概率（≈1/3之前）
     const bookRolls = killCount;
     for(let i = 0; i < Math.min(bookRolls, 5000); i++){
       if(Math.random() < bookRate) offlineBookCount++;
