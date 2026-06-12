@@ -1195,8 +1195,8 @@ const CLASS_ADV=[
 // Class stat per level: {str, vit, agi, dex, int} — 5 points total
 const CLASS_GROWTH={
   warrior:{str:2,vit:1,agi:1,dex:1,int:0},
-  archer:{str:1,vit:0,agi:2,dex:2,int:0},
-  mage:{str:0,vit:0,agi:1,dex:1,int:3}
+  archer:{str:1,vit:1,agi:2,dex:1,int:0},
+  mage:{str:0,vit:1,agi:1,dex:1,int:2}
 };
 
 // Maps with monster pools + boss/elite
@@ -1413,15 +1413,15 @@ let G={
 
 function classBaseStats(){
   if(G.classId==='warrior')return{str:10,vit:8,agi:4,dex:3,int:1};
-  if(G.classId==='archer')return{str:5,vit:4,agi:10,dex:8,int:1};
-  return{str:2,vit:3,agi:5,dex:4,int:12};
+  if(G.classId==='archer')return{str:5,vit:6,agi:10,dex:6,int:1};
+  return{str:2,vit:5,agi:5,dex:4,int:12};
 }
 
 function computeStats(){
   const cb=classBaseStats();
   let ST=cb.str+G.str, VT=cb.vit+G.vit, AG=cb.agi+G.agi, DX=cb.dex+G.dex, IN=cb.int+G.int;
   // Str→ATK, Vit→HP, Agi→ATK_SPD+Dodge, Dex→CritRate, Int→ATK(mage only)
-  let a=ST*2, d=VT*1, h=VT*15, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
+  let a=ST*2, d=VT*1.2, h=VT*15, cr=DX*0.5+5, cd=150, sp=100-AG*1.5;
   if(G.classId==='mage')a+=IN*3;
   let dodge=AG*0.3, block=0, lifesteal=0, thorns=0, magicFind=0, expBonus=0, goldBonus=0, hpRegen=0, doubleAtk=0, armorPierce=0, siphon=0;
 
