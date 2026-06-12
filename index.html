@@ -2385,21 +2385,20 @@ function refreshSkillBtns(){
   if(!extraEl)return;
   extraEl.innerHTML='';
   const activeSkills=G.skills.filter(s=>!s.skillType||s.skillType==='active');
-  // 显示所有主动技能（包括前2个也显示在这里，前面固定按钮保留用于快捷操作）
-  for(let i=0;i<activeSkills.length;i++){
+  // 从第2个开始显示（第1个已固定在battle-skill-btns中）
+  for(let i=1;i<activeSkills.length;i++){
     const sk=activeSkills[i];
     const btn=document.createElement('button');
     btn.className='btn btn-xs';
-    // 不同技能用不同颜色区分
     const colors=['btn-purple','btn-teal','btn-gold','btn-pink','btn-blue2','btn-red2','btn-green','btn-blue'];
-    btn.classList.add(colors[i%colors.length]);
+    btn.classList.add(colors[(i-1)%colors.length]);
     const cdL=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;
     btn.textContent=sk.icon+' '+sk.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');
     btn.disabled=cdL>0||G.dead;
     btn.addEventListener('click',(function(s){return function(){useSpecificSkill(s);};})(sk));
     extraEl.appendChild(btn);
   }
-  // 更新前两个按钮
+  // 更新前两个固定按钮
   const s1=G.skills[0];const bs=document.getElementById('btn-skill');
   if(s1){const cdL=s1.lastUsed?Math.max(0,s1.cdMs-(now()-s1.lastUsed)):0;bs.textContent='✨ '+s1.name+(cdL>0?` (${(cdL/1000).toFixed(1)}s)`:'');bs.disabled=cdL>0||G.dead;}
 }
