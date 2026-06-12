@@ -734,7 +734,7 @@ body{
     <div class="char-icon" id="class-icon">⚔️</div>
     <div class="char-info">
       <div class="name" id="char-name">战士学徒</div>
-      <div class="sub">Lv.<span id="top-lv">1</span> · <span id="top-class">战士</span> <button class="btn btn-pink btn-xs" id="btn-class-switch">🔄</button> <button class="btn btn-gold btn-xs" id="btn-change-map">🗺️ 地图</button> <span id="death-indicator">💀 已阵亡</span></div>
+      <div class="sub">Lv.<span id="top-lv">1</span> · <span id="top-class">战士</span> <button class="btn btn-pink btn-xs" id="btn-class-switch">🔄</button> <button class="btn btn-purple btn-xs" id="btn-advance" style="display:none">🌟转职</button> <button class="btn btn-gold btn-xs" id="btn-change-map">🗺️ 地图</button> <span id="death-indicator">💀 已阵亡</span></div>
     </div>
     <div class="top-stats-row">
       <div class="top-stat"><div class="val" id="top-atk">5</div><div class="lbl">攻击力</div></div>
@@ -1769,8 +1769,6 @@ function levelUp(){
   }
   const adv=CLASS_ADV.find(a=>a.lv===G.level);
   if(adv){const opts=adv[G.classId];if(opts&&opts.length>0)showAdvModal(opts);}
-  if(G.level===50&&!G.classTier){G.classTier=1;addLog('🌟 达到50级！已解锁一转资格','sys');}
-  else if(G.level===150&&G.classTier===1){G.classTier=2;addLog('🌟 达到150级！已解锁二转资格','sys');}
   addLog(`🎉 升级！达到 Lv.${G.level}，属性自动分配`,'sys');
   computeStats();G.hp=G.maxHp;renderAll();
 }
@@ -2118,6 +2116,16 @@ function renderTopBar(){
   document.getElementById('xp-text').textContent=fmt(G.xp)+'/'+fmt(need);
   document.getElementById('xp-bar-inner').style.width=pct+'%';
   document.getElementById('char-name').textContent=(G.className||clsNames[G.classId]+'学徒')+(G.switchCount>0?` #${G.switchCount+1}`:'');
+  // 转职按钮：到达进阶等级但未选择时显示
+  const advBtn=document.getElementById('btn-advance');
+  if(advBtn){
+    const advLv=G.classTier===0?50:(G.classTier===1?150:0);
+    if(advLv>0&&G.level>=advLv&&!G.classAdvId){
+      advBtn.style.display='inline-block';
+    }else{
+      advBtn.style.display='none';
+    }
+  }
   const icons={warrior:'⚔️',archer:'🏹',mage:'🧙'};
   document.getElementById('class-icon').textContent=G.classIcon||icons[G.classId]||'⚔️';
   const di=document.getElementById('death-indicator');if(di)di.style.display=G.dead?'inline':'none';
@@ -3789,8 +3797,6 @@ function calculateOfflineRewards(offlineSec){
     const growth=CLASS_GROWTH[G.classId];
     G.str+=growth.str;G.vit+=growth.vit;G.agi+=growth.agi;G.dex+=growth.dex;G.int+=growth.int;
     if(G.level===10&&!G.skill2){const sk2=SKILLS[G.classId].find(sk=>sk.unlockLv===10);if(sk2){G.skill2={...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0};if(!G.skills.find(s=>s.id===sk2.id))G.skills.push({...sk2,lastUsed:0,gradeIdx:0,grade:'D',xp:0});}}
-    if(G.level===50&&!G.classTier)G.classTier=1;
-    else if(G.level===150&&G.classTier===1)G.classTier=2;
   }
   computeStats();G.hp=G.maxHp;
   const levelAfter = G.level;
@@ -4343,6 +4349,10 @@ safeOn('btn-use-atk-scroll','click',useAtkScroll);
 safeOn('btn-use-def-scroll','click',useDefScroll);
 safeOn('btn-use-hp-scroll','click',useHpScroll);
 safeOn('btn-class-switch','click',showClassSwitchModal);
+safeOn('btn-advance','click',function(){
+  const adv=CLASS_ADV.find(a=>(a.lv===50&&G.classTier===0)||(a.lv===150&&G.classTier===1));
+  if(adv){const opts=adv[G.classId];if(opts&&opts.length>0)showAdvModal(opts);}
+});
 safeOn('btn-diamond-shop','click',showDiamondShop);
 safeOn('auto-atk','change',function(){G.autoAtk=this.checked;});
 safeOn('auto-skill','change',function(){G.autoSkill=this.checked;});
