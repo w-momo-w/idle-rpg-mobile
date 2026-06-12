@@ -1093,17 +1093,17 @@ const MATERIALS={
 
 // Material synthesis: combine materials to craft specific-slot equipment
 const MATERIAL_CRAFT=[
-  {name:'主手武器',icon:'🗡️',desc:'合成一把主手武器',costs:{dragonScale:8,ironOre:12,crystalShard:4},slot:'mainHand',minQ:2,maxQ:6},
-  {name:'铠甲',icon:'👘',desc:'合成一件铠甲',costs:{beastHide:12,ironOre:8},slot:'armor',minQ:1,maxQ:5},
-  {name:'副手盾牌',icon:'🛡️',desc:'合成一面副手装备',costs:{beastHide:8,ironOre:6,dragonScale:3},slot:'offHand',minQ:1,maxQ:5},
-  {name:'头盔',icon:'⛑️',desc:'合成一顶头盔',costs:{beastHide:8,ironOre:6},slot:'helmet',minQ:1,maxQ:5},
-  {name:'护腕',icon:'🧤',desc:'合成一副护腕',costs:{beastHide:6,ironOre:5},slot:'bracer',minQ:1,maxQ:4},
-  {name:'裤子',icon:'👖',desc:'合成一条裤子',costs:{beastHide:7,ironOre:5},slot:'pants',minQ:1,maxQ:4},
-  {name:'靴子',icon:'👢',desc:'合成一双靴子',costs:{beastHide:6,ironOre:5},slot:'boots',minQ:1,maxQ:4},
-  {name:'项链',icon:'📿',desc:'合成一条项链',costs:{crystalShard:7,dragonScale:3},slot:'necklace',minQ:1,maxQ:5},
-  {name:'戒指',icon:'💍',desc:'合成一枚戒指',costs:{crystalShard:6,dragonScale:3},slot:'ring1',minQ:1,maxQ:5},
-  {name:'护符',icon:'🔮',desc:'合成一个护符',costs:{crystalShard:7,beastHide:5},slot:'pendant',minQ:1,maxQ:4},
-  {name:'披风',icon:'🧣',desc:'合成一件披风',costs:{beastHide:8,dragonScale:2},slot:'cloak',minQ:1,maxQ:4},
+  {name:'主手武器',icon:'🗡️',desc:'合成一把主手武器',costs:{dragonScale:8,ironOre:12,crystalShard:4},slot:'mainHand',minQ:0,maxQ:8},
+  {name:'铠甲',icon:'👘',desc:'合成一件铠甲',costs:{beastHide:12,ironOre:8},slot:'armor',minQ:0,maxQ:8},
+  {name:'副手盾牌',icon:'🛡️',desc:'合成一面副手装备',costs:{beastHide:8,ironOre:6,dragonScale:3},slot:'offHand',minQ:0,maxQ:8},
+  {name:'头盔',icon:'⛑️',desc:'合成一顶头盔',costs:{beastHide:8,ironOre:6},slot:'helmet',minQ:0,maxQ:8},
+  {name:'护腕',icon:'🧤',desc:'合成一副护腕',costs:{beastHide:6,ironOre:5},slot:'bracer',minQ:0,maxQ:8},
+  {name:'裤子',icon:'👖',desc:'合成一条裤子',costs:{beastHide:7,ironOre:5},slot:'pants',minQ:0,maxQ:8},
+  {name:'靴子',icon:'👢',desc:'合成一双靴子',costs:{beastHide:6,ironOre:5},slot:'boots',minQ:0,maxQ:8},
+  {name:'项链',icon:'📿',desc:'合成一条项链',costs:{crystalShard:7,dragonScale:3},slot:'necklace',minQ:0,maxQ:8},
+  {name:'戒指',icon:'💍',desc:'合成一枚戒指',costs:{crystalShard:6,dragonScale:3},slot:'ring1',minQ:0,maxQ:8},
+  {name:'护符',icon:'🔮',desc:'合成一个护符',costs:{crystalShard:7,beastHide:5},slot:'pendant',minQ:0,maxQ:8},
+  {name:'披风',icon:'🧣',desc:'合成一件披风',costs:{beastHide:8,dragonScale:2},slot:'cloak',minQ:0,maxQ:8},
 ];
 
 // Skill data
@@ -2491,8 +2491,7 @@ function craftEquip(craftIndex){
     for(const[mid,count] of Object.entries(recipe.costs)){
       G.materials[mid]-=count;
     }
-    const q=rollWeightedQ(recipe.minQ,recipe.maxQ);
-    const it=genEquip(recipe.slot,q,recipe.maxQ,G.level);
+    const it=genEquip(recipe.slot,recipe.minQ,recipe.maxQ,G.level);
     it.reqLv=G.level;
     G.inventory.push(it);autoEquipCheck(it);
     let logMsg=`🔨 合成${recipe.name}：<span style="color:${QCOLOR[it.quality]}">${it.name}</span>`;
