@@ -1512,6 +1512,8 @@ function genMonster(){
   // Scale by monster type, 10级后额外+20%
   const typeMult=type==='boss'?5:type==='elite'?2.5:1;
   const diffMult=G.level>=10?1.2:1;
+  const mName=type==='boss'?template.name:(type==='elite'?'精英·'+template.name:template.name);
+  const mIcon=template.icon;
   const hp=Math.floor(template.hp*typeMult*diffMult);
   const atk=Math.floor(template.atk*typeMult*diffMult);
   const def=Math.floor(template.def*typeMult*diffMult);
