@@ -1821,7 +1821,7 @@ function checkQuests(){
     if(q.type==='kill'){q.progress=Math.min(Math.max(0,(G.kills[q.monster]||0)-(q._startCount||0)),q.target);}
     else if(q.type==='kill_any'){q.progress=Math.min(Math.max(0,(G.killAnyCount||0)-(q._startCount||0)),q.target);}
     else if(q.type==='collect_gold'){q.progress=Math.min(q._goldCollected||0,q.target);}
-    else if(q.type==='collect_material'){q.progress=Math.min((G.materials[q.materialId]||0)-(q._startMatCount||0),q.target);}
+    else if(q.type==='collect_material'){q.progress=Math.min(Math.max(0,(G.materials[q.materialId]||0)-(q._startMatCount||0)),q.target);}
   }
 }
 
@@ -2161,7 +2161,8 @@ function doDecompose(threshold,nonClassOnly){
     const it=G.inventory[i];
     const matchQuality=it.quality<=threshold;
     const matchNonClass=nonClassOnly&&it.classReq&&it.classReq!=='all'&&it.classReq!==G.classId;
-    if(nonClassOnly?matchNonClass:matchQuality){
+    // 一键分解：非本职业+品质都分解
+    if(matchNonClass||matchQuality){
       totalGold+=decomposeItem(it);
       G.inventory.splice(i,1);
       decomposed++;
