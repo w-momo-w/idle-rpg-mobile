@@ -3594,7 +3594,18 @@ const DIAMOND_SHOP=[
 function showDiamondShop(){
   const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
   ov.classList.add('show');
-  let html=`<h3>💎 钻石充值</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">当前余额：<b style="color:var(--purple)">💎${fmt(G.diamond)}</b></p><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">`;
+  let html=`<h3>💎 钻石商城</h3><p style="font-size:11px;color:var(--muted);margin-bottom:8px">当前余额：<b style="color:var(--purple)">💎${fmt(G.diamond)}</b></p>`;
+  // 金币兑换钻石
+  html+=`<div style="background:var(--card);border-radius:8px;padding:10px;margin-bottom:10px">
+    <div style="font-weight:bold;font-size:13px;margin-bottom:6px">💰 金币兑换钻石</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:6px">1万金币 = 1💎钻石（当前金币：${fmt(G.gold)}）</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <input type="number" id="gold-exchange-amount" value="1" min="1" max="${Math.floor(G.gold/10000)}" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);font-size:13px" placeholder="兑换钻石数量">
+      <button class="btn btn-gold btn-sm" id="btn-gold-exchange" style="white-space:nowrap">💰 兑换</button>
+    </div>
+  </div>`;
+  // 充值区域
+  html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:4px">📱 钻石充值</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">`;
   for(const item of DIAMOND_SHOP){
     html+=`<button class="btn btn-pink" style="flex-direction:column;padding:8px;min-height:auto" id="btn-dshop-${item.id}">
       <span style="font-size:14px;font-weight:bold">💎${item.diamond}</span>
@@ -3604,6 +3615,19 @@ function showDiamondShop(){
   html+=`</div><button class="btn btn-sm" style="width:100%;margin-top:8px" id="btn-dshop-close">关闭</button>`;
   box.innerHTML=html;
   document.getElementById('btn-dshop-close').addEventListener('click',closeModal);
+  // 金币兑换逻辑
+  const goldExBtn=document.getElementById('btn-gold-exchange');
+  const goldExInput=document.getElementById('gold-exchange-amount');
+  goldExBtn.addEventListener('click',()=>{
+    const amount=parseInt(goldExInput.value)||0;
+    if(amount<=0){addLog('⚠️ 请输入有效数量','sys');return;}
+    const cost=amount*10000;
+    if(G.gold<cost){addLog('⚠️ 金币不足（需要'+fmt(cost)+'）','sys');return;}
+    G.gold-=cost;G.diamond+=amount;
+    addLog(`💰 兑换成功！消耗 ${fmt(cost)} 金币 → 💎${amount} 钻石（余额：${fmt(G.diamond)}）`,'sys');
+    closeModal();renderAll();showDiamondShop(); // 重新打开刷新界面
+  });
+  // 充值逻辑
   for(const item of DIAMOND_SHOP){
     document.getElementById('btn-dshop-'+item.id).addEventListener('click',()=>{
       G.diamond+=item.diamond;
