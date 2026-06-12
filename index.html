@@ -1071,7 +1071,7 @@ const SPECIAL_ATTRS=[
 // Material system
 const MATERIALS={
   beastHide:{id:'beastHide',name:'兽皮',icon:'🦴',desc:'野兽的皮毛，可兑换金币',dropRate:0.18,dropSources:['normal','elite'],use:{gold:3,count:5,desc:'5兽皮→3金币'}},
-  crystalShard:{id:'crystalShard',name:'魔晶碎片',icon:'💠',desc:'蕴含魔力的碎片，集齐兑换钻石',dropRate:0.10,dropSources:['elite','boss'],use:{diamond:1,count:10,desc:'10碎片→1💎'}},
+  crystalShard:{id:'crystalShard',name:'魔晶碎片',icon:'💠',desc:'蕴含魔力的碎片，可出售获得金币',dropRate:0.10,dropSources:['elite','boss'],use:{gold:8,count:1,desc:'1碎片→8金币'}},
   herb:{id:'herb',name:'草药',icon:'🌿',desc:'疗伤的草药，合成血瓶',dropRate:0.14,dropSources:['normal','elite','boss'],use:{potion:'hpPotion',count:3,desc:'3草药→1小血瓶'}},
   ironOre:{id:'ironOre',name:'铁矿石',icon:'🪨',desc:'用于装备强化，在装备详情中使用',dropRate:0.12,dropSources:['normal','elite','boss'],use:{count:1,desc:'铁矿石请到装备详情中配合金币强化使用'}},
   dragonScale:{id:'dragonScale',name:'龙鳞',icon:'🛡️',desc:'稀有材料，可兑换高品质装备',dropRate:0.03,dropSources:['boss'],use:{equipMinQ:4,count:5,desc:'5龙鳞→随机黄金+装备'}},
@@ -2087,9 +2087,17 @@ function renderBagMaterials(){
       const md=MATERIALS[mid];const div=document.createElement('div');
       div.className='shop-item-row';
       div.innerHTML=`<div class="shop-item-icon">${md.icon}</div><div class="shop-item-info"><div class="shop-item-name">${md.name}<span style="font-size:9px;color:var(--muted);margin-left:4px">×${count}</span></div><div class="shop-item-desc">${md.desc} · <span style="color:var(--purple)">${md.use.desc}</span></div></div>`;
-      const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
-      ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
-      div.appendChild(ub);el.appendChild(div);
+      // 出售按钮
+      const sb=document.createElement('button');sb.className='btn btn-red btn-xs';sb.textContent='出售';
+      sb.addEventListener('click',(function(id,cnt){return function(){showMaterialSellModal(id,cnt);};})(mid,count));
+      div.appendChild(sb);
+      // 非铁矿石的材料保留使用按钮
+      if(md.id!=='ironOre'){
+        const ub=document.createElement('button');ub.className='btn btn-blue btn-xs';ub.textContent='使用';
+        ub.addEventListener('click',(function(id){return function(){useMaterial(id);};})(mid));
+        div.appendChild(ub);
+      }
+      el.appendChild(div);
     }
     totalItems+=mats.length;
   }
@@ -2209,6 +2217,36 @@ function exchangeSkillBook(index){
     renderBag();renderAll();
   });
 }
+// ═══ 材料出售 ═══
+function showMaterialSellModal(mid,count){
+  const md=MATERIALS[mid];if(!md||count<=0)return;
+  const ov=document.getElementById('modal-overlay'),box=document.getElementById('modal-box');
+  ov.classList.add('show');
+  let html=`<h3>💰 出售材料</h3><p style="font-size:12px;margin:8px 0">${md.icon} ${md.name} · 当前持有：<b>${count}</b>个</p>`;
+  html+=`<div style="display:flex;align-items:center;gap:8px;margin:8px 0"><button class="btn btn-sm" id="btn-sellm-minus">-</button>`;
+  html+=`<input type="number" id="inp-sellm-count" value="${Math.min(count,10)}" min="1" max="${count}" style="width:60px;text-align:center;border:1px solid var(--border);border-radius:4px;padding:4px;background:var(--card);color:var(--text)">`;
+  html+=`<button class="btn btn-sm" id="btn-sellm-plus">+</button>`;
+  html+=`<button class="btn btn-sm" id="btn-sellm-max">最大</button></div>`;
+  const unitGold=md.use&&md.use.gold?md.use.gold/md.use.count:1;
+  html+=`<p style="font-size:11px;color:var(--muted)" id="sellm-preview">预计获得：💰${Math.min(count,10)*unitGold} 金币</p>`;
+  html+=`<div style="display:flex;gap:8px"><button class="btn btn-red" style="flex:1" id="btn-sellm-confirm">💰 出售</button><button class="btn btn-sm" style="flex:1" id="btn-sellm-cancel">取消</button></div>`;
+  box.innerHTML=html;
+  const inp=document.getElementById('inp-sellm-count');
+  const preview=document.getElementById('sellm-preview');
+  function updatePreview(){preview.textContent=`预计获得：💰${Math.floor(parseInt(inp.value||0)*unitGold)} 金币`;}
+  document.getElementById('btn-sellm-minus').addEventListener('click',()=>{inp.value=Math.max(1,parseInt(inp.value||1)-1);updatePreview();});
+  document.getElementById('btn-sellm-plus').addEventListener('click',()=>{inp.value=Math.min(count,parseInt(inp.value||1)+1);updatePreview();});
+  document.getElementById('btn-sellm-max').addEventListener('click',()=>{inp.value=count;updatePreview();});
+  inp.addEventListener('input',updatePreview);
+  document.getElementById('btn-sellm-cancel').addEventListener('click',closeModal);
+  document.getElementById('btn-sellm-confirm').addEventListener('click',()=>{
+    const sellCount=Math.min(count,Math.max(1,parseInt(inp.value||1)));
+    const totalGold=Math.floor(sellCount*unitGold);
+    G.materials[mid]-=sellCount;G.gold+=totalGold;
+    addLog(`💰 出售${sellCount}个${md.name}，获得${totalGold}金币`,'sys');
+    closeModal();renderBag();renderAll();
+  });
+}
 // ═══ 材料使用 ═══
 function useMaterial(mid){
   const md=MATERIALS[mid];const count=G.materials[mid]||0;
@@ -2220,7 +2258,6 @@ function useMaterial(mid){
   // 确认提示
   let desc='';
   if(md.use.gold)desc=`使用${md.use.count}个${md.name}兑换 ${md.use.gold}金币，确定吗？`;
-  else if(md.use.diamond)desc=`使用${md.use.count}个${md.name}兑换 ${md.use.diamond}钻石，确定吗？`;
   else if(md.use.potion)desc=`使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}，确定吗？`;
   else if(md.use.atkBoost)desc=`使用${md.use.count}个${md.name}随机强化已装备武器攻击力+1~3，确定吗？`;
   else if(md.use.equipMinQ!==undefined)desc=`使用${md.use.count}个${md.name}兑换随机装备，确定吗？`;
@@ -2228,7 +2265,6 @@ function useMaterial(mid){
   confirmAction('使用材料',desc,()=>{
     G.materials[mid]-=md.use.count;
     if(md.use.gold){G.gold+=md.use.gold;addLog(`💰 使用${md.use.count}个${md.name}兑换${md.use.gold}金币`,'sys');}
-    else if(md.use.diamond){G.diamond+=md.use.diamond;addLog(`💎 使用${md.use.count}个${md.name}兑换${md.use.diamond}钻石`,'sys');}
     else if(md.use.potion){G.consumables[md.use.potion]=(G.consumables[md.use.potion]||0)+1;addLog(`🧪 使用${md.use.count}个${md.name}合成1个${md.use.potion==='hpPotion'?'小血瓶':'大血瓶'}`,'sys');}
     else if(md.use.atkBoost){
       const eqSlots=Object.keys(G.equipped).filter(k=>G.equipped[k]);
