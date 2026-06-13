@@ -786,10 +786,21 @@ body{
             <div id="anim-enemy" style="text-align:center;font-size:40px;transition:transform .15s">🐺</div>
           </div>
           <div id="buff-bar"></div>
+          <!-- 被动技能 -->
+          <div class="act-btns act-btns-sm" id="passive-skill-btns">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:2px">🟠 被动技能</div>
+          </div>
+          <!-- 主动技能 -->
+          <div class="act-btns act-btns-sm" id="active-skill-btns">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:2px">🟣 主动技能</div>
+          </div>
+          <!-- 攻击 -->
           <div class="act-btns" id="skill-btns">
             <button class="btn btn-red btn-lg" id="btn-attack">⚔️ 攻击</button>
           </div>
+          <!-- 消耗品 -->
           <div class="act-btns act-btns-sm" id="consumable-btns">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:2px">🧪 消耗品</div>
             <button class="btn btn-green" id="btn-use-hp-small">🧪 小血瓶</button>
             <button class="btn btn-blue" id="btn-use-hp-large">💉 大血瓶</button>
           </div>
@@ -2946,43 +2957,58 @@ function buildSkillItem(sk){
   return div;
 }
 function refreshSkillBtns(){
-  const container=document.getElementById('skill-btns');
-  if(!container)return;
-  // 保留攻击按钮
-  const attackBtn=document.getElementById('btn-attack');
-  // 清除除攻击按钮外的所有技能按钮
-  container.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
-  // 过滤主动技能 + 有冷却的被动buff技能
-  const activeSkills=G.skills.filter(s=>s.skillType==='active'||(s.skillType==='passive'&&s.type==='buff'&&s.cdMs>0));
-  // 同时也添加 skill2
+  const passiveContainer=document.getElementById('passive-skill-btns');
+  const activeContainer=document.getElementById('active-skill-btns');
+  const attackContainer=document.getElementById('skill-btns');
+  if(!attackContainer)return;
+  // 清除所有动态按钮
+  passiveContainer&&passiveContainer.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
+  activeContainer&&activeContainer.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
+  attackContainer.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
+
+  // 分离被动buff技能和主动技能
+  const passiveSkills=G.skills.filter(s=>s.skillType==='passive'&&s.type==='buff'&&s.cdMs>0);
+  const activeSkills=G.skills.filter(s=>s.skillType==='active');
   if(G.skill2&&G.skill2.skillType==='active')activeSkills.push(G.skill2);
-  // 按 id 去重
-  const seen=new Set();const uniqueSkills=[];
-  for(const sk of activeSkills){
-    if(!seen.has(sk.id)){seen.add(sk.id);uniqueSkills.push(sk);}
+
+  // 渲染被动buff技能
+  if(passiveContainer&&passiveSkills.length>0){
+    for(const sk of passiveSkills){
+      const btn=buildSkillBtn(sk);
+      passiveContainer.appendChild(btn);
+    }
   }
-  for(const sk of uniqueSkills){
-    const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
-    const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
-    const isPassiveBuff=sk.skillType==='passive'&&sk.type==='buff';
-    const btn=document.createElement('button');
-    btn.className='btn '+(isPassiveBuff?'btn-orange':'btn-purple')+' skill-dyn-btn btn-sm';
-    btn.textContent=sk.icon+' '+sk.name+(ready?'':` (${(cdLeft/1000).toFixed(1)}s)`);
-    btn.disabled=!ready;
-    btn.addEventListener('click',()=>{
-      if(!G.enemy||G.dead)return;
-      if(isPassiveBuff){
-        // 被动buff技能：直接应用buff
-        sk.lastUsed=now();
-        applySkillBuff(sk,gradeMult);
-        addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
-        computeStats();renderAll();
-      }else{
-        playerAttackWithSkill(sk);
-      }
-    });
-    container.appendChild(btn);
+  // 渲染主动技能
+  if(activeContainer&&activeSkills.length>0){
+    const seen=new Set();
+    for(const sk of activeSkills){
+      if(seen.has(sk.id))continue;
+      seen.add(sk.id);
+      const btn=buildSkillBtn(sk);
+      activeContainer.appendChild(btn);
+    }
   }
+}
+function buildSkillBtn(sk){
+  const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
+  const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+  const isPassiveBuff=sk.skillType==='passive'&&sk.type==='buff';
+  const btn=document.createElement('button');
+  btn.className='btn '+(isPassiveBuff?'btn-orange':'btn-purple')+' skill-dyn-btn btn-sm';
+  btn.textContent=sk.icon+' '+sk.name+(ready?'':` (${(cdLeft/1000).toFixed(1)}s)`);
+  btn.disabled=!ready;
+  btn.addEventListener('click',()=>{
+    if(!G.enemy||G.dead)return;
+    if(isPassiveBuff){
+      sk.lastUsed=now();
+      applySkillBuff(sk,gradeMult);
+      addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+      computeStats();renderAll();
+    }else{
+      playerAttackWithSkill(sk);
+    }
+  });
+  return btn;
 }
 function renderMaps(){
   const el=document.getElementById('map-list');
