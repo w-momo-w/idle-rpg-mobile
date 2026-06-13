@@ -4170,9 +4170,9 @@ function gameTick(){
       if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){
         // 自动战斗：交替进行普攻和技能，每次只做一个动作
         if(G.autoSkill){
-          // 优先释放被动buff技能（冷却长但效果重要），再释放主动技能
-          const passiveBuffSk=G.skills.find(s=>s.skillType==='passive'&&s.type==='buff'&&canUseSkill(s));
-          const sk=passiveBuffSk||G.skills.find(s=>canUseSkill(s));
+          // 优先释放有冷却时间的被动buff技能，再放主动技能（跳过cdMs=0永久被动，它们由下方循环自动刷新）
+          const passiveBuffSk=G.skills.find(s=>s.skillType==='passive'&&s.type==='buff'&&s.cdMs>0&&canUseSkill(s));
+          const sk=passiveBuffSk||G.skills.find(s=>s.cdMs>0&&canUseSkill(s));
           if(sk){
             // 技能可用 → 放技能
             G._lastAutoAtk=now();
