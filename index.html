@@ -2453,8 +2453,7 @@ function renderEnemy(){
   document.getElementById('en-ap').textContent=e._armorPierce?e._armorPierce+'%':'-';
   document.getElementById('en-crit').textContent=e._critRate?e._critRate+'%':'-';
   // Show death state
-  const actBtns=document.querySelector('.act-btns');
-  if(actBtns){actBtns.querySelectorAll('button').forEach(b=>b.disabled=G.dead);}
+  document.querySelectorAll('.act-btns').forEach(c=>c.querySelectorAll('button').forEach(b=>b.disabled=G.dead));
   // Enemy specials display
   let specialsHtml='';
   if(e.specials&&e.specials.length>0){
@@ -2971,21 +2970,31 @@ function refreshSkillBtns(){
   const activeSkills=G.skills.filter(s=>s.skillType==='active');
   if(G.skill2&&G.skill2.skillType==='active')activeSkills.push(G.skill2);
 
-  // 渲染被动buff技能
-  if(passiveContainer&&passiveSkills.length>0){
-    for(const sk of passiveSkills){
-      const btn=buildSkillBtn(sk);
-      passiveContainer.appendChild(btn);
+  // 渲染被动buff技能（无技能时隐藏容器）
+  if(passiveContainer){
+    if(passiveSkills.length>0){
+      passiveContainer.style.display='';
+      for(const sk of passiveSkills){
+        const btn=buildSkillBtn(sk);
+        passiveContainer.appendChild(btn);
+      }
+    }else{
+      passiveContainer.style.display='none';
     }
   }
-  // 渲染主动技能
-  if(activeContainer&&activeSkills.length>0){
-    const seen=new Set();
-    for(const sk of activeSkills){
-      if(seen.has(sk.id))continue;
-      seen.add(sk.id);
-      const btn=buildSkillBtn(sk);
-      activeContainer.appendChild(btn);
+  // 渲染主动技能（无技能时隐藏容器）
+  if(activeContainer){
+    if(activeSkills.length>0){
+      activeContainer.style.display='';
+      const seen=new Set();
+      for(const sk of activeSkills){
+        if(seen.has(sk.id))continue;
+        seen.add(sk.id);
+        const btn=buildSkillBtn(sk);
+        activeContainer.appendChild(btn);
+      }
+    }else{
+      activeContainer.style.display='none';
     }
   }
 }
