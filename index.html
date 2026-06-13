@@ -1385,19 +1385,22 @@ const ENEMY_SPECIALS=[
   {id:'enraged',icon:'😡',name:'狂暴',desc:'攻击力大幅提升',apply(e){e.atk=Math.floor(e.atk*1.5);}},
   {id:'hardened',icon:'🛡️',name:'硬化',desc:'防御+60%',apply(e){e.def=Math.floor(e.def*1.6);}},
   {id:'regenerating',icon:'💚',name:'再生',desc:'每秒回复5%HP',isRegen:true,regenPct:0.05},
-  {id:'evasive',icon:'🌀',name:'闪避',desc:'45%闪避攻击',dodge:45},
   {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹50%伤害',thorns:50},
   {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血35%',lifesteal:35},
   {id:'tough',icon:'💪',name:'坚韧',desc:'生命+60%',apply(e){e.hp=Math.floor(e.hp*1.6);e.maxHp=e.hp;}},
-  // 新增进攻属性
-  {id:'accurate',icon:'🎯',name:'精准',desc:'命中率+45%（降低玩家闪避）',hitRate:45},
   {id:'piercing',icon:'🗡️',name:'穿甲',desc:'无视55%玩家防御',armorPierce:55},
-  {id:'ferocious',icon:'🔥',name:'凶猛',desc:'暴击率+35%·暴伤220%',critRate:35,critDmg:220},
   // 减益效果
   {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害55%',dmgReduce:0.55},
   {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率45%',critReduce:45},
   {id:'drain',icon:'🕳️',name:'汲取',desc:'降低玩家攻速40%',atkSpdReduce:40},
 ];
+// 所有怪物默认拥有的基础属性（不占特殊属性名额）
+const ENEMY_BASE_TRAITS={
+  hitRate:15,   // 基础命中15%
+  dodge:15,     // 基础闪避15%
+  critRate:10,  // 基础暴击10%
+  critDmg:150,  // 基础暴伤150%
+};
 // Boss skills
 const ENEMY_SKILLS=[
   {name:'毁灭重击',icon:'💥',cdMs:8000,mult:2.5,desc:'250%伤害'},
@@ -1797,23 +1800,26 @@ function genMonster(){
 
   const enemy={name:mName,icon:mIcon,type,level:monLv,hp,maxHp:hp,atk,def,xp,gold,dropQ,originalName:template.name,specials:[],skill:null,skillLastUsed:0,dotDmg:0,dotUntil:0};
 
+  // 所有怪物默认拥有基础命中/闪避/暴击（不受特殊属性池影响）
+  const bt=ENEMY_BASE_TRAITS;
+  const typeBaseMult=type==='boss'?1.6:type==='elite'?1.3:1;
+  enemy._hitRate=Math.floor(bt.hitRate*typeBaseMult);
+  enemy._dodge=Math.floor(bt.dodge*typeBaseMult);
+  enemy._critRate=Math.floor(bt.critRate*typeBaseMult);
+  enemy._critDmg=Math.floor(bt.critDmg*typeBaseMult);
+
   // 普通怪物随机获得1个特殊属性（减益效果除外）
   // 30级以下新增进攻属性效果减半
   if(type==='normal'&&Math.random()<0.5){
     const normalPool=ENEMY_SPECIALS.filter(s=>!s.dmgReduce&&!s.critReduce&&!s.atkSpdReduce);
     if(normalPool.length>0){
       const sp=pick(normalPool);
-      const lvPenalty=monLv<30?0.5:1;
       enemy.specials.push({...sp});
       if(sp.apply)sp.apply(enemy);
       if(sp.isRegen)enemy._regen=sp.regenPct;
-      if(sp.dodge)enemy._dodge=sp.dodge;
       if(sp.thorns)enemy._thorns=sp.thorns;
       if(sp.lifesteal)enemy._lifesteal=sp.lifesteal;
-      if(sp.hitRate)enemy._hitRate=Math.floor(sp.hitRate*lvPenalty);
-      if(sp.armorPierce)enemy._armorPierce=Math.floor(sp.armorPierce*lvPenalty);
-      if(sp.critRate)enemy._critRate=Math.floor(sp.critRate*lvPenalty);
-      if(sp.critDmg)enemy._critDmg=Math.floor(sp.critDmg*lvPenalty);
+      if(sp.armorPierce)enemy._armorPierce=Math.floor(sp.armorPierce*(monLv<30?0.5:1));
     }
   }
 
@@ -1824,32 +1830,24 @@ function genMonster(){
     enemy.specials.push({...sp1});
     if(sp1.apply)sp1.apply(enemy);
     if(sp1.isRegen)enemy._regen=sp1.regenPct;
-    if(sp1.dodge)enemy._dodge=sp1.dodge;
     if(sp1.thorns)enemy._thorns=sp1.thorns;
     if(sp1.lifesteal)enemy._lifesteal=sp1.lifesteal;
     if(sp1.dmgReduce)enemy._dmgReduce=sp1.dmgReduce;
     if(sp1.critReduce)enemy._critReduce=sp1.critReduce;
     if(sp1.atkSpdReduce)enemy._atkSpdReduce=sp1.atkSpdReduce;
-    if(sp1.hitRate)enemy._hitRate=sp1.hitRate;
     if(sp1.armorPierce)enemy._armorPierce=sp1.armorPierce;
-    if(sp1.critRate)enemy._critRate=sp1.critRate;
-    if(sp1.critDmg)enemy._critDmg=sp1.critDmg;
     // 第二个属性：排除已选的
     const pool2=ENEMY_SPECIALS.filter(s=>s.id!==sp1.id);
     const sp2=pick(pool2);
     enemy.specials.push({...sp2});
     if(sp2.apply)sp2.apply(enemy);
     if(sp2.isRegen)enemy._regen=(enemy._regen||0)+sp2.regenPct;
-    if(sp2.dodge)enemy._dodge=(enemy._dodge||0)+sp2.dodge;
     if(sp2.thorns)enemy._thorns=(enemy._thorns||0)+sp2.thorns;
     if(sp2.lifesteal)enemy._lifesteal=(enemy._lifesteal||0)+sp2.lifesteal;
     if(sp2.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp2.dmgReduce);
     if(sp2.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp2.critReduce);
     if(sp2.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp2.atkSpdReduce);
-    if(sp2.hitRate)enemy._hitRate=(enemy._hitRate||0)+sp2.hitRate;
     if(sp2.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp2.armorPierce;
-    if(sp2.critRate)enemy._critRate=(enemy._critRate||0)+sp2.critRate;
-    if(sp2.critDmg)enemy._critDmg=Math.max(enemy._critDmg||0,sp2.critDmg);
   }
   if(type==='boss'){
     const shuffled=[...ENEMY_SPECIALS].sort(()=>Math.random()-0.5);
@@ -1858,16 +1856,12 @@ function genMonster(){
       enemy.specials.push({...sp});
       if(sp.apply)sp.apply(enemy);
       if(sp.isRegen)enemy._regen=(enemy._regen||0)+sp.regenPct;
-      if(sp.dodge)enemy._dodge=(enemy._dodge||0)+sp.dodge;
       if(sp.thorns)enemy._thorns=(enemy._thorns||0)+sp.thorns;
       if(sp.lifesteal)enemy._lifesteal=(enemy._lifesteal||0)+sp.lifesteal;
       if(sp.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp.dmgReduce);
       if(sp.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp.critReduce);
       if(sp.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp.atkSpdReduce);
-      if(sp.hitRate)enemy._hitRate=(enemy._hitRate||0)+sp.hitRate;
       if(sp.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp.armorPierce;
-      if(sp.critRate)enemy._critRate=(enemy._critRate||0)+sp.critRate;
-      if(sp.critDmg)enemy._critDmg=Math.max(enemy._critDmg||0,sp.critDmg);
     }
     // Boss 70%概率额外附带一个减益效果
     if(Math.random()<0.7){
@@ -2445,13 +2439,10 @@ function renderEnemy(){
   document.getElementById('en-hp').textContent=fmt(Math.max(0,e.hp))+'/'+fmt(e.maxHp);
   document.getElementById('en-hp-bar').style.width=(e.maxHp>0?Math.max(0,e.hp/e.maxHp*100):0)+'%';
   document.getElementById('en-atk').textContent=e.atk;document.getElementById('en-def').textContent=e.def;
-  // 显示新增属性（考虑精英/Boss加成）
-  const hitMult=(e.type==='elite'?1.3:e.type==='boss'?1.6:1);
-  const apMult=(e.type==='elite'?1.3:e.type==='boss'?1.6:1);
-  const crMult=(e.type==='elite'?1.3:e.type==='boss'?1.6:1);
-  document.getElementById('en-hit').textContent=e._hitRate?Math.floor(e._hitRate*hitMult)+'%':'-';
-  document.getElementById('en-ap').textContent=e._armorPierce?Math.floor(Math.min(100,e._armorPierce*apMult))+'%':'-';
-  document.getElementById('en-crit').textContent=e._critRate?Math.floor(Math.min(100,e._critRate*crMult))+'%':'-';
+  // 显示基础属性（已含精英/Boss加成，在genMonster时已乘好）
+  document.getElementById('en-hit').textContent=e._hitRate?e._hitRate+'%':'-';
+  document.getElementById('en-ap').textContent=e._armorPierce?e._armorPierce+'%':'-';
+  document.getElementById('en-crit').textContent=e._critRate?e._critRate+'%':'-';
   // Show death state
   const actBtns=document.querySelector('.act-btns');
   if(actBtns){actBtns.querySelectorAll('button').forEach(b=>b.disabled=G.dead);}
