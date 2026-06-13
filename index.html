@@ -4140,7 +4140,16 @@ function gameTick(){
         if(sk){
           // 技能可用 → 放技能
           G._lastAutoAtk=now();
-          playerAttack(true);
+          if(sk.type==='buff'){
+            // buff类技能直接应用，不走伤害逻辑
+            const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+            sk.lastUsed=now();
+            applySkillBuff(sk,gradeMult);
+            addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+            computeStats();renderAll();
+          }else{
+            playerAttack(true);
+          }
         }else{
           // 技能全在冷却 → 普攻
           G._lastAutoAtk=now();
