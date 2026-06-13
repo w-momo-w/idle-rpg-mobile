@@ -2952,8 +2952,8 @@ function refreshSkillBtns(){
   const attackBtn=document.getElementById('btn-attack');
   // 清除除攻击按钮外的所有技能按钮
   container.querySelectorAll('.skill-dyn-btn').forEach(b=>b.remove());
-  // 过滤主动技能
-  const activeSkills=G.skills.filter(s=>s.skillType==='active');
+  // 过滤主动技能 + 有冷却的被动buff技能
+  const activeSkills=G.skills.filter(s=>s.skillType==='active'||(s.skillType==='passive'&&s.type==='buff'&&s.cdMs>0));
   // 同时也添加 skill2
   if(G.skill2&&G.skill2.skillType==='active')activeSkills.push(G.skill2);
   // 按 id 去重
@@ -2964,13 +2964,22 @@ function refreshSkillBtns(){
   for(const sk of uniqueSkills){
     const cdLeft=sk.lastUsed?Math.max(0,sk.cdMs-(now()-sk.lastUsed)):0;const ready=cdLeft===0;
     const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+    const isPassiveBuff=sk.skillType==='passive'&&sk.type==='buff';
     const btn=document.createElement('button');
-    btn.className='btn btn-purple skill-dyn-btn btn-sm';
+    btn.className='btn '+(isPassiveBuff?'btn-orange':'btn-purple')+' skill-dyn-btn btn-sm';
     btn.textContent=sk.icon+' '+sk.name+(ready?'':` (${(cdLeft/1000).toFixed(1)}s)`);
     btn.disabled=!ready;
     btn.addEventListener('click',()=>{
       if(!G.enemy||G.dead)return;
-      playerAttackWithSkill(sk);
+      if(isPassiveBuff){
+        // 被动buff技能：直接应用buff
+        sk.lastUsed=now();
+        applySkillBuff(sk,gradeMult);
+        addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+        computeStats();renderAll();
+      }else{
+        playerAttackWithSkill(sk);
+      }
     });
     container.appendChild(btn);
   }
@@ -4125,7 +4134,9 @@ function gameTick(){
     if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){
       // 自动战斗：交替进行普攻和技能，每次只做一个动作
       if(G.autoSkill){
-        const sk=G.skills.find(s=>canUseSkill(s));
+        // 优先释放被动buff技能（冷却长但效果重要），再释放主动技能
+        const passiveBuffSk=G.skills.find(s=>s.skillType==='passive'&&s.type==='buff'&&canUseSkill(s));
+        const sk=passiveBuffSk||G.skills.find(s=>canUseSkill(s));
         if(sk){
           // 技能可用 → 放技能
           G._lastAutoAtk=now();
