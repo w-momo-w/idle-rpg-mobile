@@ -1388,7 +1388,6 @@ const ENEMY_SPECIALS=[
   {id:'thorny',icon:'🌵',name:'荆棘',desc:'反弹50%伤害',thorns:50},
   {id:'vampiric',icon:'🩸',name:'吸血',desc:'吸血35%',lifesteal:35},
   {id:'tough',icon:'💪',name:'坚韧',desc:'生命+60%',apply(e){e.hp=Math.floor(e.hp*1.6);e.maxHp=e.hp;}},
-  {id:'piercing',icon:'🗡️',name:'穿甲',desc:'无视55%玩家防御',armorPierce:55},
   // 减益效果
   {id:'weaken',icon:'🔻',name:'弱化',desc:'降低玩家伤害55%',dmgReduce:0.55},
   {id:'curse',icon:'☠️',name:'诅咒',desc:'降低玩家暴击率45%',critReduce:45},
@@ -1396,10 +1395,11 @@ const ENEMY_SPECIALS=[
 ];
 // 所有怪物默认拥有的基础属性（不占特殊属性名额）
 const ENEMY_BASE_TRAITS={
-  hitRate:15,   // 基础命中15%
-  dodge:15,     // 基础闪避15%
-  critRate:10,  // 基础暴击10%
-  critDmg:150,  // 基础暴伤150%
+  hitRate:15,     // 基础命中15%
+  dodge:15,       // 基础闪避15%
+  critRate:10,    // 基础暴击10%
+  critDmg:150,    // 基础暴伤150%
+  armorPierce:20, // 基础穿甲20%
 };
 // Boss skills
 const ENEMY_SKILLS=[
@@ -1800,13 +1800,14 @@ function genMonster(){
 
   const enemy={name:mName,icon:mIcon,type,level:monLv,hp,maxHp:hp,atk,def,xp,gold,dropQ,originalName:template.name,specials:[],skill:null,skillLastUsed:0,dotDmg:0,dotUntil:0};
 
-  // 所有怪物默认拥有基础命中/闪避/暴击（不受特殊属性池影响）
+  // 所有怪物默认拥有基础属性（不受特殊属性池影响）
   const bt=ENEMY_BASE_TRAITS;
   const typeBaseMult=type==='boss'?1.6:type==='elite'?1.3:1;
   enemy._hitRate=Math.floor(bt.hitRate*typeBaseMult);
   enemy._dodge=Math.floor(bt.dodge*typeBaseMult);
   enemy._critRate=Math.floor(bt.critRate*typeBaseMult);
   enemy._critDmg=Math.floor(bt.critDmg*typeBaseMult);
+  enemy._armorPierce=Math.floor(bt.armorPierce*typeBaseMult);
 
   // 普通怪物随机获得1个特殊属性（减益效果除外）
   // 30级以下新增进攻属性效果减半
@@ -1819,7 +1820,6 @@ function genMonster(){
       if(sp.isRegen)enemy._regen=sp.regenPct;
       if(sp.thorns)enemy._thorns=sp.thorns;
       if(sp.lifesteal)enemy._lifesteal=sp.lifesteal;
-      if(sp.armorPierce)enemy._armorPierce=Math.floor(sp.armorPierce*(monLv<30?0.5:1));
     }
   }
 
@@ -1835,7 +1835,6 @@ function genMonster(){
     if(sp1.dmgReduce)enemy._dmgReduce=sp1.dmgReduce;
     if(sp1.critReduce)enemy._critReduce=sp1.critReduce;
     if(sp1.atkSpdReduce)enemy._atkSpdReduce=sp1.atkSpdReduce;
-    if(sp1.armorPierce)enemy._armorPierce=sp1.armorPierce;
     // 第二个属性：排除已选的
     const pool2=ENEMY_SPECIALS.filter(s=>s.id!==sp1.id);
     const sp2=pick(pool2);
@@ -1847,7 +1846,6 @@ function genMonster(){
     if(sp2.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp2.dmgReduce);
     if(sp2.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp2.critReduce);
     if(sp2.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp2.atkSpdReduce);
-    if(sp2.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp2.armorPierce;
   }
   if(type==='boss'){
     const shuffled=[...ENEMY_SPECIALS].sort(()=>Math.random()-0.5);
@@ -1861,7 +1859,6 @@ function genMonster(){
       if(sp.dmgReduce)enemy._dmgReduce=Math.max(enemy._dmgReduce||0,sp.dmgReduce);
       if(sp.critReduce)enemy._critReduce=Math.max(enemy._critReduce||0,sp.critReduce);
       if(sp.atkSpdReduce)enemy._atkSpdReduce=Math.max(enemy._atkSpdReduce||0,sp.atkSpdReduce);
-      if(sp.armorPierce)enemy._armorPierce=(enemy._armorPierce||0)+sp.armorPierce;
     }
     // Boss 70%概率额外附带一个减益效果
     if(Math.random()<0.7){
