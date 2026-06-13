@@ -4161,41 +4161,45 @@ function gameTick(){
   if(G._slowUntil&&now()<G._slowUntil){G._slowed=true;}else{G._slowed=false;}
   if(G.autoAtk&&G.enemy&&G.enemy.hp>0){
     // 怪物刷新/复活后等待1秒再开始战斗，让玩家看清怪物
-    if(G._monsterSpawnTime&&now()-G._monsterSpawnTime<1000)return;
-    // 敌人汲取减益：降低攻速
-    const atkSpdReduce=G.enemy._atkSpdReduce||0;
-    const effectiveAtkSpd=Math.max(20,G.curAtkSpd+atkSpdReduce); // 攻速值越高越慢
-    const spd=Math.max(800,(G._slowed?effectiveAtkSpd*1.5:effectiveAtkSpd)*10);
-    if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){
-      // 自动战斗：交替进行普攻和技能，每次只做一个动作
-      if(G.autoSkill){
-        // 优先释放被动buff技能（冷却长但效果重要），再释放主动技能
-        const passiveBuffSk=G.skills.find(s=>s.skillType==='passive'&&s.type==='buff'&&canUseSkill(s));
-        const sk=passiveBuffSk||G.skills.find(s=>canUseSkill(s));
-        if(sk){
-          // 技能可用 → 放技能
-          G._lastAutoAtk=now();
-          if(sk.type==='buff'){
-            // buff类技能直接应用，不走伤害逻辑
-            const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
-            sk.lastUsed=now();
-            applySkillBuff(sk,gradeMult);
-            addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
-            computeStats();renderAll();
+    const spawnDelay=G._monsterSpawnTime&&now()-G._monsterSpawnTime<1000;
+    if(!spawnDelay){
+      // 敌人汲取减益：降低攻速
+      const atkSpdReduce=G.enemy._atkSpdReduce||0;
+      const effectiveAtkSpd=Math.max(20,G.curAtkSpd+atkSpdReduce); // 攻速值越高越慢
+      const spd=Math.max(800,(G._slowed?effectiveAtkSpd*1.5:effectiveAtkSpd)*10);
+      if(!G._lastAutoAtk||now()-G._lastAutoAtk>=spd){
+        // 自动战斗：交替进行普攻和技能，每次只做一个动作
+        if(G.autoSkill){
+          // 优先释放被动buff技能（冷却长但效果重要），再释放主动技能
+          const passiveBuffSk=G.skills.find(s=>s.skillType==='passive'&&s.type==='buff'&&canUseSkill(s));
+          const sk=passiveBuffSk||G.skills.find(s=>canUseSkill(s));
+          if(sk){
+            // 技能可用 → 放技能
+            G._lastAutoAtk=now();
+            if(sk.type==='buff'){
+              // buff类技能直接应用，不走伤害逻辑
+              const grade=sk.grade||'D';const gradeMult=SKILL_GRADE_MULT[grade]||1.0;
+              sk.lastUsed=now();
+              applySkillBuff(sk,gradeMult);
+              addLog(`✨ ${sk.icon} 使用 ${sk.name}（${grade}级·效果×${gradeMult}）！`,'skill');
+              computeStats();renderAll();
+            }else{
+              playerAttack(true);
+            }
           }else{
-            playerAttack(true);
+            // 技能全在冷却 → 普攻
+            G._lastAutoAtk=now();
+            playerAttack(false);
           }
         }else{
-          // 技能全在冷却 → 普攻
           G._lastAutoAtk=now();
           playerAttack(false);
         }
-      }else{
-        G._lastAutoAtk=now();
-        playerAttack(false);
       }
     }
   }
+  // 清除怪物刷新延迟标记（1秒后自动清除）
+  if(G._monsterSpawnTime&&now()-G._monsterSpawnTime>=1000)G._monsterSpawnTime=0;
   // 为永久被动技能（cdMs=0, type=buff）自动刷新buff，防止10秒后过期
   for(const sk of G.skills){
     if(sk.skillType!=='passive'||sk.type!=='buff'||sk.cdMs!==0)continue;
