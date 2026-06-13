@@ -1803,11 +1803,12 @@ function genMonster(){
   // 所有怪物默认拥有基础属性（不受特殊属性池影响）
   const bt=ENEMY_BASE_TRAITS;
   const typeBaseMult=type==='boss'?1.6:type==='elite'?1.3:1;
-  enemy._hitRate=Math.floor(bt.hitRate*typeBaseMult);
-  enemy._dodge=Math.floor(bt.dodge*typeBaseMult);
-  enemy._critRate=Math.floor(bt.critRate*typeBaseMult);
-  enemy._critDmg=Math.floor(bt.critDmg*typeBaseMult);
-  enemy._armorPierce=Math.floor(bt.armorPierce*typeBaseMult);
+  const lvBaseMult=monLv>=50?2:1; // 50级以上翻倍
+  enemy._hitRate=Math.floor(bt.hitRate*typeBaseMult*lvBaseMult);
+  enemy._dodge=Math.floor(bt.dodge*typeBaseMult*lvBaseMult);
+  enemy._critRate=Math.floor(bt.critRate*typeBaseMult*lvBaseMult);
+  enemy._critDmg=Math.floor(bt.critDmg*typeBaseMult*lvBaseMult);
+  enemy._armorPierce=Math.floor(bt.armorPierce*typeBaseMult*lvBaseMult);
 
   // 普通怪物随机获得1个特殊属性（减益效果除外）
   // 30级以下新增进攻属性效果减半
